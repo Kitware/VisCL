@@ -20,28 +20,43 @@ typedef vcl_string STRING_CLASS;
 #include <CL/cl.hpp>
 #endif
 
+#include <vil/vil_image_view.h>
+#include <vcl_map.h>
+
 class cl_manager
 {
 public:
 
   static cl_manager *inst();
-  
-  void init_opencl();
 
   const cl::Context &get_context() const { return context; }
   const cl::Device &get_device(int device = 0) const { return devices[device]; }
-  
+
   cl::Program *build_source(const char *source, int device = 0) const;
   cl::CommandQueue *create_queue(int device = 0);
-  
+
+  //This function will reformat image views to interleaved
+  template<class T>
+  cl::Image2D *create_image(vil_image_view<T> &img, bool norm = false);
+  template<class T>
+  cl::Buffer *create_buffer(T *, size_t len);
+
+
+  void report_system_specs(int device = 0);
+
 private:
 
   cl_manager();
   static cl_manager *inst_;
 
+  void init_opencl();
+  void make_pixel_format_map();
+
   vcl_vector<cl::Platform> platforms;
   cl::Context context;
   vcl_vector<cl::Device> devices;
+  vcl_map<vil_pixel_format, cl::ImageFormat> pixel_format_map;
+  vcl_map<vil_pixel_format, cl::ImageFormat> pixel_format_norm_map;
 };
 
 const char *print_cl_errstring(cl_int err);
