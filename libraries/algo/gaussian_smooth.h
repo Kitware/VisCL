@@ -14,7 +14,6 @@ public:
   template<class T>
   void smooth(vil_image_view<T> &img, float sigma);
 
-  template<>
   void smooth(vil_image_view<vxl_byte> &img, float sigma);
 
   void smooth(cl::Image2D *img, float sigma);
