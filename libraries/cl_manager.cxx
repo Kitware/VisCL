@@ -119,7 +119,7 @@ cl::Image2D *cl_manager::create_image(vil_image_view<T> &img, bool norm)
 //*****************************************************************************
 
 template<class T>
-cl::Buffer *create_buffer(T *buf, size_t len)
+cl::Buffer *cl_manager::create_buffer(T *buf, size_t len)
 {
   return new cl::Buffer(context, CL_MEM_READ_ONLY, len * sizeof(T), buf);
 }
