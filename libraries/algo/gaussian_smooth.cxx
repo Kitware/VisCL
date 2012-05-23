@@ -46,7 +46,7 @@ void gaussian_smooth::smooth(cl::Image2D *img, float sigma)
   filter[2] = params.filt0();
 
   cl::Buffer *smoothing_kernel = cl_manager::inst()->create_buffer(filter, 5);
-  queue.enqueueWriteBuffer(smoothing_kernel, CL_TRUE, 0, 5 * sizeof(float), filter);
+ // queue.enqueueWriteBuffer(smoothing_kernel, CL_TRUE, 0, 5 * sizeof(float), filter);
 
   //  cl::Image2D working(context,
   //                  CL_MEM_READ_WRITE,
