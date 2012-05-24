@@ -1,9 +1,4 @@
-#ifndef SCALE_SPACE_CL_
-#define SCALE_SPACE_CL_
 
-#define STRINGIFY(A) #A
-
-const char *gaussian_smooth_source = STRINGIFY(
 
 __constant sampler_t imageSampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP | CLK_FILTER_NEAREST;
 
@@ -46,6 +41,3 @@ __kernel void conv_y(__read_only image2d_t input, __global const float *filter, 
   write_imagef(output, coord, temp);
 }
 
-);
-
-#endif
