@@ -4,7 +4,8 @@
 #include <vil/algo/vil_gauss_filter.h>
 
 #include "cl_manager.h"
-#include "algo/gaussian_smooth.cl"
+
+extern const char* gaussian_smooth_source;
 
 //*****************************************************************************
 
