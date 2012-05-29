@@ -1,5 +1,7 @@
 #include "cl_manager.h"
 
+#include <boost/make_shared.hpp>
+
 #include <vcl_iostream.h>
 #include <vil/vil_copy.h>
 #include <vcl_sstream.h>
@@ -50,13 +52,13 @@ void cl_manager::init_opencl()
 
 //*****************************************************************************
 
-cl::Program *cl_manager::build_source(const char *source, int device) const
+cl_program_t cl_manager::build_source(const char *source, int device) const
 {
   vcl_vector<cl::Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
   cl::Program::Sources source_(1, std::make_pair(source, strlen(source)+1));
 
   // Make program of the source code in the context
-  cl::Program *program = new cl::Program(context, source_);
+  cl_program_t program = boost::make_shared<cl::Program>(cl::Program(context, source_));
 
   // Build program for these specific devices
   try {
@@ -76,52 +78,51 @@ cl::Program *cl_manager::build_source(const char *source, int device) const
 
 //*****************************************************************************
 
-cl::CommandQueue *cl_manager::create_queue(int device)
+cl_queue_t cl_manager::create_queue(int device)
 {
-  return new cl::CommandQueue(context, devices[device]);
+  return boost::make_shared<cl::CommandQueue>(cl::CommandQueue(context, devices[device]));
 }
 
 //*****************************************************************************
 
+//Does NOT support multiplane images or non-continuous memory
 template<class T>
-cl::Image2D *cl_manager::create_image(vil_image_view<T> &img, bool norm)
+cl_image cl_manager::create_image(const vil_image_view<T> &img)
 {
   vil_pixel_format pf = img.pixel_format();
   vcl_map<vil_pixel_format, cl::ImageFormat>::iterator itr;
-  if (norm)
-  {
-    if ((itr = pixel_format_norm_map.find(pf)) == pixel_format_norm_map.end())
-      return NULL;
-  }
-  else
-  {
-    if ((itr = pixel_format_map.find(pf)) == pixel_format_map.end())
-      return NULL;
-  }
-  
-  if (img.nplanes() == 3 || img.nplanes() == 4)
-  {
-    vil_image_view<T> img_to_write = vil_image_view<T>(img.ni(), img.nj(), 1, img.nplanes());
-    vil_copy_reformat(img, img_to_write);
-    img = img_to_write;
-  }
+  if ((itr = pixel_format_map.find(pf)) == pixel_format_map.end())
+    return cl_image();
 
-  //Does not deal with non continuous memory atm
-  return new cl::Image2D(context,
-                         CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR,
-                         itr->second,
-                         img.ni(),
-                         img.nj(),
-                         0,
-                         (T *)img.top_left_ptr());
+  const cl::ImageFormat &img_fmt = itr->second;
+  return cl_image(boost::make_shared<cl::Image2D>(cl::Image2D(context,
+                                                  CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                                                  img_fmt,
+                                                  img.ni(),
+                                                  img.nj(),
+                                                  0,
+                                                  (T *)img.top_left_ptr())));
+}
+
+//*****************************************************************************
+
+cl_image cl_manager::create_image(const cl::ImageFormat &img_frmt, cl_mem_flags flags, size_t ni, size_t nj)
+{
+  return cl_image(boost::make_shared<cl::Image2D>(cl::Image2D(context,
+                                                              flags,
+                                                              img_frmt,
+                                                              ni,
+                                                              nj,
+                                                              0,
+                                                              0)));
 }
 
 //*****************************************************************************
 
 template<class T>
-cl::Buffer *cl_manager::create_buffer(T *buf, size_t len)
+cl_buffer cl_manager::create_buffer(cl_mem_flags flags, size_t len)
 {
-  return new cl::Buffer(context, CL_MEM_READ_ONLY, len * sizeof(T), buf);
+  return cl_buffer(boost::make_shared<cl::Buffer>(cl::Buffer(context, flags, len * sizeof(T))), len);
 }
 
 //*****************************************************************************
@@ -168,32 +169,11 @@ void cl_manager::report_system_specs(int device)
 
 //*****************************************************************************
 
+//http://www.khronos.org/registry/cl/sdk/1.0/docs/man/xhtml/cl_image_format.html
 void cl_manager::make_pixel_format_map()
 {
-  int offsets[3] = {0,
-                    VIL_PIXEL_FORMAT_RGB_UINT_32 - VIL_PIXEL_FORMAT_UINT_32,
-                    VIL_PIXEL_FORMAT_RGBA_UINT_32 - VIL_PIXEL_FORMAT_UINT_32};
-  cl_channel_order order[3] = {CL_INTENSITY, CL_RGBx, CL_RGBA};
-  for (unsigned int i = 0; i < 3; i++)
-  {
-    vcl_cout << offsets[i] << "\n";
-    pixel_format_map[(vil_pixel_format)(VIL_PIXEL_FORMAT_UINT_32+offsets[i])] = cl::ImageFormat(order[i], CL_UNSIGNED_INT32);
-    pixel_format_map[(vil_pixel_format)(VIL_PIXEL_FORMAT_INT_32+offsets[i])] = cl::ImageFormat(order[i], CL_SIGNED_INT32);
-    pixel_format_map[(vil_pixel_format)(VIL_PIXEL_FORMAT_UINT_16+offsets[i])] = cl::ImageFormat(order[i], CL_UNSIGNED_INT16);
-    pixel_format_map[(vil_pixel_format)(VIL_PIXEL_FORMAT_INT_16+offsets[i])] = cl::ImageFormat(order[i], CL_SIGNED_INT16);
-    pixel_format_map[(vil_pixel_format)(VIL_PIXEL_FORMAT_BYTE+offsets[i])] = cl::ImageFormat(order[i], CL_UNSIGNED_INT8);
-    pixel_format_map[(vil_pixel_format)(VIL_PIXEL_FORMAT_SBYTE+offsets[i])] = cl::ImageFormat(order[i], CL_SIGNED_INT8);
-    pixel_format_map[(vil_pixel_format)(VIL_PIXEL_FORMAT_FLOAT+offsets[i])] = cl::ImageFormat(order[i], CL_FLOAT);
-    //pixel_format_map[VIL_PIXEL_FORMAT_DOUBLE] needs extension
-  }
-
-  for (unsigned int i = 0; i < 3; i++)
-  {
-    pixel_format_norm_map[(vil_pixel_format)(VIL_PIXEL_FORMAT_UINT_16+offsets[i])] = cl::ImageFormat(order[i], CL_UNORM_INT16);
-    pixel_format_norm_map[(vil_pixel_format)(VIL_PIXEL_FORMAT_INT_16+offsets[i])] = cl::ImageFormat(order[i], CL_SNORM_INT16);
-    pixel_format_norm_map[(vil_pixel_format)(VIL_PIXEL_FORMAT_BYTE+offsets[i])] = cl::ImageFormat(order[i], CL_UNORM_INT8);
-    pixel_format_norm_map[(vil_pixel_format)(VIL_PIXEL_FORMAT_SBYTE+offsets[i])] = cl::ImageFormat(order[i], CL_SNORM_INT8);
-  }
+  pixel_format_map[VIL_PIXEL_FORMAT_FLOAT] = cl::ImageFormat(CL_INTENSITY, CL_FLOAT);
+  pixel_format_map[VIL_PIXEL_FORMAT_BYTE] = cl::ImageFormat(CL_INTENSITY, CL_UNORM_INT8);
 }
 
 //*****************************************************************************
@@ -254,8 +234,12 @@ const char *print_cl_errstring(cl_int err)
 
 //*****************************************************************************
 
-template cl::Image2D *cl_manager::create_image<float>(vil_image_view<float> &, bool);
-template cl::Image2D *cl_manager::create_image<vxl_byte>(vil_image_view<vxl_byte> &, bool);
+template cl_image cl_manager::create_image<float>(const vil_image_view<float> &);
+template cl_image cl_manager::create_image<vxl_byte>(const vil_image_view<vxl_byte> &);
 
-template cl::Buffer *cl_manager::create_buffer<float>(float *, size_t);
-template cl::Buffer *cl_manager::create_buffer<vxl_byte>(vxl_byte *, size_t);
+template cl_buffer cl_manager::create_buffer<float>(float *, cl_mem_flags, size_t);
+template cl_buffer cl_manager::create_buffer<vxl_byte>(vxl_byte *, cl_mem_flags, size_t);
+
+template cl_buffer cl_manager::create_buffer<float>(cl_mem_flags, size_t);
+template cl_buffer cl_manager::create_buffer<vxl_byte>(cl_mem_flags, size_t);
+

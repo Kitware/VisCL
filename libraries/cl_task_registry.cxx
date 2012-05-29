@@ -1,6 +1,6 @@
 #include "cl_task_registry.h"
 
-#include "algo/gaussian_smooth.h"
+#include "gaussian_smooth.h"
 
 cl_task_registry *cl_task_registry::inst_ = 0;
 

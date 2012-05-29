@@ -1,9 +1,7 @@
-
-
-__constant sampler_t imageSampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP | CLK_FILTER_NEAREST;
+__constant sampler_t imageSampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP | CLK_FILTER_NEAREST; 
 
 /* Copy input 2D image to output 2D image */
-__kernel void conv_x(__read_only image2d_t input, __global const float *filter, __write_only image2d_t output, uint2 dims)
+__kernel void smoothHoriz(__read_only image2d_t input, __global const float *filter, __write_only image2d_t output, uint2 dims)
 {
   int2 coord = (int2)(get_global_id(0), get_global_id(1));
   float4 temp = 0.0f;
@@ -22,7 +20,7 @@ __kernel void conv_x(__read_only image2d_t input, __global const float *filter, 
   write_imagef(output, coord, temp);
 }
 
-__kernel void conv_y(__read_only image2d_t input, __global const float *filter, __write_only image2d_t output, uint2 dims)
+__kernel void smoothVert(__read_only image2d_t input, __global const float *filter, __write_only image2d_t output, uint2 dims)
 {
   int2 coord = (int2)(get_global_id(0), get_global_id(1));
   float4 temp = 0.0f;
@@ -40,4 +38,3 @@ __kernel void conv_y(__read_only image2d_t input, __global const float *filter, 
   
   write_imagef(output, coord, temp);
 }
-
