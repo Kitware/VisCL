@@ -7,7 +7,7 @@
 
 #include "cl_manager.h"
 #include "cl_task_registry.h"
-#include "gaussian_smooth.h"
+#include "hessian.h"
 
 int main(int argc, char *argv[])
 {
@@ -18,11 +18,8 @@ int main(int argc, char *argv[])
   vil_convert_planes_to_grey(img_color, img);
   //vcl_cout << print_cl_errstring(-30) << "\n";
 
-  gaussian_smooth *gs = (gaussian_smooth *)cl_task_registry::inst()->new_task("gaussian_smooth");
-  gs->smooth(img, output, 1.0f);
-  vil_image_view<vxl_byte> outb;
-  vil_convert_cast(output, outb);
-  vil_save(outb, "out.png");
+  hessian_t gs = NEW_TASK(hessian);
+  gs->detect(img, 1000);
 
   return 0;
 }

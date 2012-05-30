@@ -1,17 +1,16 @@
 
 set(OCL_SRC_FILES
     gaussian_smooth.cl
-    FAST.cl
+    hessian.cl 
 )
 
 set(CXX_SRC_FILES
     cl_manager.h               cl_manager.cxx
+    cl_task.h                  cl_task.cxx
     cl_image.h                 cl_image.cxx
     cl_buffer.h                cl_buffer.cxx
-    cl_task.h                  cl_task.cxx
     cl_task_registry.h         cl_task_registry.cxx
-    cl_header.h
-    FAST.h                     FAST.cxx
+    hessian.h                  hessian.cxx
     gaussian_smooth.h          gaussian_smooth.cxx
 )
 

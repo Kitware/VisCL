@@ -63,34 +63,29 @@ cl_image gaussian_smooth::smooth(const cl_image &img, float sigma) const
   cl_image working = cl_manager::inst()->create_image(img.format(), CL_MEM_READ_WRITE, ni, nj);
   cl_image result = cl_manager::inst()->create_image(img.format(), CL_MEM_WRITE_ONLY, ni, nj);
 
-  cl_uint2 image_dims = {ni, nj};
-
   // Set arguments to kernel
   conv_x->setArg(0, *img().get());
   conv_x->setArg(1, *smoothing_kernel().get());
   conv_x->setArg(2, *working().get());
-  conv_x->setArg(3, image_dims);
 
   // Set arguments to kernel
   conv_y->setArg(0, *working().get());
   conv_y->setArg(1, *smoothing_kernel().get());
   conv_y->setArg(2, *result().get());
-  conv_y->setArg(3, image_dims);
 
   //Run the kernel on specific ND range
   cl::NDRange global(ni, nj);
   cl::NDRange local(1,1);
 
-  queue->enqueueNDRangeKernel(*conv_x, cl::NullRange, global, cl::NullRange);
+  queue->enqueueNDRangeKernel(*conv_x.get(), cl::NullRange, global, cl::NullRange);
   queue->enqueueBarrier();
-  queue->enqueueNDRangeKernel(*conv_y, cl::NullRange, global, cl::NullRange);
+  queue->enqueueNDRangeKernel(*conv_y.get(), cl::NullRange, global, cl::NullRange);
   queue->finish();
 
   return result;
 }
 
 //*****************************************************************************
-
 
 template void gaussian_smooth::smooth(const vil_image_view<vxl_byte> &img, vil_image_view<vxl_byte> &output, float sigma) const;
 template void gaussian_smooth::smooth(const vil_image_view<float> &img, vil_image_view<float> &output, float sigma) const;

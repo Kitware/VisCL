@@ -2,6 +2,9 @@
 #define CL_TASK_REGISTRY
 
 #include "cl_task.h"
+#include <boost/make_shared.hpp>
+
+#define NEW_TASK(T) boost::shared_ptr<T>((T *)cl_task_registry::inst()->new_task(vcl_string(#T)))
 
 class cl_task_registry
 {

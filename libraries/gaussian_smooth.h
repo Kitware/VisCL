@@ -26,4 +26,6 @@ private:
   cl_queue_t queue;
 };
 
+typedef boost::shared_ptr<gaussian_smooth> gaussian_smooth_t;
+
 #endif
