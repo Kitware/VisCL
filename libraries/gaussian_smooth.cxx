@@ -51,14 +51,14 @@ void gaussian_smooth::smooth(const vil_image_view<T> &img, vil_image_view<T> &ou
 cl_image gaussian_smooth::smooth(const cl_image &img, float sigma) const
 {
   vil_gauss_filter_5tap_params params(sigma);
-  float *filter = new float[5];
+  float filter[5];
   filter[0] = filter[4] = (float)params.filt2();
   filter[1] = filter[3] = (float)params.filt1();
   filter[2] = (float)params.filt0();
 
   cl_buffer smoothing_kernel = cl_manager::inst()->create_buffer<float>(CL_MEM_READ_ONLY, 5);
   queue->enqueueWriteBuffer(*smoothing_kernel().get(), CL_TRUE, 0, smoothing_kernel.mem_size(), filter);
- 
+
   size_t ni = img.ni(), nj = img.nj();
   cl_image working = cl_manager::inst()->create_image(img.format(), CL_MEM_READ_WRITE, ni, nj);
   cl_image result = cl_manager::inst()->create_image(img.format(), CL_MEM_WRITE_ONLY, ni, nj);

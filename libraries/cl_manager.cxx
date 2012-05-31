@@ -237,9 +237,13 @@ const char *print_cl_errstring(cl_int err)
 template cl_image cl_manager::create_image<float>(const vil_image_view<float> &);
 template cl_image cl_manager::create_image<vxl_byte>(const vil_image_view<vxl_byte> &);
 
-template cl_buffer cl_manager::create_buffer<float>(float *, cl_mem_flags, size_t);
-template cl_buffer cl_manager::create_buffer<vxl_byte>(vxl_byte *, cl_mem_flags, size_t);
+//template cl_buffer cl_manager::create_buffer<float>(float *, cl_mem_flags, size_t);
+//template cl_buffer cl_manager::create_buffer<vxl_byte>(vxl_byte *, cl_mem_flags, size_t);
 
 template cl_buffer cl_manager::create_buffer<float>(cl_mem_flags, size_t);
 template cl_buffer cl_manager::create_buffer<vxl_byte>(cl_mem_flags, size_t);
+template cl_buffer cl_manager::create_buffer<int>(cl_mem_flags, size_t);
+template cl_buffer cl_manager::create_buffer<cl_int2>(cl_mem_flags, size_t);
+
+
 

@@ -9,6 +9,7 @@ set(CXX_SRC_FILES
     cl_task.h                  cl_task.cxx
     cl_image.h                 cl_image.cxx
     cl_buffer.h                cl_buffer.cxx
+    cl_util.h                  cl_util.cxx
     cl_task_registry.h         cl_task_registry.cxx
     hessian.h                  hessian.cxx
     gaussian_smooth.h          gaussian_smooth.cxx

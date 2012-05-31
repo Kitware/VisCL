@@ -4,6 +4,7 @@
 
 #include "cl_task_registry.h"
 #include "cl_manager.h"
+#include "cl_util.h"
 
 #include "gaussian_smooth.h"
 
@@ -53,7 +54,7 @@ void hessian::detect(const vil_image_view<T> &img, unsigned int max_keypoints) c
   {
     for (unsigned int j = 0; j < output.nj(); j++)
     {
-      vcl_cout << (int)output(i,j) << " ";
+      //vcl_cout << (int)output(i,j) << " ";
       if (output(i,j)) {
         outfile << i << " " << j << "\n";
         count++;
@@ -70,8 +71,14 @@ void hessian::detect(const vil_image_view<T> &img, unsigned int max_keypoints) c
 cl_image hessian::detect(const cl_image &img, unsigned int max_keypoints) const
 {
   gaussian_smooth_t gs = NEW_TASK(gaussian_smooth);
-  cl_image smoothed = gs->smooth(img, 2.0);
+  cl_image smoothed = gs->smooth(img, 2.0f);
 
+  //int count[1];
+  //count[0] = 0;
+  //cl_buffer counter = cl_manager::inst()->create_buffer<int>(CL_MEM_READ_WRITE, 1);
+  //queue->enqueueWriteBuffer(*counter().get(), CL_TRUE, 0, counter.mem_size(), count);
+
+  //boost::shared_ptr<cl_int2> kpts(new cl_int2[max_keypoints]);
   size_t ni = img.ni(), nj = img.nj();
   cl::ImageFormat detimg_fmt(CL_INTENSITY, CL_FLOAT);
   cl_image detimg = cl_manager::inst()->create_image(detimg_fmt, CL_MEM_READ_WRITE, ni, nj);
@@ -95,6 +102,9 @@ cl_image hessian::detect(const cl_image &img, unsigned int max_keypoints) const
   queue->enqueueBarrier();
   queue->enqueueNDRangeKernel(*detect_extrema.get(), cl::NullRange, global, cl::NullRange);
   queue->finish();
+
+  //save_cl_image<float>(queue, detimg, "dethes.png");
+  save_cl_image<unsigned char>(queue, kptmap, "kptmap.png");
 
   return kptmap;
 }

@@ -6,8 +6,7 @@ __kernel void det_hessian(__read_only image2d_t input, __write_only image2d_t ou
   int2 pixel = (int2)(get_global_id(0), get_global_id(1));
   float4 H = 0.0f;
 
-  float center2 = read_imagef(input, imageSampler, pixel).x;
-  center2 += center2;
+  float center2 = 2*read_imagef(input, imageSampler, pixel).x;
   H.x = read_imagef(input, imageSampler, pixel + (int2)(1,0)).x - center2 +
         read_imagef(input, imageSampler, pixel + (int2)(-1,0)).x;
   H.y = read_imagef(input, imageSampler, pixel + (int2)(0,1)).x - center2 +
@@ -28,32 +27,17 @@ __kernel void detect_extrema(__read_only image2d_t detimg, __write_only image2d_
 
   unsigned char kpt = 0;
   float val = read_imagef(detimg, imageSampler, pixel).x;
-  float up = read_imagef(detimg, imageSampler, pixel + (int2)(0,1)).x;
-  if (up < val)
+
+  if (read_imagef(detimg, imageSampler, pixel + (int2)(0,1)).x > val &&
+      read_imagef(detimg, imageSampler, pixel + (int2)(1,1)).x > val &&
+      read_imagef(detimg, imageSampler, pixel + (int2)(1,0)).x > val &&
+      read_imagef(detimg, imageSampler, pixel + (int2)(1,-1)).x > val &&
+      read_imagef(detimg, imageSampler, pixel + (int2)(0,-1)).x > val &&
+      read_imagef(detimg, imageSampler, pixel + (int2)(-1,-1)).x > val &&
+      read_imagef(detimg, imageSampler, pixel + (int2)(-1,0)).x > val &&
+      read_imagef(detimg, imageSampler, pixel + (int2)(-1,1)).x > val)
   {
-    if (read_imagef(detimg, imageSampler, pixel + (int2)(1,1)).x < val &&
-        read_imagef(detimg, imageSampler, pixel + (int2)(1,0)).x < val &&
-        read_imagef(detimg, imageSampler, pixel + (int2)(1,-1)).x < val &&
-        read_imagef(detimg, imageSampler, pixel + (int2)(0,-1)).x < val &&
-        read_imagef(detimg, imageSampler, pixel + (int2)(-1,-1)).x < val &&
-        read_imagef(detimg, imageSampler, pixel + (int2)(-1,0)).x < val &&
-        read_imagef(detimg, imageSampler, pixel + (int2)(-1,1)).x < val)
-    {
-      kpt = 1;
-    }
-  }
-  else if (up > val)
-  {
-    if (read_imagef(detimg, imageSampler, pixel + (int2)(1,1)).x > val &&
-        read_imagef(detimg, imageSampler, pixel + (int2)(1,0)).x > val &&
-        read_imagef(detimg, imageSampler, pixel + (int2)(1,-1)).x > val &&
-        read_imagef(detimg, imageSampler, pixel + (int2)(0,-1)).x > val &&
-        read_imagef(detimg, imageSampler, pixel + (int2)(-1,-1)).x > val &&
-        read_imagef(detimg, imageSampler, pixel + (int2)(-1,0)).x > val &&
-        read_imagef(detimg, imageSampler, pixel + (int2)(-1,1)).x > val)
-    {
-      kpt = 1;
-    }
+    kpt = 1;
   }
 
   write_imageui(extrema, pixel, kpt);
