@@ -3,6 +3,7 @@
 
 #include "cl_task.h"
 #include "cl_image.h"
+#include "cl_buffer.h"
 
 #include <vil/vil_image_view.h>
 
@@ -14,7 +15,7 @@ public:
 
   template <class T>
   void detect(const vil_image_view<T> &img, unsigned int max_keypoints) const;
-  cl_image detect(const cl_image &img, unsigned int max_keypoints) const;
+  void hessian::detect(const cl_image &img, unsigned int max_keypoints, cl_buffer &kpts, cl_buffer &numkpts) const;
 
 private:
 

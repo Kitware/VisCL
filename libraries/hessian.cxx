@@ -33,66 +33,56 @@ template <class T>
 void hessian::detect(const vil_image_view<T> &img, unsigned int max_keypoints) const
 {
   cl_image img_cl = cl_manager::inst()->create_image<T>(img);
-  cl_image kptmap = detect(img_cl, max_keypoints);
+  cl_buffer kpts, numkpts;
+  detect(img_cl, max_keypoints, kpts, numkpts);
 
-  cl::size_t<3> origin;
-  origin.push_back(0);
-  origin.push_back(0);
-  origin.push_back(0);
+  int num[1];
+  queue->enqueueReadBuffer(*numkpts().get(), CL_TRUE, 0, numkpts.mem_size(), num);
 
-  cl::size_t<3> region;
-  region.push_back(img.ni());
-  region.push_back(img.nj());
-  region.push_back(1);
+  vcl_cout << numkpts.mem_size() << " " << num[0] << " " << kpts.mem_size() << "\n";
+  vcl_vector<cl_int2> keypoints(num[0]);
+  queue->enqueueReadBuffer(*kpts().get(), CL_TRUE, 0, num[0] * sizeof(cl_int2), keypoints.data());
 
-  vil_image_view<vxl_byte> output(img.ni(), img.nj());
-  queue->enqueueReadImage(*kptmap().get(),  CL_TRUE, origin, region, 0, 0, (float *)output.top_left_ptr());
-
-  unsigned int count = 0;
   vcl_ofstream outfile("kpts.txt");
-  for (unsigned int i = 0; i < output.ni(); i++)
+  for (unsigned int i = 0; i < keypoints.size(); i++)
   {
-    for (unsigned int j = 0; j < output.nj(); j++)
-    {
-      //vcl_cout << (int)output(i,j) << " ";
-      if (output(i,j)) {
-        outfile << i << " " << j << "\n";
-        count++;
-      }
-    }
+    outfile << keypoints[i].s[0] << " " << keypoints[i].s[1] << "\n";
   }
 
-  vcl_cout << count << "\n";
+  vcl_cout << keypoints.size() << "\n";
   outfile.close();
 }
 
 //*****************************************************************************
 
-cl_image hessian::detect(const cl_image &img, unsigned int max_keypoints) const
+void hessian::detect(const cl_image &img, unsigned int max_keypoints, cl_buffer &kpts, cl_buffer &numkpts) const
 {
+  float thresh = 0.0f, scale = 4.0f;
   gaussian_smooth_t gs = NEW_TASK(gaussian_smooth);
-  cl_image smoothed = gs->smooth(img, 2.0f);
+  cl_image smoothed = gs->smooth(img, scale);
 
-  //int count[1];
-  //count[0] = 0;
-  //cl_buffer counter = cl_manager::inst()->create_buffer<int>(CL_MEM_READ_WRITE, 1);
-  //queue->enqueueWriteBuffer(*counter().get(), CL_TRUE, 0, counter.mem_size(), count);
+  int count[1];
+  count[0] = 0;
+  numkpts = cl_manager::inst()->create_buffer<int>(CL_MEM_READ_WRITE, 1);
+  queue->enqueueWriteBuffer(*numkpts().get(), CL_TRUE, 0, numkpts.mem_size(), count);
 
-  //boost::shared_ptr<cl_int2> kpts(new cl_int2[max_keypoints]);
+  kpts = cl_manager::inst()->create_buffer<cl_int2>(CL_MEM_WRITE_ONLY, max_keypoints);
+
   size_t ni = img.ni(), nj = img.nj();
   cl::ImageFormat detimg_fmt(CL_INTENSITY, CL_FLOAT);
   cl_image detimg = cl_manager::inst()->create_image(detimg_fmt, CL_MEM_READ_WRITE, ni, nj);
 
-  cl::ImageFormat kptmap_fmt(CL_R, CL_UNSIGNED_INT8);
-  cl_image kptmap = cl_manager::inst()->create_image(kptmap_fmt, CL_MEM_WRITE_ONLY, ni, nj);
-
   // Set arguments to kernel
   det_hessian->setArg(0, *smoothed().get());
   det_hessian->setArg(1, *detimg().get());
+  det_hessian->setArg(2, scale);
   
   // Set arguments to kernel
   detect_extrema->setArg(0, *detimg().get());
-  detect_extrema->setArg(1, *kptmap().get());
+  detect_extrema->setArg(1, max_keypoints);
+  detect_extrema->setArg(2, thresh);
+  detect_extrema->setArg(3, *numkpts().get());
+  detect_extrema->setArg(4, *kpts().get());
   
   //Run the kernel on specific ND range
   cl::NDRange global(ni, nj);
@@ -104,9 +94,6 @@ cl_image hessian::detect(const cl_image &img, unsigned int max_keypoints) const
   queue->finish();
 
   //save_cl_image<float>(queue, detimg, "dethes.png");
-  save_cl_image<unsigned char>(queue, kptmap, "kptmap.png");
-
-  return kptmap;
 }
 
 //*****************************************************************************

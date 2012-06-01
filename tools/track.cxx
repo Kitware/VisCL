@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
   //vcl_cout << print_cl_errstring(-30) << "\n";
 
   hessian_t gs = NEW_TASK(hessian);
-  gs->detect(img, 1000);
+  gs->detect(img, 100000);
 
   return 0;
 }
