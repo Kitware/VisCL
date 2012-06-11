@@ -1,5 +1,6 @@
 #include "cl_buffer.h"
 
+//*****************************************************************************
 
 cl_buffer::cl_buffer(const boost::shared_ptr<cl::Buffer> &buffer, size_t length) : buf(buffer), len_(length)
 {

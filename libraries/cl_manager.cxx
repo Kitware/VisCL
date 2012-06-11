@@ -244,6 +244,7 @@ template cl_buffer cl_manager::create_buffer<float>(cl_mem_flags, size_t);
 template cl_buffer cl_manager::create_buffer<vxl_byte>(cl_mem_flags, size_t);
 template cl_buffer cl_manager::create_buffer<int>(cl_mem_flags, size_t);
 template cl_buffer cl_manager::create_buffer<cl_int2>(cl_mem_flags, size_t);
+template cl_buffer cl_manager::create_buffer<cl_int4>(cl_mem_flags, size_t);
 
 
 

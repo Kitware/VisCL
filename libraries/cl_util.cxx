@@ -24,7 +24,6 @@ void save_cl_image(const cl_queue_t &queue, const cl_image &img, const char *fil
   percentiles.push_back(1.00);
   vcl_vector<T> range;
 
-  
   vil_math_value_range_percentiles(downloaded, percentiles, range);
   vcl_cout << range[0] << " " << range[1] << "\n";
   double scale = 255.0 / (range[1]-range[0]);
@@ -51,7 +50,6 @@ void save_cl_image<unsigned char>(const cl_queue_t &queue, const cl_image &img, 
   vil_image_view<unsigned char> downloaded(img.ni(), img.nj());
   
   queue->enqueueReadImage(*img().get(),  CL_TRUE, origin, region, 0, 0, (float *)downloaded.top_left_ptr());
-  //vil_math_scale_and_offset_values(downloaded, 255, 0);
   vil_save(downloaded, filename);
 }
 

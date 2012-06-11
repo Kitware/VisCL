@@ -1,0 +1,19 @@
+Features:
+	Profiling
+	KLT from vidtk to compare against
+	Homography
+	Warping
+		VIDTK
+		GPU
+
+Design:
+	Solve meta-programming design
+		Allow track_descr_match to use any descriptor
+	allow include files in .cl
+		Re encode strings
+		cmake defines libraries directory
+
+	
+Algorithmic:
+	Subpixel accuracy on hessian
+	Parameters

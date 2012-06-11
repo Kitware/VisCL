@@ -16,10 +16,8 @@ include(${VXL_CMAKE_DIR}/UseVXL.cmake)
 include_directories(SYSTEM ${VXL_BRL_INCLUDE_DIR})
 include_directories(SYSTEM ${VXL_GEL_INCLUDE_DIR}/mrc)
 include_directories(SYSTEM ${OPENCL_INCLUDE_DIR})
-             
+
 include_directories(libraries)
 
-                      
 add_subdirectory(libraries)
 add_subdirectory(tools)
-

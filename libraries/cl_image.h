@@ -15,6 +15,7 @@ public:
   size_t nj() const;
 
   cl::ImageFormat format() const;
+  void del() { img.reset(); }
 
   const boost::shared_ptr<cl::Image2D> &operator()() const {return img;}
 

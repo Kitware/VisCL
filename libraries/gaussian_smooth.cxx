@@ -17,9 +17,9 @@ gaussian_smooth::gaussian_smooth() : cl_task(gaussian_smooth_source)
 
 //*****************************************************************************
 
-gaussian_smooth *gaussian_smooth::clone()
+cl_task_t gaussian_smooth::clone()
 {
-  gaussian_smooth *clone_ = new gaussian_smooth(*this);
+  gaussian_smooth_t clone_ = boost::make_shared<gaussian_smooth>(*this);
   clone_->queue = cl_manager::inst()->create_queue();
   return clone_;
 }
@@ -75,7 +75,7 @@ cl_image gaussian_smooth::smooth(const cl_image &img, float sigma) const
 
   //Run the kernel on specific ND range
   cl::NDRange global(ni, nj);
-  cl::NDRange local(1,1);
+  //cl::NDRange local(1,1);
 
   queue->enqueueNDRangeKernel(*conv_x.get(), cl::NullRange, global, cl::NullRange);
   queue->enqueueBarrier();

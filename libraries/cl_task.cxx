@@ -3,9 +3,9 @@
 
 #include <boost/make_shared.hpp>
 
-cl_task::cl_task(const char *source)
+cl_task::cl_task(const vcl_string &source)
 {
-  program = cl_manager::inst()->build_source(source);
+  program = cl_manager::inst()->build_source(source.c_str());
 }
 
 boost::shared_ptr<cl::Kernel> cl_task::make_kernel(const vcl_string &kernel_name)

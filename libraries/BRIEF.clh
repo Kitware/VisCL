@@ -1,0 +1,11 @@
+typedef int4 brief_descr;
+
+int brief_dist(brief_descr b1, brief_descr b2)
+{
+  int4 v = b1 ^ b2;
+  v = v - ((v >> 1) & 0x55555555);
+  v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
+  int4 c = ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
+  return c.x + c.y + c.z + c.w;
+}
+

@@ -10,7 +10,7 @@ class gaussian_smooth : public cl_task
 {
 public:
 
-  gaussian_smooth *clone();
+  cl_task_t clone();
 
   template<class T>
   void smooth(const vil_image_view<T> &img, vil_image_view<T> &output, float sigma) const;

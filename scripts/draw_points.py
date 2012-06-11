@@ -36,10 +36,20 @@ def main():
 
     img = load_image(img_file)
     pts = load_points(pts_file)
-
+    
     plt.imshow(img)
     plt.axis('off')
-    plt.scatter(pts[:, 0], pts[:, 1], c='r')
+    
+    frompts = pts[:,0:2]
+    topts = pts[:,2:4]
+    
+    #print frompts
+       
+    for frm_pt, to_pt in zip(frompts, topts):
+        #print frm_pt, to_pt
+        plt.plot([frm_pt[0], to_pt[0]], [frm_pt[1], to_pt[1]], 'ro-')
+        plt.plot(to_pt[0], to_pt[1], 'bo')
+    
     plt.show()
 
 
