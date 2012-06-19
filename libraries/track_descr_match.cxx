@@ -42,6 +42,7 @@ void track_descr_match::first_frame(const vil_image_view<T> &img)
   cl_image kptmap_first;
   hes->detect(smoothed, kptmap_first, kpts1, numkpts_b, max_kpts, thresh, sigma);
   numkpts1 = hes->num_kpts(numkpts_b);
+  vcl_cout << numkpts1 << "\n";
 
   brf = NEW_VISCL_TASK(brief<10>);
   brf->compute_descriptors(smoothed, kpts1, numkpts1, descriptors1);
@@ -60,13 +61,14 @@ void track_descr_match::track(vil_image_view<T> &img)
   cl_image kptmap;
   hes->detect(smoothed, kptmap, kpts2, numkpts2_b, max_kpts, thresh, sigma);
   int numkpts2 = hes->num_kpts(numkpts2_b);
+  vcl_cout << numkpts2 << "\n";
 
   cl_buffer descriptors2;
   brf->compute_descriptors(smoothed, kpts2, numkpts2, descriptors2);
 
   cl_buffer tracks_b = cl_manager::inst()->create_buffer<int>(CL_MEM_WRITE_ONLY, numkpts1);
 
-  const int window = 30; //window is radius / 2
+  const int window = 250; //window is radius / 2
   track_k->setArg(0, *kpts1().get());
   track_k->setArg(1, *kptmap().get());
   track_k->setArg(2, *descriptors1().get());
@@ -84,13 +86,20 @@ void track_descr_match::track(vil_image_view<T> &img)
   queue->enqueueReadBuffer(*kpts1().get(), CL_TRUE, 0, sizeof(cl_int2)*numkpts1, &kpts1_v[0]);
   queue->enqueueReadBuffer(*kpts2().get(), CL_TRUE, 0, sizeof(cl_int2)*numkpts2, &kpts2_v[0]);
 
-  vcl_ofstream outfile("tracks.txt");
+  tracks.resize(numkpts1);
   for (int i = 0; i < numkpts1; i++)
   {
-    if (indices[i] != -1)
-      outfile << kpts1_v[i].s[0] << " " << kpts1_v[i].s[1] << " " << kpts2_v[indices[i]].s[0] << " " << kpts2_v[indices[i]].s[1] << "\n";
+    tracks[i].pt_last = vnl_int_2(kpts1_v[i].s[0], kpts1_v[i].s[1]);
+    tracks[i].pt_new = vnl_int_2(kpts2_v[indices[i]].s[0], kpts2_v[indices[i]].s[1]);
   }
-  outfile.close();
+
+  //vcl_ofstream outfile("tracks.txt");
+  //for (int i = 0; i < numkpts1; i++)
+  //{
+  //  if (indices[i] != -1)
+  //    outfile << kpts1_v[i].s[0] << " " << kpts1_v[i].s[1] << " " << kpts2_v[indices[i]].s[0] << " " << kpts2_v[indices[i]].s[1] << "\n";
+  //}
+  //outfile.close();
 
   kpts1 = kpts2;
   numkpts1 = numkpts2;

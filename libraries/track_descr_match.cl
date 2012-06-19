@@ -24,7 +24,7 @@ __kernel void track(__global int2 *kpts1, __read_only image2d_t kptmap,
   int2 pixel = kpts1[index] / 2;
 
   int2 loc;
-  int closest_dist = 30;
+  int closest_dist = 15;
   int closest_index = -1;
   for (loc.x = pixel.x - window; loc.x <= pixel.x + window; loc.x++)
   {

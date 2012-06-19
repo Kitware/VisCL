@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
   //br->compute_descriptors(img, kpts, descriptors, 2.0f);
 
   track_descr_match_t tracker = NEW_VISCL_TASK(track_descr_match);
+  vcl_cout << "start\n";
   tracker->first_frame(img1);
   tracker->track(img2);
   

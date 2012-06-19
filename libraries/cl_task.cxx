@@ -5,6 +5,9 @@
 
 cl_task::cl_task(const vcl_string &source)
 {
+  vcl_ofstream outfile("foo.txt");
+  outfile << source;
+  outfile.close();
   program = cl_manager::inst()->build_source(source.c_str());
 }
 

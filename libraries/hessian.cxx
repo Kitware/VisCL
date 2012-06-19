@@ -89,7 +89,6 @@ void hessian::detect(const cl_image &smoothed, cl_image &kptmap, cl_buffer &kpts
   detect_extrema->setArg(4, max_kpts);
   detect_extrema->setArg(5, thresh);
 
-  vcl_cout << ni << "\n";
   //Run the kernel on specific ND range
   cl::NDRange global(ni, nj);
   cl::NDRange initsize(ni >> 1, nj >> 1);

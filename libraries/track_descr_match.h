@@ -9,6 +9,7 @@
 #include "gaussian_smooth.h"
 
 #include <vil/vil_image_view.h>
+#include <vnl/vnl_int_2.h>
 
 class track_descr_match;
 typedef boost::shared_ptr<track_descr_match> track_descr_match_t;
@@ -16,6 +17,12 @@ typedef boost::shared_ptr<track_descr_match> track_descr_match_t;
 class track_descr_match : public cl_task
 {
 public:
+
+  struct pt_track
+  {
+    vnl_int_2 pt_last;
+    vnl_int_2 pt_new;
+  };
 
   //Copy constructor for cloning
   track_descr_match(const track_descr_match &t);
@@ -28,6 +35,9 @@ public:
   template<class T>
   void track(vil_image_view<T> &img);
   void track(const cl_image &img);
+
+  //Copies tracks for async
+  vcl_vector<pt_track> get_tracks() const { return tracks; }
 
 private:
 
@@ -42,7 +52,7 @@ private:
   cl_kernel_t track_k;
   cl_queue_t queue;  
 
-  vcl_vector<vcl_vector<cl_int2> > tracks;
+  vcl_vector<pt_track> tracks;
 
   cl_buffer kpts1;
   cl_buffer descriptors1;

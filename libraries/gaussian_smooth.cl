@@ -9,7 +9,7 @@ __kernel void smoothHoriz(__read_only image2d_t input, __global const float *fil
   float4 temp = 0.0f;
   int i = 0;
 
-  int2 pixel = coord;
+  int2 pixel = coord; 
   int left = pixel.x - 2;
   int right = pixel.x + 2;
 
