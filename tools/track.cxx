@@ -1,3 +1,9 @@
+/*ckwg +5
+ * Copyright 2012 by Kitware, Inc. All Rights Reserved. Please refer to
+ * KITWARE_LICENSE.TXT for licensing information, or contact General Counsel,
+ * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
+ */
+
 #include <vcl_iostream.h>
 
 #include <vil/vil_image_view.h>
@@ -23,26 +29,12 @@ int main(int argc, char *argv[])
 
   //vcl_cout << print_cl_errstring(-30) << "\n";
 
-  //hessian_t gs = NEW_VISCL_TASK(hessian);
-
-  //vcl_vector<cl_int2> kpts;
-  //gs->detect(img, 10000, 0.01f, 2.0f, kpts);
-  ////vcl_ofstream outfile("kpts.txt");
-  ////for (unsigned int i = 0; i < kpts.size(); i++)
-  ////{
-  ////  outfile << kpts[i].s[0] << " " << kpts[i].s[1] << "\n";
-  ////}
-  ////outfile.close();
-
-  //brief<10>::type br = NEW_VISCL_TASK(brief<10>);
-  //vcl_vector<cl_int4> descriptors;
-  //br->compute_descriptors(img, kpts, descriptors, 2.0f);
 
   track_descr_match_t tracker = NEW_VISCL_TASK(track_descr_match);
   vcl_cout << "start\n";
   tracker->first_frame(img1);
-  tracker->track(img2);
-  
+  tracker->track(img2, 100);
+  tracker->write_tracks_to_file("tracks.txt");
 
   return 0;
 }

@@ -1,3 +1,9 @@
+/*ckwg +5
+ * Copyright 2012 by Kitware, Inc. All Rights Reserved. Please refer to
+ * KITWARE_LICENSE.TXT for licensing information, or contact General Counsel,
+ * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
+ */
+
 #ifndef BRIEF_H_
 #define BRIEF_H_
 
@@ -28,8 +34,7 @@ private:
   brief();
 
   vcl_string generate_meta_source(const vcl_string &source);
-
-  
+    
   cl_kernel_t brief_k, brief_dist_k;
   cl_queue_t queue;
 };
