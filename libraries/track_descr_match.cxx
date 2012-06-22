@@ -23,9 +23,6 @@ cl_task_t track_descr_match::clone()
 {
   track_descr_match_t clone_ = boost::make_shared<track_descr_match>(*this);
   clone_->queue = cl_manager::inst()->create_queue();
-  gs = NEW_VISCL_TASK(gaussian_smooth);
-  hes = NEW_VISCL_TASK(hessian);
-  brf = NEW_VISCL_TASK(brief<10>);
   return clone_;
 }
 
@@ -43,14 +40,17 @@ void track_descr_match::first_frame(const vil_image_view<T> &img)
   float thresh = 0.007f, sigma = 2.0f;
 
   cl_image img_cl = cl_manager::inst()->create_image<T>(img);
+  gs = NEW_VISCL_TASK(gaussian_smooth);
   cl_image smoothed = gs->smooth(img_cl, sigma);
   img_cl.del();
 
   cl_buffer numkpts_b;
   cl_image kptmap_first;
+  hes = NEW_VISCL_TASK(hessian);
   hes->detect(smoothed, kptmap_first, kpts1, numkpts_b, max_kpts, thresh, sigma);
   numkpts1 = hes->num_kpts(numkpts_b);
 
+  brf = NEW_VISCL_TASK(brief<10>);
   brf->compute_descriptors(smoothed, kpts1, numkpts1, descriptors1);
 }
 

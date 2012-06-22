@@ -50,7 +50,7 @@ void cl_manager::init_opencl()
     // Get a list of devices on this platform
     devices = context.getInfo<CL_CONTEXT_DEVICES>();
   }
-  catch(cl::Error error)
+  catch(cl::Error &error)
   {
     vcl_cout << "Error: " << error.what() << " - " << print_cl_errstring(error.err()) << vcl_endl;
   }
@@ -60,7 +60,6 @@ void cl_manager::init_opencl()
 
 cl_program_t cl_manager::build_source(const char *source, int device) const
 {
-  vcl_vector<cl::Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
   cl::Program::Sources source_(1, std::make_pair(source, strlen(source)+1));
 
   // Make program of the source code in the context
@@ -95,6 +94,11 @@ cl_queue_t cl_manager::create_queue(int device)
 template<class T>
 cl_image cl_manager::create_image(const vil_image_view<T> &img)
 {
+  if (!img.top_left_ptr())
+  {
+    vcl_cerr << "No image data!\n";
+  }
+
   vil_pixel_format pf = img.pixel_format();
   vcl_map<vil_pixel_format, cl::ImageFormat>::iterator itr;
   if ((itr = pixel_format_map.find(pf)) == pixel_format_map.end())
