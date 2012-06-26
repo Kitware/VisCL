@@ -31,7 +31,6 @@ int main(int argc, char *argv[])
 
 
   track_descr_match_t tracker = NEW_VISCL_TASK(track_descr_match);
-  vcl_cout << "start\n";
   tracker->first_frame(img1);
   tracker->track(img2, 100);
   tracker->write_tracks_to_file("tracks.txt");

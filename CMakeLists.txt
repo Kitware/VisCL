@@ -33,3 +33,17 @@ include_directories(libraries)
 
 add_subdirectory(libraries)
 add_subdirectory(tools)
+
+# Save library dependencies.
+SET(viscl_LIBRARY_DEPENDS_FILE ${viscl_BINARY_DIR}/visclLibraryDepends.cmake)
+EXPORT_LIBRARY_DEPENDENCIES(${viscl_LIBRARY_DEPENDS_FILE})
+
+# Construct the include directories.
+SET(viscl_INCLUDE_DIR_CONFIG ${viscl_SOURCE_DIR})
+
+
+CONFIGURE_FILE(${viscl_SOURCE_DIR}/visclConfig.cmake.in
+               ${viscl_BINARY_DIR}/visclConfig.cmake @ONLY IMMEDIATE)
+
+
+#----------------------------------
