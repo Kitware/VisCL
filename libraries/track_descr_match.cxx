@@ -9,6 +9,7 @@
 
 #include "cl_task_registry.h"
 
+#include <fstream>
 #include <boost/make_shared.hpp>
 
 extern const char* track_descr_match_source;
@@ -114,7 +115,7 @@ vcl_vector<tdm_track> track_descr_match::track(const vil_image_view<T> &img, int
 
 void track_descr_match::write_tracks_to_file(const char *filename)
 {
-  vcl_ofstream outfile("tracks.txt");
+  std::ofstream outfile("tracks.txt");
   for (int i = 0; i < tracks.size(); i++)
   {
     outfile << tracks[i].pt_prev[0] << " " << tracks[i].pt_prev[1] << " "

@@ -7,11 +7,12 @@
 #include "cl_task.h"
 #include "cl_manager.h"
 
+#include <fstream>
 #include <boost/make_shared.hpp>
 
 cl_task::cl_task(const vcl_string &source)
 {
-  vcl_ofstream outfile("foo.txt");
+  std::ofstream outfile("foo.txt");
   outfile << source;
   outfile.close();
   program = cl_manager::inst()->build_source(source.c_str());

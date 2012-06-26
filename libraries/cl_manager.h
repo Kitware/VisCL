@@ -30,7 +30,7 @@ public:
   //This function will reformat image views to interleaved
   template<class T>
   cl_image create_image(const vil_image_view<T> &img);
-  cl_image cl_manager::create_image(const cl::ImageFormat &img_frmt, cl_mem_flags flags, size_t ni, size_t nj);
+  cl_image create_image(const cl::ImageFormat &img_frmt, cl_mem_flags flags, size_t ni, size_t nj);
   //template<class T>
   //cl_buffer create_buffer(T *, cl_mem_flags flags, size_t len);
   template<class T>
