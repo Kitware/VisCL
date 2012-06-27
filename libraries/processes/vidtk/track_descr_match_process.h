@@ -50,7 +50,7 @@ protected:
   unsigned int search_range_;
 
   /// The current frame.
-  vil_image_view<vxl_byte> const* cur_img_;
+  vil_image_view<vxl_byte> cur_img_;
 
   track_descr_match_t tracker_;
 

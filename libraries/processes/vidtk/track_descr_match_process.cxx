@@ -82,12 +82,12 @@ bool track_descr_match_process::step()
 {
   if( !first_frame_set_ )
   {
-    tracker_->first_frame(*cur_img_);
+    tracker_->first_frame(cur_img_);
     first_frame_set_ = true;
   }
   else
   {
-    tracks_ = tracker_->track<vxl_byte>(*cur_img_, (int)search_range_);
+    tracks_ = tracker_->track<vxl_byte>(cur_img_, (int)search_range_);
   }
 
   // Mark that they have been used.
@@ -100,7 +100,7 @@ bool track_descr_match_process::step()
 void
 track_descr_match_process::set_image( vil_image_view< vxl_byte > const& img )
 {
-  cur_img_ = &img;
+  cur_img_ = img;
 }
 
 
