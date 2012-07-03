@@ -13,14 +13,10 @@ set(processes_porting_srcs
   common/vistk_process.h
   common/vistk_process.cxx
   common/vistk_process_macros.h
-  conversion/homography.h
-  conversion/homography.cxx
   conversion/timestamp.h
   conversion/timestamp.cxx
   registration.h
   registration.cxx  
-  vistk_homography_process.h
-  vistk_homography_process.cxx
   vistk_track_descr_match_process.h
   vistk_track_descr_match_process.cxx
   )

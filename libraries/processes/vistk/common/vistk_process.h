@@ -12,6 +12,10 @@
 
 #include <boost/scoped_ptr.hpp>
 
+#ifdef WIN32
+#pragma warning( disable: 4251 )
+#endif
+
 namespace vidtk
 {
 

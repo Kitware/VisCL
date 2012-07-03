@@ -10,6 +10,7 @@
 #include <utilities/timestamp.h>
 #include <process_framework/process.h>
 #include <process_framework/pipeline_aid.h>
+#include <kwklt/klt_track.h>
 
 #include "track_descr_match.h"
 
@@ -38,9 +39,13 @@ public:
   VIDTK_INPUT_PORT( set_image, vil_image_view< vxl_byte > const& );
 
   /// Set of tracks that are actively being tracked.
-  vcl_vector< tdm_track > const& tracks() const;
-  VIDTK_OUTPUT_PORT( vcl_vector< tdm_track > const&, tracks );
-  
+  vcl_vector< vidtk::klt_track_ptr > const& active_tracks() const;
+  VIDTK_OUTPUT_PORT( vcl_vector< vidtk::klt_track_ptr > const&, active_tracks );
+
+  /// Set of new tracks that were created at the last step.
+  vcl_vector<vidtk::klt_track_ptr> const& created_tracks() const;
+  VIDTK_OUTPUT_PORT(vcl_vector<vidtk::klt_track_ptr> const&, created_tracks);
+
 protected:
 
   // ----- Parameters
@@ -55,12 +60,16 @@ protected:
   track_descr_match_t tracker_;
 
   /// Set of tracks corresponding to still active features
-  vcl_vector< tdm_track > tracks_;
+  vcl_vector< vidtk::klt_track_ptr > *tracks_last_, *tracks_cur_;
+  vcl_vector< vidtk::klt_track_ptr > active_tracks_;
+  vcl_vector< vidtk::klt_track_ptr > new_tracks_;
 
   // If the process is retained across two calls on intialize(), then
   // we only want to "initialize" only the first time.
   bool initialized_;
   bool first_frame_set_;
+
+  int num_feat_;
 };
 
 

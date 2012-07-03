@@ -26,7 +26,8 @@ vistk_track_descr_match_process::vistk_track_descr_match_process(vistk::config_t
   this->declare_input_port("image", boost::make_shared<port_info>("image/vil/byte/gray", required, "input image"));
   this->declare_input_port("reset", boost::make_shared<port_info>("bool", required_nodep, "Whether to reset the process or not."));
   
-  this->declare_output_port("tracks", boost::make_shared<port_info>("tracks/descr_match", required, "output tracks"));
+  this->declare_output_port("created_tracks", boost::make_shared<port_info>("tracks/klt/vidtk:created", required, "created tracks"));
+  this->declare_output_port("active_tracks", boost::make_shared<port_info>("tracks/klt/vidtk:active", required, "active tracks"));
 }
 
 //*****************************************************************************
@@ -69,12 +70,14 @@ void vistk_track_descr_match_process::_step()
 
   IF_FAILED()
   {
-    OUTPUT_COMPLETE(w_proc, tracks);
+    OUTPUT_COMPLETE(w_proc, active_tracks);
+    OUTPUT_COMPLETE(w_proc, created_tracks);
     mark_process_as_complete();
   }
   else 
   {
-    OUTPUT_BRIDGE(w_proc, tracks, vcl_vector< tdm_track >);
+    OUTPUT_BRIDGE(w_proc, active_tracks, vcl_vector< vidtk::klt_track_ptr >);
+    OUTPUT_BRIDGE(w_proc, created_tracks, vcl_vector< vidtk::klt_track_ptr >);
   }
 
   vistk_process::_step();

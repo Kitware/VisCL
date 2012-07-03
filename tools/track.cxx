@@ -23,17 +23,24 @@ int main(int argc, char *argv[])
 
   vil_image_view<vxl_byte> img1_color = vil_load(argv[1]);
   vil_image_view<vxl_byte> img2_color = vil_load(argv[2]);
-  vil_image_view<vxl_byte> img1, img2, output;
+  vil_image_view<vxl_byte> img3_color = vil_load(argv[3]);
+
+  vil_image_view<vxl_byte> img1, img2, img3, output;
   vil_convert_planes_to_grey(img1_color, img1);
   vil_convert_planes_to_grey(img2_color, img2);
+  vil_convert_planes_to_grey(img3_color, img3);
 
   //vcl_cout << print_cl_errstring(-30) << "\n";
 
 
   track_descr_match_t tracker = NEW_VISCL_TASK(track_descr_match);
-  tracker->first_frame(img1);
-  tracker->track(img2, 100);
-  tracker->write_tracks_to_file("tracks.txt");
+
+  vcl_vector<vnl_vector_fixed<double, 2> > kpts1, kpts2, kpts3;
+  tracker->first_frame(img1, kpts1);
+  vcl_vector<int> indices21(tracker->track(img2, kpts2, 100));
+  vcl_vector<int> indices32(tracker->track(img3, kpts3, 100));
+
+  write_tracks_to_file("tracks.txt", kpts2, kpts3, indices32);
 
   return 0;
 }

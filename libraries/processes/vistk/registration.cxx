@@ -6,7 +6,6 @@
 
 #include "registration.h"
 
-#include "vistk_homography_process.h"
 #include "vistk_track_descr_match_process.h"
 
 #include <vistk/pipeline/process_registry.h>
@@ -32,7 +31,7 @@ register_processes()
   }
 
   registry->register_process("viscl_track_descr_match", "Wrapper around viscl track_descr_match_process", create_process<vistk_track_descr_match_process>);
-  registry->register_process("viscl_homography", "Wrapper around viscl homography_process", create_process<vistk_homography_process>);
+  
 
   registry->mark_module_as_loaded(module_name);
 }

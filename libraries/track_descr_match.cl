@@ -17,16 +17,16 @@ int brief_dist(brief_descr b1, brief_descr b2)
   return c.x + c.y + c.z + c.w;
 }
 
-__kernel void track(__global int2 *kpts1, __read_only image2d_t kptmap,
+__kernel void track(__global int2 *kpts2, __read_only image2d_t kptmap1,
                     __global brief_descr *descriptors1, __global brief_descr *descriptors2, 
                     __global int *tracks, int window)
 {
   //index into kpts1 and descriptors1
   int index = get_global_id(0);
-  brief_descr descr = descriptors1[index];
+  brief_descr descr = descriptors2[index];
 
   //kptmap is 1/2 the size of the original image
-  int2 pixel = kpts1[index] / 2;
+  int2 pixel = kpts2[index] / 2;
 
   int2 loc;
   int closest_dist = 15;
@@ -35,10 +35,10 @@ __kernel void track(__global int2 *kpts1, __read_only image2d_t kptmap,
   {
     for (loc.y = pixel.y - window; loc.y <= pixel.y + window; loc.y++)
     {
-      int val = read_imagei(kptmap, imageSampler, loc).x;
+      int val = read_imagei(kptmap1, imageSampler, loc).x;
       if (val > -1)
       {
-        int dist = brief_dist(descriptors2[val], descr);
+        int dist = brief_dist(descriptors1[val], descr);
         if (dist <= closest_dist)
         {
           closest_dist = dist;
