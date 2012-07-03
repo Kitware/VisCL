@@ -29,12 +29,19 @@ int main(int argc, char *argv[])
 
   //vcl_cout << print_cl_errstring(-30) << "\n";
 
-
-  track_descr_match_t tracker = NEW_VISCL_TASK(track_descr_match);
-  tracker->first_frame(img1);
-  tracker->track(img2, 100);
-  tracker->write_tracks_to_file("tracks.txt");
-
+  try
+  {
+    track_descr_match_t tracker = NEW_VISCL_TASK(track_descr_match);
+    tracker->first_frame(img1);
+    tracker->track(img2, 100);
+    tracker->write_tracks_to_file("tracks.txt");
+  }
+  catch(const cl::Error &e)
+  {
+    vcl_cerr << "ERROR: " << e.what() << " (" << e.err() << " : "
+             << print_cl_errstring(e.err()) << ")" << vcl_endl;
+    return 1;
+  }
   return 0;
 }
 
