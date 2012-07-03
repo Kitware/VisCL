@@ -23,6 +23,9 @@ class process;
 
 }
 
+namespace viscl
+{
+
 class vistk_process
   : public vistk::process
 {
@@ -40,5 +43,7 @@ class vistk_process
   private:
     vistk::config::keys_t m_keys;
 };
+
+}
 
 #endif // VIDTK_PROCESSES_PORTING_COMMON_VISTK_PROCESS_H

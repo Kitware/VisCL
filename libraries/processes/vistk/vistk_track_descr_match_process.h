@@ -10,7 +10,7 @@
 #include "common/vistk_process.h"
 #include "processes/vidtk/track_descr_match_process.h"
 
-class vistk_track_descr_match_process : public vistk_process
+class vistk_track_descr_match_process : public viscl::vistk_process
 {
 public:
 

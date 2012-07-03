@@ -13,7 +13,7 @@
 //*****************************************************************************
 
 vistk_track_descr_match_process::vistk_track_descr_match_process(vistk::config_t const& conf) 
-  : vistk_process(conf),
+  : viscl::vistk_process(conf),
     w_proc(new viscl_proc_type(name()))
 {
   this->declare_vistk_configuration(w_proc.get());

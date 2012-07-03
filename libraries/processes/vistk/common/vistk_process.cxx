@@ -20,6 +20,9 @@
 
 #include <map>
 
+namespace viscl
+{
+
 vistk::process::constraint_t const vistk_process::constraint_vidtk = "_vidtk";
 
 vistk_process
@@ -95,4 +98,6 @@ vistk_process
 
     throw vistk::invalid_configuration_exception(name(), reason);
   }
+}
+
 }
