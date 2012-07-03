@@ -4,11 +4,11 @@ project(viscl)
 set(CMAKE_MODULE_PATH "${viscl_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH})
 
 find_package(VXL)
-find_package(OpenCL)
+find_package(OpenCL REQUIRED)
 find_package(Boost REQUIRED)
-find_package(vidtk)
 
-find_package(vistk)
+find_package(vidtk QUIET)
+find_package(vistk QUIET)
 if (vistk_FOUND)
   include(${vistk_DIR}/vistk-macros.cmake)
   include_directories(SYSTEM ${VISTK_INCLUDE_DIR})
@@ -25,7 +25,6 @@ include_directories(SYSTEM ${VXL_BRL_INCLUDE_DIR})
 include_directories(SYSTEM ${VXL_RPL_INCLUDE_DIR})
 include_directories(SYSTEM ${VXL_GEL_INCLUDE_DIR}/mrc)
 include_directories(SYSTEM ${VIDTK_INCLUDE_DIRS})
-message(SYSTEM ${VIDTK_INCLUDE_DIRS})
 
 include_directories(SYSTEM ${OPENCL_INCLUDE_DIR})
 
