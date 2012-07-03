@@ -67,7 +67,7 @@ cl_image gaussian_smooth::smooth(const cl_image &img, float sigma) const
 
   size_t ni = img.ni(), nj = img.nj();
   cl_image working = cl_manager::inst()->create_image(img.format(), CL_MEM_READ_WRITE, ni, nj);
-  cl_image result = cl_manager::inst()->create_image(img.format(), CL_MEM_WRITE_ONLY, ni, nj);
+  cl_image result = cl_manager::inst()->create_image(img.format(), CL_MEM_READ_WRITE, ni, nj);
 
   // Set arguments to kernel
   conv_x->setArg(0, *img().get());
