@@ -5,6 +5,9 @@
  */
 
 #include <vcl_iostream.h>
+#include <vcl_cstdlib.h>
+#include <vcl_ctime.h>
+#include <vul/vul_arg.h>
 
 #include <vil/vil_image_view.h>
 #include <vil/vil_load.h>
@@ -21,18 +24,34 @@
 
 int main(int argc, char *argv[])
 {
+  vul_arg<unsigned> arg_iw("-iw", "Image width", 4096);
+  vul_arg<unsigned> arg_ih("-ih", "Image height", 4096);
+  vul_arg<unsigned> arg_nj("-nj", "# of iterations", 10);
+
+  vul_arg_parse(argc, argv);
+
+  unsigned iw = arg_iw();
+  unsigned ih = arg_ih();
+  const unsigned iter = arg_nj();
+
   cl_manager::inst()->report_system_specs();
 
-  vil_image_view<vxl_byte> img_color = vil_load(argv[1]);
-  vil_image_view<vxl_byte> img, output;
-  vil_convert_planes_to_grey(img_color, img);
+  vil_image_view<vxl_byte> output, img = vil_image_view<vxl_byte>(iw,ih);
+  vcl_srand(vcl_time(NULL));
+  for(unsigned j=0; j<img.nj(); ++j)
+  {
+    for(unsigned i=0; i<img.ni(); ++i)
+    {
+      img(i,j) = vcl_rand();
+    }
+  }
 
   int radii[3] = {2, 3, 4};
 
   gaussian_smooth_t smoother = NEW_VISCL_TASK(gaussian_smooth);
   cl_image img_cl = cl_manager::inst()->create_image<vxl_byte>(img);
 
-  const int iter = 100;
+
   for (int r = 0; r < 3; r++)
   {
     boost::chrono::system_clock::time_point start = boost::chrono::system_clock::now();
