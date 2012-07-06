@@ -58,12 +58,12 @@ int main(int argc, char *argv[])
     for (int i = 0; i < iter; i++)
       cl_image result = smoother->smooth( img_cl, 2.0, radii[r]);
     boost::chrono::duration<double> sec = boost::chrono::system_clock::now() - start;
-    vcl_cout << "viscl took " << sec.count() << " seconds to smooth a " << img.ni() << "x" << img.nj() << " img " << iter << "x w/ kernel size=" << 2*radii[r]+1 << ".\n";
+    vcl_cout << "viscl took " << sec.count() / iter << " seconds to smooth a " << img.ni() << "x" << img.nj() << " img " << iter << "x w/ kernel size=" << 2*radii[r]+1 << ".\n";
     start = boost::chrono::system_clock::now();
     for (int i = 0; i < iter; i++)
       vil_gauss_filter_2d<vxl_byte, vxl_byte>(img, output, 2.0, radii[r]);
     sec = boost::chrono::system_clock::now() - start;
-    vcl_cout << "VXL took "   << sec.count() << " seconds to smooth a " << img.ni() << "x" << img.nj() << " img " << iter << "x w/ kernel size=" << 2*radii[r]+1 << ".\n";
+    vcl_cout << "VXL took "   << sec.count() / iter << " seconds to smooth a " << img.ni() << "x" << img.nj() << " img " << iter << "x w/ kernel size=" << 2*radii[r]+1 << ".\n";
   }
 
   return 0;
