@@ -6,6 +6,8 @@
 #include <vcl_vector.h>
 #include <vul/vul_arg.h>
 
+#include <boost/chrono.hpp>
+
 #include <CL/cl.hpp>
 
 //******************************************************************************
@@ -151,14 +153,14 @@ int main(int argc, char **argv)
 
   vcl_cout << "Copying host to device..." << vcl_flush;
   ocl->q.finish();
-  timespec ts_start, ts_stop;
-  clock_gettime(CLOCK_REALTIME, &ts_start);
+
+  boost::chrono::system_clock::time_point t_start = boost::chrono::system_clock::now();
   ret = copyHostToDev(iw, ih, ip, ie,
     host_img, host_buf, host_raw,
     dev_img, dev_buf,
     use_images, mapped,
     nj);
-  clock_gettime(CLOCK_REALTIME, &ts_stop);
+  boost::chrono::system_clock::time_point t_stop = boost::chrono::system_clock::now();
   vcl_cout << "done" << vcl_endl;
 
   vcl_cout << "Freeing device memory..." << vcl_flush;
@@ -170,14 +172,14 @@ int main(int argc, char **argv)
   vcl_cout << "done" << vcl_endl;
 
   // Convert time struct to total seconds
-  double t_start = ts_start.tv_sec + 1e-9*ts_start.tv_nsec;
-  double t_stop = ts_stop.tv_sec + 1e-9*ts_stop.tv_nsec;
-  double t_seconds = t_stop - t_start;
+
+  boost::chrono::duration<double> sec = t_stop - t_start;
+  double t_seconds = sec.count();
   vcl_cout << "\n\nImage size: " << iw << 'x' << ih << 'x' << ip << " ("
            << ((iw*ih*ip*ie) / (1024.0*1024)) << "MB)" << vcl_endl;
   vcl_cout << ni*nj << " seperate transfers" << vcl_endl;
   vcl_cout << t_seconds << "s total" << vcl_endl;
-  vcl_cout << (t_seconds/(ni*nj))*1e3 << "ms per image" << vcl_endl;
+  vcl_cout << (t_seconds/(ni*nj)) << "s per image" << vcl_endl;
   double img_size = iw*ih*ip*ie;
   double total_size = img_size*ni*nj;
   vcl_cout << (total_size/t_seconds)/(1024.0*1024.0) << " MB/s" << vcl_endl;

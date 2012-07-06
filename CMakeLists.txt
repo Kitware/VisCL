@@ -6,9 +6,10 @@ set(CMAKE_MODULE_PATH "${viscl_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH})
 find_package(VXL)
 find_package(OpenCL REQUIRED)
 
+set(viscl_boost_version 1.47)
 set(BOOST_ROOT "" CACHE PATH "The root path to Boost")
 option(Boost_USE_STATIC_LIBS "Use a statically-linked Boost" OFF)
-find_package(Boost REQUIRED COMPONENTS chrono system)
+find_package(Boost ${viscl_boost_version} REQUIRED COMPONENTS chrono system)
 find_package(vidtk QUIET)
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
