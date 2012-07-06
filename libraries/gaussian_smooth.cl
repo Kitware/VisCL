@@ -7,15 +7,15 @@
 __constant sampler_t imageSampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_NEAREST;
 
 /* Copy input 2D image to output 2D image */
-__kernel void smoothHoriz(__read_only image2d_t input, __global const float *filter, __write_only image2d_t output)
+__kernel void smoothHoriz(__read_only image2d_t input, __global const float *filter, int radius, __write_only image2d_t output)
 {
   int2 coord = (int2)(get_global_id(0), get_global_id(1));
   float4 temp = 0.0f;
   int i = 0;
 
   int2 pixel = coord; 
-  int left = pixel.x - 2;
-  int right = pixel.x + 2;
+  int left = pixel.x - radius;
+  int right = pixel.x + radius;
 
   for(pixel.x =  left; pixel.x <= right; pixel.x++, i++)
   {
@@ -25,15 +25,15 @@ __kernel void smoothHoriz(__read_only image2d_t input, __global const float *fil
   write_imagef(output, coord, temp);
 }
 
-__kernel void smoothVert(__read_only image2d_t input, __global const float *filter, __write_only image2d_t output)
+__kernel void smoothVert(__read_only image2d_t input, __global const float *filter, int radius, __write_only image2d_t output)
 {
   int2 coord = (int2)(get_global_id(0), get_global_id(1));
   float4 temp = 0.0f;
   int i = 0;
 
   int2 pixel = coord;
-  int top = pixel.y - 2;
-  int bottom = pixel.y + 2;
+  int top = pixel.y - radius;
+  int bottom = pixel.y + radius;
 
   for(pixel.y =  top; pixel.y <= bottom; pixel.y++, i++)
   {

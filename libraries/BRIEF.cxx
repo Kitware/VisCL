@@ -68,7 +68,7 @@ void brief<radius>::compute_descriptors(const vil_image_view<T> &img, const vcl_
 {
   cl_image img_cl = cl_manager::inst()->create_image<T>(img);
   gaussian_smooth_t gs = NEW_VISCL_TASK(gaussian_smooth);
-  cl_image smoothed_cl = gs->smooth(img_cl, sigma);
+  cl_image smoothed_cl = gs->smooth(img_cl, sigma, 2);
   cl_buffer kpts_cl = cl_manager::inst()->create_buffer<cl_int2>(CL_MEM_READ_ONLY, kpts.size());
   queue->enqueueWriteBuffer(*kpts_cl().get(), CL_TRUE, 0, kpts_cl.mem_size(), &kpts[0]);
 

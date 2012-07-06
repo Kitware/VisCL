@@ -5,8 +5,18 @@ set(CMAKE_MODULE_PATH "${viscl_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH})
 
 find_package(VXL)
 find_package(OpenCL)
-find_package(Boost REQUIRED)
+
+set(BOOST_ROOT "" CACHE PATH "The root path to Boost")
+option(Boost_USE_STATIC_LIBS "Use a statically-linked Boost" OFF)
+find_package(Boost REQUIRED COMPONENTS chrono system)
 find_package(vidtk)
+
+include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
+link_directories(${Boost_LIBRARY_DIRS})
+
+if (WIN32)
+  add_definitions(-DBOOST_ALL_NO_LIB)
+endif (WIN32)
 
 find_package(vistk)
 if (vistk_FOUND)
@@ -14,8 +24,6 @@ if (vistk_FOUND)
   include_directories(SYSTEM ${VISTK_INCLUDE_DIR})
   link_directories(${VISTK_LIBRARY_DIR})
 endif (vistk_FOUND)
-
-include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 # include the standard stuff, such as Dart test
 set(VXL_PROVIDE_STANDARD_OPTIONS 1)

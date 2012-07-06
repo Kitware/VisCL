@@ -55,7 +55,7 @@ void track_descr_match::first_frame(const vil_image_view<pixtype> &img,
 
   cl_image img_cl = cl_manager::inst()->create_image<pixtype>(img);
 
-  cl_image smoothed = gs->smooth(img_cl, sigma);
+  cl_image smoothed = gs->smooth(img_cl, sigma, 2);
   img_cl.del();
 
   cl_buffer numkpts_b;
@@ -83,7 +83,7 @@ const vcl_vector<int>& track_descr_match::track(const vil_image_view<pixtype> &i
 {
   float thresh = 0.003f, sigma = 2.0f;
   cl_image img_cl = cl_manager::inst()->create_image<pixtype>(img);
-  cl_image smoothed = gs->smooth(img_cl, sigma);
+  cl_image smoothed = gs->smooth(img_cl, sigma, 2);
   img_cl.del(); 
   
   cl_buffer kpts2, numkpts2_b;

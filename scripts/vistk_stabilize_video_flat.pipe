@@ -1,7 +1,7 @@
 config stabilize_video
   :input        images.txt
   :verify       false
-  :num_features 1000
+  :num_features 2000
   :search_range 100
   :output       homog.txt
   :rate         10

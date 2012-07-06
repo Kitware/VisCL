@@ -19,8 +19,8 @@ public:
   cl_task_t clone();
 
   template<class T>
-  void smooth(const vil_image_view<T> &img, vil_image_view<T> &output, float sigma) const;
-  cl_image smooth(const cl_image &img, float sigma) const;
+  void smooth(const vil_image_view<T> &img, vil_image_view<T> &output, float sigma, int kernel_radius) const;
+  cl_image smooth(const cl_image &img, float sigma, int kernel_radius) const;
 
 private:
 
