@@ -4,12 +4,12 @@ project(viscl)
 set(CMAKE_MODULE_PATH "${viscl_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH})
 
 find_package(VXL)
-find_package(OpenCL)
+find_package(OpenCL REQUIRED)
 
 set(BOOST_ROOT "" CACHE PATH "The root path to Boost")
 option(Boost_USE_STATIC_LIBS "Use a statically-linked Boost" OFF)
 find_package(Boost REQUIRED COMPONENTS chrono system)
-find_package(vidtk)
+find_package(vidtk QUIET)
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
@@ -18,7 +18,7 @@ if (WIN32)
   add_definitions(-DBOOST_ALL_NO_LIB)
 endif (WIN32)
 
-find_package(vistk)
+find_package(vistk QUIET)
 if (vistk_FOUND)
   include(${vistk_DIR}/vistk-macros.cmake)
   include_directories(SYSTEM ${VISTK_INCLUDE_DIR})
@@ -33,7 +33,6 @@ include_directories(SYSTEM ${VXL_BRL_INCLUDE_DIR})
 include_directories(SYSTEM ${VXL_RPL_INCLUDE_DIR})
 include_directories(SYSTEM ${VXL_GEL_INCLUDE_DIR}/mrc)
 include_directories(SYSTEM ${VIDTK_INCLUDE_DIRS})
-message(SYSTEM ${VIDTK_INCLUDE_DIRS})
 
 include_directories(SYSTEM ${OPENCL_INCLUDE_DIR})
 

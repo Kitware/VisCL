@@ -33,15 +33,23 @@ int main(int argc, char *argv[])
   //vcl_cout << print_cl_errstring(-30) << "\n";
 
 
-  track_descr_match_t tracker = NEW_VISCL_TASK(track_descr_match);
+  try
+  {
+    track_descr_match_t tracker = NEW_VISCL_TASK(track_descr_match);
 
-  vcl_vector<vnl_vector_fixed<double, 2> > kpts1, kpts2, kpts3;
-  tracker->first_frame(img1, kpts1);
-  vcl_vector<int> indices21(tracker->track(img2, kpts2, 100));
-  vcl_vector<int> indices32(tracker->track(img3, kpts3, 100));
+    vcl_vector<vnl_vector_fixed<double, 2> > kpts1, kpts2, kpts3;
+    tracker->first_frame(img1, kpts1);
+    vcl_vector<int> indices21(tracker->track(img2, kpts2, 100));
+    vcl_vector<int> indices32(tracker->track(img3, kpts3, 100));
 
-  write_tracks_to_file("tracks.txt", kpts2, kpts3, indices32);
-
+    write_tracks_to_file("tracks.txt", kpts2, kpts3, indices32);
+  }
+  catch(const cl::Error &e)
+  {
+    vcl_cerr << "ERROR: " << e.what() << " (" << e.err() << " : "
+             << print_cl_errstring(e.err()) << ")" << vcl_endl;
+    return 1;
+  }
   return 0;
 }
 
