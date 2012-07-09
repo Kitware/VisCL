@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 
   if (!arg_use_cpu() && !arg_use_gpu())
   {
-    vcl_cerr << "must specify either -cpu or -gpu flag, or both"
+    vcl_cerr << "must specify either -cpu or -gpu flag, or both" << vcl_endl;
     return -1;
   }
 
