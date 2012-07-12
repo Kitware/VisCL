@@ -4,7 +4,6 @@ set(OCL_SRC_FILES
     hessian.cl
     track_descr_match.cl
     BRIEF.cl
-    quicksort.cl
 )
 
 set(CXX_SRC_FILES
@@ -14,7 +13,6 @@ set(CXX_SRC_FILES
     hessian.h                  hessian.cxx
     gaussian_smooth.h          gaussian_smooth.cxx
     track_descr_match.h        track_descr_match.cxx
-    quicksort.h                quicksort.cxx
     cl_image_3d.h			   cl_image_3d.cxx
     BRIEF.h                    BRIEF.cxx
     cl_image.h                 cl_image.cxx
