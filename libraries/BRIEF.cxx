@@ -16,12 +16,21 @@
 
 extern const char* BRIEF_source;
 
-//template<int radius>
-//vcl_string brief<radius>::dist_func = vcl_string("brief_dist");
+//*****************************************************************************
 
 template<int radius>
-brief<radius>::brief() : cl_task(generate_meta_source(BRIEF_source))
+void brief<radius>::init()
 {
+  cl_task::build_source(generate_meta_source(BRIEF_source));
+  brief_k = make_kernel("brief");
+}
+
+//*****************************************************************************
+
+template<int radius>
+void brief<radius>::init(const cl_program_t &prog)
+{
+  program = prog;
   brief_k = make_kernel("brief");
 }
 

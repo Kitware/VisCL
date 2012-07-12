@@ -35,5 +35,7 @@ IF(NOT viscl_NO_USE_VXL)
   ENDIF(VXL_FOUND)
 ENDIF(NOT viscl_NO_USE_VXL)
 
-find_package(Boost REQUIRED)
-include_directories(${viscl_Boost_INCLUDE_DIR})
+#find_package(Boost REQUIRED)
+#include_directories(${viscl_Boost_INCLUDE_DIR})
+
+

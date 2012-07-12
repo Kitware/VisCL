@@ -20,16 +20,19 @@ class cl_task
 {
 public:
 
-  cl_task(const vcl_string &source);
-
-  cl_kernel_t make_kernel(const vcl_string &kernel_name);
-
   virtual cl_task_t clone() = 0;
 
 protected:
 
+  friend class cl_task_registry;
+
+  virtual void init() = 0;
+  virtual void init(const cl_program_t &prog) = 0;
+  
+  cl_kernel_t make_kernel(const vcl_string &kernel_name);
+  void build_source(const vcl_string &source);
+
   cl_program_t program;
-  cl_task() {}
 };
 
 

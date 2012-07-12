@@ -15,17 +15,38 @@
 
 extern const char* track_descr_match_source;
 
-track_descr_match::track_descr_match() : cl_task(track_descr_match_source)
+//*****************************************************************************
+
+track_descr_match::track_descr_match()
 {
-  track_k = make_kernel("track");
   max_kpts = 5000;
 }
+
+//*****************************************************************************
+
+void track_descr_match::init()
+{
+  cl_task::build_source(track_descr_match_source);
+  track_k = make_kernel("track");
+}
+
+//*****************************************************************************
+
+void track_descr_match::init(const cl_program_t &prog)
+{
+  program = prog;
+  track_k = make_kernel("track");
+}
+
+//*****************************************************************************
 
 track_descr_match::~track_descr_match()
 {
   delete kpts1_v;
   delete kpts2_v;
 }
+
+//*****************************************************************************
 
 cl_task_t track_descr_match::clone()
 {
@@ -36,6 +57,8 @@ cl_task_t track_descr_match::clone()
   return clone_;
 }
 
+//*****************************************************************************
+
 //Copy constructor for cloning, does not clone tracks
 track_descr_match::track_descr_match(const track_descr_match &t)
 {
@@ -43,6 +66,8 @@ track_descr_match::track_descr_match(const track_descr_match &t)
   this->track_k = t.track_k;
   this->max_kpts = t.max_kpts;
 }
+
+//*****************************************************************************
 
 template<class pixtype, class loctype>
 void track_descr_match::first_frame(const vil_image_view<pixtype> &img,
@@ -75,6 +100,8 @@ void track_descr_match::first_frame(const vil_image_view<pixtype> &img,
     kpts.push_back(vnl_vector_fixed<loctype, 2>((loctype)loc.s[0],(loctype)loc.s[1]));
   }
 }
+
+//*****************************************************************************
 
 template<class pixtype, class loctype>
 const vcl_vector<int>& track_descr_match::track(const vil_image_view<pixtype> &img,
@@ -129,6 +156,8 @@ const vcl_vector<int>& track_descr_match::track(const vil_image_view<pixtype> &i
   return tracks;
 }
 
+//*****************************************************************************
+
 template<class T>
 void write_tracks_to_file(const char *filename, const vcl_vector<vnl_vector_fixed<T, 2> > &kpts1, 
                           const vcl_vector<vnl_vector_fixed<T, 2> > &kpts2, const vcl_vector<int> &indices)
@@ -143,6 +172,8 @@ void write_tracks_to_file(const char *filename, const vcl_vector<vnl_vector_fixe
   }
   outfile.close();
 }
+
+//*****************************************************************************
 
 template void track_descr_match::first_frame<vxl_byte, double>(const vil_image_view<vxl_byte> &img,
                                                                vcl_vector<vnl_vector_fixed<double, 2> > &kpts);

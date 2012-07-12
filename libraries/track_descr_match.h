@@ -45,6 +45,11 @@ public:
   const vcl_vector<int> &get_tracks() const { return tracks; }
   void set_max_kpts(int max) { max_kpts = max; }
 
+protected:
+
+  void init();
+  void init(const cl_program_t &prog);
+
 private:
 
   //This makes it so only the task registry can compile the .cl code

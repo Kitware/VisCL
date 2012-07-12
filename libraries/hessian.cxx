@@ -18,8 +18,19 @@ extern const char* hessian_source;
 
 //*****************************************************************************
 
-hessian::hessian() : cl_task(hessian_source)
+void hessian::init()
 {
+  cl_task::build_source(hessian_source);
+  det_hessian = make_kernel("det_hessian");
+  detect_extrema = make_kernel("detect_extrema");
+  init_kpt_map = make_kernel("init_kpt_map");
+}
+
+//*****************************************************************************
+
+void hessian::init(const cl_program_t &prog)
+{
+  program = prog;
   det_hessian = make_kernel("det_hessian");
   detect_extrema = make_kernel("detect_extrema");
   init_kpt_map = make_kernel("init_kpt_map");

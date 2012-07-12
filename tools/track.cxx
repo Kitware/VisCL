@@ -32,7 +32,6 @@ int main(int argc, char *argv[])
 
   //vcl_cout << print_cl_errstring(-30) << "\n";
 
-
   try
   {
     track_descr_match_t tracker = NEW_VISCL_TASK(track_descr_match);

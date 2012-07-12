@@ -6,8 +6,6 @@
 
 #include "cl_manager.h"
 
-#include <boost/make_shared.hpp>
-
 #include <vcl_iostream.h>
 #include <vil/vil_copy.h>
 #include <vcl_sstream.h>
@@ -129,14 +127,6 @@ cl_image cl_manager::create_image(const cl::ImageFormat &img_frmt, cl_mem_flags 
 
 //*****************************************************************************
 
-template<class T>
-cl_buffer cl_manager::create_buffer(cl_mem_flags flags, size_t len)
-{
-  return cl_buffer(boost::make_shared<cl::Buffer>(cl::Buffer(context, flags, len * sizeof(T))), len);
-}
-
-//*****************************************************************************
-
 void cl_manager::report_system_specs(int device)
 {
   vcl_cout << "***********Device Information***********\n";
@@ -246,15 +236,3 @@ const char *print_cl_errstring(cl_int err)
 
 template cl_image cl_manager::create_image<float>(const vil_image_view<float> &);
 template cl_image cl_manager::create_image<vxl_byte>(const vil_image_view<vxl_byte> &);
-
-//template cl_buffer cl_manager::create_buffer<float>(float *, cl_mem_flags, size_t);
-//template cl_buffer cl_manager::create_buffer<vxl_byte>(vxl_byte *, cl_mem_flags, size_t);
-
-template cl_buffer cl_manager::create_buffer<float>(cl_mem_flags, size_t);
-template cl_buffer cl_manager::create_buffer<vxl_byte>(cl_mem_flags, size_t);
-template cl_buffer cl_manager::create_buffer<int>(cl_mem_flags, size_t);
-template cl_buffer cl_manager::create_buffer<cl_int2>(cl_mem_flags, size_t);
-template cl_buffer cl_manager::create_buffer<cl_int4>(cl_mem_flags, size_t);
-
-
-

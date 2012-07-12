@@ -22,11 +22,16 @@ public:
   void smooth(const vil_image_view<T> &img, vil_image_view<T> &output, float sigma, int kernel_radius) const;
   cl_image smooth(const cl_image &img, float sigma, int kernel_radius) const;
 
+protected:
+
+  void init();
+  void init(const cl_program_t &prog);
+
 private:
 
   //This makes it so only the task registry can compile the .cl code
   friend class cl_task_registry;
-  gaussian_smooth();
+  gaussian_smooth() {}
 
   cl_kernel_t conv_x, conv_y;
   cl_queue_t queue;

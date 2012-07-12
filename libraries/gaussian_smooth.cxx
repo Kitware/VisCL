@@ -14,8 +14,18 @@ extern const char* gaussian_smooth_source;
 
 //*****************************************************************************
 
-gaussian_smooth::gaussian_smooth() : cl_task(gaussian_smooth_source)
+void gaussian_smooth::init()
 {
+  cl_task::build_source(gaussian_smooth_source);
+  conv_x = make_kernel("smoothHoriz");
+  conv_y = make_kernel("smoothVert");
+}
+
+//*****************************************************************************
+
+void gaussian_smooth::init(const cl_program_t &prog)
+{
+  program = prog;
   conv_x = make_kernel("smoothHoriz");
   conv_y = make_kernel("smoothVert");
 }

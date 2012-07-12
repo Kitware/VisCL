@@ -28,10 +28,15 @@ public:
   void compute_descriptors(const vil_image_view<T> &img, const vcl_vector<cl_int2> &kpts, vcl_vector<cl_int4> &descriptors);
   void compute_descriptors(const cl_image &img_s, const cl_buffer &kpts, size_t numkpts, cl_buffer &descriptors);
 
+protected:
+
+  void init();
+  void init(const cl_program_t &prog);
+
 private:
 
   friend class cl_task_registry;
-  brief();
+  brief() {}
 
   vcl_string generate_meta_source(const vcl_string &source);
     

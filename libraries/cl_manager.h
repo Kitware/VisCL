@@ -9,6 +9,8 @@
 
 #include "cl_header.h"
 
+#include <boost/make_shared.hpp>
+
 #include <vil/vil_image_view.h>
 #include <vcl_map.h>
 
@@ -54,5 +56,12 @@ private:
 };
 
 const char *print_cl_errstring(cl_int err);
+
+//Implicit Instantiations
+template<class T>
+cl_buffer cl_manager::create_buffer(cl_mem_flags flags, size_t len)
+{
+  return cl_buffer(boost::make_shared<cl::Buffer>(cl::Buffer(context, flags, len * sizeof(T))), len);
+}
 
 #endif
