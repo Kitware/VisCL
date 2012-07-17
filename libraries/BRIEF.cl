@@ -4,10 +4,10 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-/* BRIEF dectector 
+/* BRIEF dectector
 Meta Definitions:
 __const int4 map[128];
-*/ 
+*/
 
 typedef int4 brief_descr;
 

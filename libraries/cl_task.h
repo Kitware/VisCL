@@ -28,7 +28,7 @@ protected:
 
   virtual void init() = 0;
   virtual void init(const cl_program_t &prog) = 0;
-  
+
   cl_kernel_t make_kernel(const vcl_string &kernel_name);
   void build_source(const vcl_string &source);
 

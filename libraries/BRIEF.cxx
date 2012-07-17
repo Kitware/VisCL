@@ -117,7 +117,7 @@ void brief<radius>::compute_descriptors(const cl_image &img_s, const cl_buffer &
   brief_k->setArg(0, *img_s().get());
   brief_k->setArg(1, *kpts().get());
   brief_k->setArg(2, *descriptors().get());
-  
+
   cl::NDRange global(numkpts);
   queue->enqueueNDRangeKernel(*brief_k.get(), cl::NullRange, global, cl::NullRange);
   queue->finish();

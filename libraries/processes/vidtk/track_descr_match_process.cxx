@@ -134,7 +134,7 @@ bool track_descr_match_process::step()
         tr = vidtk::klt_track::extend_track(p);
         new_tracks_.push_back(tr);
       }
-      
+
       (*tracks_cur_)[i] = tr;
     }
   }

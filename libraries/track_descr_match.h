@@ -57,7 +57,7 @@ private:
   gaussian_smooth_t gs;
 
   cl_kernel_t track_k;
-  cl_queue_t queue;  
+  cl_queue_t queue;
 
   vcl_vector<int> tracks;
 
@@ -72,7 +72,7 @@ private:
 typedef boost::shared_ptr<track_descr_match> track_descr_match_t;
 
 template<class T>
-void write_tracks_to_file(const char *filename, const vcl_vector<vnl_vector_fixed<T, 2> > &kpts1, 
+void write_tracks_to_file(const char *filename, const vcl_vector<vnl_vector_fixed<T, 2> > &kpts1,
                           const vcl_vector<vnl_vector_fixed<T, 2> > &kpts2, const vcl_vector<int> &indices);
 
 #endif

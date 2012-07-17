@@ -38,7 +38,7 @@ private:
   //This makes it so only the task registry can compile the .cl code
   friend class cl_task_registry;
   hessian() {};
-  
+
   cl_kernel_t det_hessian, detect_extrema, init_kpt_map;
   cl_queue_t queue;
 };

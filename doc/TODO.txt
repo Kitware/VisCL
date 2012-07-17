@@ -13,7 +13,7 @@ Design:
 		Re encode strings
 		cmake defines libraries directory
 
-	
+
 Algorithmic:
 	Subpixel accuracy on hessian
 	Parameters

@@ -7,7 +7,7 @@
 __constant sampler_t imageSampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_NEAREST;
 
 // A Brief descriptor is represented as 128 bits
-//using 4 32 bit integers in the int4 datat type 
+//using 4 32 bit integers in the int4 datat type
 typedef int4 brief_descr;
 
 //Hamming distance between brief descriptors.  This function counts the number of bits
@@ -26,7 +26,7 @@ int brief_dist(brief_descr b1, brief_descr b2)
 }
 
 __kernel void track(__global int2 *kpts2, __read_only image2d_t kptmap1,
-                    __global brief_descr *descriptors1, __global brief_descr *descriptors2, 
+                    __global brief_descr *descriptors1, __global brief_descr *descriptors2,
                     __global int *tracks, int window)
 {
   //index into kpts1 and descriptors1

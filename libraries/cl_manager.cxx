@@ -33,14 +33,14 @@ void cl_manager::init_opencl()
 {
   try
   {
-    // Get available platforms    
+    // Get available platforms
     cl::Platform::get(&platforms);
 
     // Select the default platform and create a context using this platform and the GPU
     cl_context_properties cps[3] = {
-        CL_CONTEXT_PLATFORM, 
+        CL_CONTEXT_PLATFORM,
         (cl_context_properties)(platforms[0])(),
-        0 
+        0
     };
 
     context =  cl::Context(CL_DEVICE_TYPE_GPU, cps);
@@ -143,7 +143,7 @@ void cl_manager::report_system_specs(int device)
     vcl_istringstream extensions(vcl_string((const char *)buf, len));
     vcl_string double_extension("cl_khr_fp64");
     bool has_double_extension = false;
-  
+
     vcl_string extension;
     while (extensions >> extension)
     {
@@ -157,11 +157,11 @@ void cl_manager::report_system_specs(int device)
     clGetDeviceInfo(devices[device](), CL_DEVICE_IMAGE2D_MAX_WIDTH, sizeof(size_t), &width, NULL);
     clGetDeviceInfo(devices[device](), CL_DEVICE_IMAGE2D_MAX_HEIGHT, sizeof(size_t), &height, NULL);
     vcl_cout << "Max image dimensions: " << width << "x" << height << "\n";
-    
+
     cl_ulong max_alloc;
     clGetDeviceInfo(devices[device](), CL_DEVICE_MAX_MEM_ALLOC_SIZE, sizeof(cl_ulong), &max_alloc, NULL);
     vcl_cout << "Max memory allocation: " << max_alloc/1048576 << " mb\n";
-  } 
+  }
   catch (cl::Error error) {
     vcl_cout << "Error: " << error.what() << " - " << print_cl_errstring(error.err()) << vcl_endl;
   }

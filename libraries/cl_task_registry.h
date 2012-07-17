@@ -11,7 +11,7 @@
 #include <vcl_map.h>
 #include <boost/make_shared.hpp>
 
-//Cloning a task does not deep copy its kernel, therefore if a task is used in multiple threads 
+//Cloning a task does not deep copy its kernel, therefore if a task is used in multiple threads
 //there will be a race-condition for the kernel args.  Thus deep_clone should be used when
 //using a kernel in a different thread
 

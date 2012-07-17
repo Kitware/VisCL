@@ -31,7 +31,7 @@ register_processes()
   }
 
   registry->register_process("viscl_track_descr_match", "Wrapper around viscl track_descr_match_process", create_process<vistk_track_descr_match_process>);
-  
+
 
   registry->mark_module_as_loaded(module_name);
 }

@@ -17,9 +17,9 @@ template<int radius>
 class brief : public cl_task
 {
 public:
-  
+
   typedef boost::shared_ptr<brief<radius> > type;
-  
+
   cl_task_t clone();
 
   template<class T>
@@ -39,7 +39,7 @@ private:
   brief() {}
 
   vcl_string generate_meta_source(const vcl_string &source);
-    
+
   cl_kernel_t brief_k, brief_dist_k;
   cl_queue_t queue;
 };

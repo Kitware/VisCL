@@ -9,7 +9,7 @@
 
 #include <vcl_string.h>
 
-class descriptor 
+class descriptor
 {
 public:
 

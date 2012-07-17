@@ -16,7 +16,7 @@ set(processes_porting_srcs
   conversion/timestamp.h
   conversion/timestamp.cxx
   registration.h
-  registration.cxx  
+  registration.cxx
   vistk_track_descr_match_process.h
   vistk_track_descr_match_process.cxx
   )

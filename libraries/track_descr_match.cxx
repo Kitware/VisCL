@@ -163,7 +163,7 @@ const vcl_vector<int>& track_descr_match::track(const vil_image_view<pixtype> &i
 //*****************************************************************************
 
 template<class T>
-void write_tracks_to_file(const char *filename, const vcl_vector<vnl_vector_fixed<T, 2> > &kpts1, 
+void write_tracks_to_file(const char *filename, const vcl_vector<vnl_vector_fixed<T, 2> > &kpts1,
                           const vcl_vector<vnl_vector_fixed<T, 2> > &kpts2, const vcl_vector<int> &indices)
 {
   vcl_ofstream outfile(filename);
