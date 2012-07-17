@@ -1,6 +1,10 @@
-#include "cl_manager.h"
+/*ckwg +5
+ * Copyright 2012 by Kitware, Inc. All Rights Reserved. Please refer to
+ * KITWARE_LICENSE.TXT for licensing information, or contact General Counsel,
+ * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
+ */
 
-#include <boost/make_shared.hpp>
+#include "cl_manager.h"
 
 #include <vcl_iostream.h>
 #include <vil/vil_copy.h>
@@ -29,14 +33,14 @@ void cl_manager::init_opencl()
 {
   try
   {
-    // Get available platforms    
+    // Get available platforms
     cl::Platform::get(&platforms);
 
     // Select the default platform and create a context using this platform and the GPU
     cl_context_properties cps[3] = {
-        CL_CONTEXT_PLATFORM, 
+        CL_CONTEXT_PLATFORM,
         (cl_context_properties)(platforms[0])(),
-        0 
+        0
     };
 
     context =  cl::Context(CL_DEVICE_TYPE_GPU, cps);
@@ -44,7 +48,7 @@ void cl_manager::init_opencl()
     // Get a list of devices on this platform
     devices = context.getInfo<CL_CONTEXT_DEVICES>();
   }
-  catch(cl::Error error)
+  catch(cl::Error &error)
   {
     vcl_cout << "Error: " << error.what() << " - " << print_cl_errstring(error.err()) << vcl_endl;
   }
@@ -54,7 +58,6 @@ void cl_manager::init_opencl()
 
 cl_program_t cl_manager::build_source(const char *source, int device) const
 {
-  vcl_vector<cl::Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
   cl::Program::Sources source_(1, std::make_pair(source, strlen(source)+1));
 
   // Make program of the source code in the context
@@ -89,6 +92,11 @@ cl_queue_t cl_manager::create_queue(int device)
 template<class T>
 cl_image cl_manager::create_image(const vil_image_view<T> &img)
 {
+  if (!img.top_left_ptr())
+  {
+    vcl_cerr << "No image data!\n";
+  }
+
   vil_pixel_format pf = img.pixel_format();
   vcl_map<vil_pixel_format, cl::ImageFormat>::iterator itr;
   if ((itr = pixel_format_map.find(pf)) == pixel_format_map.end())
@@ -119,14 +127,6 @@ cl_image cl_manager::create_image(const cl::ImageFormat &img_frmt, cl_mem_flags 
 
 //*****************************************************************************
 
-template<class T>
-cl_buffer cl_manager::create_buffer(cl_mem_flags flags, size_t len)
-{
-  return cl_buffer(boost::make_shared<cl::Buffer>(cl::Buffer(context, flags, len * sizeof(T))), len);
-}
-
-//*****************************************************************************
-
 void cl_manager::report_system_specs(int device)
 {
   vcl_cout << "***********Device Information***********\n";
@@ -143,7 +143,7 @@ void cl_manager::report_system_specs(int device)
     vcl_istringstream extensions(vcl_string((const char *)buf, len));
     vcl_string double_extension("cl_khr_fp64");
     bool has_double_extension = false;
-  
+
     vcl_string extension;
     while (extensions >> extension)
     {
@@ -157,11 +157,11 @@ void cl_manager::report_system_specs(int device)
     clGetDeviceInfo(devices[device](), CL_DEVICE_IMAGE2D_MAX_WIDTH, sizeof(size_t), &width, NULL);
     clGetDeviceInfo(devices[device](), CL_DEVICE_IMAGE2D_MAX_HEIGHT, sizeof(size_t), &height, NULL);
     vcl_cout << "Max image dimensions: " << width << "x" << height << "\n";
-    
+
     cl_ulong max_alloc;
     clGetDeviceInfo(devices[device](), CL_DEVICE_MAX_MEM_ALLOC_SIZE, sizeof(cl_ulong), &max_alloc, NULL);
     vcl_cout << "Max memory allocation: " << max_alloc/1048576 << " mb\n";
-  } 
+  }
   catch (cl::Error error) {
     vcl_cout << "Error: " << error.what() << " - " << print_cl_errstring(error.err()) << vcl_endl;
   }
@@ -236,15 +236,3 @@ const char *print_cl_errstring(cl_int err)
 
 template cl_image cl_manager::create_image<float>(const vil_image_view<float> &);
 template cl_image cl_manager::create_image<vxl_byte>(const vil_image_view<vxl_byte> &);
-
-//template cl_buffer cl_manager::create_buffer<float>(float *, cl_mem_flags, size_t);
-//template cl_buffer cl_manager::create_buffer<vxl_byte>(vxl_byte *, cl_mem_flags, size_t);
-
-template cl_buffer cl_manager::create_buffer<float>(cl_mem_flags, size_t);
-template cl_buffer cl_manager::create_buffer<vxl_byte>(cl_mem_flags, size_t);
-template cl_buffer cl_manager::create_buffer<int>(cl_mem_flags, size_t);
-template cl_buffer cl_manager::create_buffer<cl_int2>(cl_mem_flags, size_t);
-template cl_buffer cl_manager::create_buffer<cl_int4>(cl_mem_flags, size_t);
-
-
-

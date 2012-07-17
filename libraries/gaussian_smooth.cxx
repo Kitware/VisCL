@@ -1,7 +1,12 @@
+/*ckwg +5
+ * Copyright 2012 by Kitware, Inc. All Rights Reserved. Please refer to
+ * KITWARE_LICENSE.TXT for licensing information, or contact General Counsel,
+ * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
+ */
+
 #include "gaussian_smooth.h"
 
 #include <boost/make_shared.hpp>
-#include <vil/algo/vil_gauss_filter.h>
 
 #include "cl_manager.h"
 
@@ -9,10 +14,20 @@ extern const char* gaussian_smooth_source;
 
 //*****************************************************************************
 
-gaussian_smooth::gaussian_smooth() : cl_task(gaussian_smooth_source)
+void gaussian_smooth::init()
 {
-  conv_x = make_kernel("smoothHoriz");
-  conv_y = make_kernel("smoothVert");
+  cl_task::build_source(gaussian_smooth_source);
+  conv_x = make_kernel("convolveHoriz1D");
+  conv_y = make_kernel("convolveVert1D");
+}
+
+//*****************************************************************************
+
+void gaussian_smooth::init(const cl_program_t &prog)
+{
+  program = prog;
+  conv_x = make_kernel("convolveHoriz1D");
+  conv_y = make_kernel("convolveVert1D");
 }
 
 //*****************************************************************************
@@ -27,10 +42,10 @@ cl_task_t gaussian_smooth::clone()
 //*****************************************************************************
 
 template <class T>
-void gaussian_smooth::smooth(const vil_image_view<T> &img, vil_image_view<T> &output, float sigma) const
+void gaussian_smooth::smooth(const vil_image_view<T> &img, vil_image_view<T> &output, float sigma, int kernel_radius) const
 {
   cl_image img_cl = cl_manager::inst()->create_image<T>(img);
-  cl_image result = smooth( img_cl, sigma);
+  cl_image result = smooth( img_cl, sigma, kernel_radius);
 
   cl::size_t<3> origin;
   origin.push_back(0);
@@ -48,30 +63,35 @@ void gaussian_smooth::smooth(const vil_image_view<T> &img, vil_image_view<T> &ou
 
 //*****************************************************************************
 
-cl_image gaussian_smooth::smooth(const cl_image &img, float sigma) const
+cl_image gaussian_smooth::smooth(const cl_image &img, float sigma, int kernel_radius) const
 {
-  vil_gauss_filter_5tap_params params(sigma);
-  float filter[5];
-  filter[0] = filter[4] = (float)params.filt2();
-  filter[1] = filter[3] = (float)params.filt1();
-  filter[2] = (float)params.filt0();
+  int kernel_size = 2*kernel_radius+1;
+  float *filter = new float[kernel_size];
+  float coeff = 1.0f / sqrt(6.2831853072f * sigma * sigma);
+  int i = 0;
+  for (float x = -kernel_radius;  x <= kernel_radius; x++, i++)
+  {
+    filter[i] = coeff * exp( (- x * x) / (2.0f * sigma * sigma));
+  }
 
   cl_buffer smoothing_kernel = cl_manager::inst()->create_buffer<float>(CL_MEM_READ_ONLY, 5);
   queue->enqueueWriteBuffer(*smoothing_kernel().get(), CL_TRUE, 0, smoothing_kernel.mem_size(), filter);
 
-  size_t ni = img.ni(), nj = img.nj();
+  size_t ni = img.width(), nj = img.height();
   cl_image working = cl_manager::inst()->create_image(img.format(), CL_MEM_READ_WRITE, ni, nj);
-  cl_image result = cl_manager::inst()->create_image(img.format(), CL_MEM_WRITE_ONLY, ni, nj);
+  cl_image result = cl_manager::inst()->create_image(img.format(), CL_MEM_READ_WRITE, ni, nj);
 
   // Set arguments to kernel
   conv_x->setArg(0, *img().get());
   conv_x->setArg(1, *smoothing_kernel().get());
-  conv_x->setArg(2, *working().get());
+  conv_x->setArg(2, kernel_size);
+  conv_x->setArg(3, *working().get());
 
   // Set arguments to kernel
   conv_y->setArg(0, *working().get());
   conv_y->setArg(1, *smoothing_kernel().get());
-  conv_y->setArg(2, *result().get());
+  conv_y->setArg(2, kernel_size);
+  conv_y->setArg(3, *result().get());
 
   //Run the kernel on specific ND range
   cl::NDRange global(ni, nj);
@@ -82,10 +102,12 @@ cl_image gaussian_smooth::smooth(const cl_image &img, float sigma) const
   queue->enqueueNDRangeKernel(*conv_y.get(), cl::NullRange, global, cl::NullRange);
   queue->finish();
 
+  delete [] filter;
+
   return result;
 }
 
 //*****************************************************************************
 
-template void gaussian_smooth::smooth(const vil_image_view<vxl_byte> &img, vil_image_view<vxl_byte> &output, float sigma) const;
-template void gaussian_smooth::smooth(const vil_image_view<float> &img, vil_image_view<float> &output, float sigma) const;
+template void gaussian_smooth::smooth(const vil_image_view<vxl_byte> &, vil_image_view<vxl_byte> &, float, int) const;
+template void gaussian_smooth::smooth(const vil_image_view<float> &, vil_image_view<float> &, float, int) const;

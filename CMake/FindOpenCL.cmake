@@ -1,6 +1,6 @@
 # - Try to find OpenCL
 # Once done this will define
-#  
+#
 #  OPENCL_FOUND         - system has OpenCL
 #  OPENCL_INCLUDE_DIR  - the OpenCL include directory
 #  OPENCL_LIBRARIES     - link these to use OpenCL
@@ -20,7 +20,7 @@ ELSE (WIN32)
         # Unix style platforms
         # We also search for OpenCL in the NVIDIA SDK default location
         FIND_PATH(OPENCL_INCLUDE_DIR CL/cl.h ~/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/ )
-        FIND_LIBRARY(OPENCL_LIBRARIES OpenCL 
+        FIND_LIBRARY(OPENCL_LIBRARIES OpenCL
           ENV LD_LIBRARY_PATH
         )
 
@@ -50,5 +50,6 @@ function(encode_opencl_sources cxx_file)
       -D CXX_FILE:FILEPATH=${cxx_file}
       -P ${OPENCL_STRINGIFY}
     DEPENDS ${ARGN}
+      ${OPENCL_STRINGIFY}
   )
 endfunction()

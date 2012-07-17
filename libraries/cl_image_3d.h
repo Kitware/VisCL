@@ -4,28 +4,30 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-#ifndef CL_BUFFER_H_
-#define CL_BUFFER_H_
+#ifndef CL_IMAGE_3D_H_
+#define CL_IMAGE_3D_H_
 
 #include "cl_header.h"
 #include <boost/shared_ptr.hpp>
 
-class cl_buffer
+class cl_image_3d
 {
 public:
 
-  cl_buffer() {}
-  cl_buffer(const cl_buffer_t &buffer, size_t length);
+  cl_image_3d() {}
+  cl_image_3d(const cl_image_3d_t &image);
 
-  size_t mem_size() const;
-  size_t len() const { return len_; }
+  size_t width() const;
+  size_t height() const;
+  size_t depth() const;
 
-  const boost::shared_ptr<cl::Buffer> &operator()() const {return buf;}
+  cl::ImageFormat format() const;
+
+  const cl_image_3d_t &operator()() const {return img;}
 
 private:
 
-  cl_buffer_t buf;
-  size_t len_;
+  cl_image_3d_t img;
 };
 
 #endif

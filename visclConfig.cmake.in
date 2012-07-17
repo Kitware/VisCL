@@ -1,0 +1,21 @@
+
+# The build settings file.
+SET(viscl_BUILD_SETTINGS_FILE "@viscl_BUILD_SETTINGS_FILE@")
+
+# The viscl library dependencies.
+IF(NOT viscl_NO_LIBRARY_DEPENDS)
+  INCLUDE("@viscl_LIBRARY_DEPENDS_FILE@")
+ENDIF(NOT viscl_NO_LIBRARY_DEPENDS)
+
+# The viscl include directories.
+SET(viscl_INCLUDE_DIR "@viscl_INCLUDE_DIR_CONFIG@")
+
+# The viscl library directory.
+SET(viscl_LIBRARY_DIR "@viscl_BINARY_DIR@")
+
+# The viscl CMake support directory.
+SET(viscl_CMAKE_DIR "@viscl_SOURCE_DIR@")
+
+SET(viscl_VXL_DIR "@VXL_DIR@")
+
+SET(viscl_Boost_INCLUDE_DIR "@Boost_INCLUDE_DIR@")

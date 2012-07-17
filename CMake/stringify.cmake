@@ -16,16 +16,18 @@ cmake_minimum_required(VERSION 2.8)
 #  )
 
 
-
 separate_arguments(CL_FILES)
 
-file(WRITE ${CXX_FILE} "#define STRINGIFY(A) #A\n")
-
+file(WRITE "${CXX_FILE}" "")
 foreach(CL_FILE ${CL_FILES})
   set(CL_FILE "${SRC_PATH}/${CL_FILE}")
-  file(READ ${CL_FILE} CL_CODE)
+  file(READ "${CL_FILE}" CL_CODE)
   get_filename_component(CL_NAME "${CL_FILE}" NAME_WE)
-  file(APPEND ${CXX_FILE} "const char *${CL_NAME}_source = STRINGIFY(\n${CL_CODE}\n);\n")
+  string(REGEX REPLACE "\\\\"  "\\\\\\\\"  code "${CL_CODE}")
+  string(REGEX REPLACE "\n"  "\\\\\n" code "${code}")
+  string(REGEX REPLACE "\n"  "\\n\\\\n"    code "${code}")
+  string(REGEX REPLACE "\""  "\\\\\"" code "${code}")
+  file(APPEND "${CXX_FILE}" "const char *${CL_NAME}_source = \"${code}\";\n\n\n")
 endforeach()
 
 
