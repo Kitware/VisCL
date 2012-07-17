@@ -17,8 +17,8 @@ extern const char* gaussian_smooth_source;
 void gaussian_smooth::init()
 {
   cl_task::build_source(gaussian_smooth_source);
-  conv_x = make_kernel("smoothHoriz");
-  conv_y = make_kernel("smoothVert");
+  conv_x = make_kernel("convolveHoriz1D");
+  conv_y = make_kernel("convolveVert1D");
 }
 
 //*****************************************************************************
@@ -26,8 +26,8 @@ void gaussian_smooth::init()
 void gaussian_smooth::init(const cl_program_t &prog)
 {
   program = prog;
-  conv_x = make_kernel("smoothHoriz");
-  conv_y = make_kernel("smoothVert");
+  conv_x = make_kernel("convolveHoriz1D");
+  conv_y = make_kernel("convolveVert1D");
 }
 
 //*****************************************************************************
@@ -77,7 +77,7 @@ cl_image gaussian_smooth::smooth(const cl_image &img, float sigma, int kernel_ra
   cl_buffer smoothing_kernel = cl_manager::inst()->create_buffer<float>(CL_MEM_READ_ONLY, 5);
   queue->enqueueWriteBuffer(*smoothing_kernel().get(), CL_TRUE, 0, smoothing_kernel.mem_size(), filter);
 
-  size_t ni = img.ni(), nj = img.nj();
+  size_t ni = img.width(), nj = img.height();
   cl_image working = cl_manager::inst()->create_image(img.format(), CL_MEM_READ_WRITE, ni, nj);
   cl_image result = cl_manager::inst()->create_image(img.format(), CL_MEM_READ_WRITE, ni, nj);
 

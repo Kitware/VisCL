@@ -6,14 +6,22 @@
 
 __constant sampler_t imageSampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_NEAREST;
 
+// A Brief descriptor is represented as 128 bits
+//using 4 32 bit integers in the int4 datat type 
 typedef int4 brief_descr;
 
+//Hamming distance between brief descriptors.  This function counts the number of bits
+//(pop count) between 4 32 ints in parallel then sums the result
 int brief_dist(brief_descr b1, brief_descr b2)
 {
-  int4 v = b1 ^ b2;
+  int4 v = b1 ^ b2; //Find the bits that differ
+
+  //Count the bits in v in parallel
   v = v - ((v >> 1) & 0x55555555);
   v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
   int4 c = ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
+
+  //Sum the counts
   return c.x + c.y + c.z + c.w;
 }
 

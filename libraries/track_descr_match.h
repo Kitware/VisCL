@@ -17,10 +17,6 @@
 #include <vil/vil_image_view.h>
 #include <vnl/vnl_int_2.h>
 
-class track_descr_match;
-
-typedef boost::shared_ptr<track_descr_match> track_descr_match_t;
-
 class track_descr_match : public cl_task
 {
 public:
@@ -72,6 +68,8 @@ private:
   vcl_vector<cl_int2> *kpts1_v;
   vcl_vector<cl_int2> *kpts2_v;
 };
+
+typedef boost::shared_ptr<track_descr_match> track_descr_match_t;
 
 template<class T>
 void write_tracks_to_file(const char *filename, const vcl_vector<vnl_vector_fixed<T, 2> > &kpts1, 

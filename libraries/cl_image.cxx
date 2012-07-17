@@ -13,7 +13,7 @@ cl_image::cl_image(const boost::shared_ptr<cl::Image2D> &image) : img(image)
 
 //*****************************************************************************
 
-size_t cl_image::ni() const
+size_t cl_image::width() const
 {
   size_t width;
   img->getImageInfo<size_t>(CL_IMAGE_WIDTH, &width);
@@ -22,7 +22,7 @@ size_t cl_image::ni() const
 
 //*****************************************************************************
 
-size_t cl_image::nj() const
+size_t cl_image::height() const
 {
   size_t height;
   img->getImageInfo<size_t>(CL_IMAGE_HEIGHT, &height);

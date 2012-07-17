@@ -79,7 +79,7 @@ void hessian::smooth_and_detect(const cl_image &img, cl_image &kptmap, cl_buffer
 void hessian::detect(const cl_image &smoothed, cl_image &kptmap, cl_buffer &kpts, cl_buffer &numkpts,
                      int max_kpts, float thresh, float sigma) const
 {
-  size_t ni = smoothed.ni(), nj = smoothed.nj();
+  size_t ni = smoothed.width(), nj = smoothed.height();
   cl::ImageFormat detimg_fmt(CL_INTENSITY, CL_FLOAT);
   cl_image detimg = cl_manager::inst()->create_image(detimg_fmt, CL_MEM_READ_WRITE, ni, nj);
   cl::ImageFormat kptimg_fmt(CL_R, CL_SIGNED_INT32);
@@ -90,7 +90,7 @@ void hessian::detect(const cl_image &smoothed, cl_image &kptmap, cl_buffer &kpts
   init[0] = 0;
   numkpts = cl_manager::inst()->create_buffer<int>(CL_MEM_READ_WRITE, 1);
   queue->enqueueWriteBuffer(*numkpts().get(), CL_TRUE, 0, numkpts.mem_size(), init);
-  
+
   // Set arguments to kernel
   det_hessian->setArg(0, *smoothed().get());
   det_hessian->setArg(1, *detimg().get());

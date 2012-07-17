@@ -37,7 +37,7 @@ public:
   //cl_buffer create_buffer(T *, cl_mem_flags flags, size_t len);
   template<class T>
   cl_buffer create_buffer(cl_mem_flags flags, size_t len);
-  
+
   void report_system_specs(int device = 0);
 
 private:

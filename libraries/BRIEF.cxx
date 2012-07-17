@@ -14,6 +14,9 @@
 #include "gaussian_smooth.h"
 #include "cl_manager.h"
 
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
+
 extern const char* BRIEF_source;
 
 //*****************************************************************************
@@ -39,24 +42,27 @@ void brief<radius>::init(const cl_program_t &prog)
 template<int radius>
 vcl_string brief<radius>::generate_meta_source(const vcl_string &source)
 {
-  srand(100);
-  int S = radius * 2;
+  //Boost rand guarantees that the random values generating the comparison map for brief
+  //will be constistent otherwise the descriptor algorithm would not be thread safe
+  boost::random::mt19937 gen;
+  boost::random::uniform_int_distribution<> dist(-radius, radius);
 
   vcl_stringstream metasource;
   metasource << "__constant int4 map[128] = {";
   const unsigned int nsamples = 128;
   for (unsigned int i = 0; i < 128; i++)
   {
-    int x1 = (rand() % S) - radius;
-    int y1 = (rand() % S) - radius;
-    int x2 = (rand() % S) - radius;
-    int y2 = (rand() % S) - radius;
+    int x1 = dist(gen);
+    int y1 = dist(gen);
+    int x2 = dist(gen);
+    int y2 = dist(gen);
     metasource << "(int4)(" << x1 << "," << y1 << "," << x2 << "," << y2 << ")";
     if (i < nsamples-1)
       metasource << ",\n";
   }
 
   metasource << "};\n\n" << source;
+
   return metasource.str();
 }
 

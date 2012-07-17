@@ -77,11 +77,12 @@ void track_descr_match::first_frame(const vil_image_view<pixtype> &img,
   gs = NEW_VISCL_TASK(gaussian_smooth);
   hes = NEW_VISCL_TASK(hessian);
   brf = NEW_VISCL_TASK(brief<10>);
+  cl_image smoothed;
 
-  cl_image img_cl = cl_manager::inst()->create_image<pixtype>(img);
-
-  cl_image smoothed = gs->smooth(img_cl, sigma, 2);
-  img_cl.del();
+  {
+    cl_image img_cl = cl_manager::inst()->create_image<pixtype>(img);
+    smoothed = gs->smooth(img_cl, sigma, 2);
+  }
 
   cl_buffer numkpts_b;
 
@@ -109,10 +110,13 @@ const vcl_vector<int>& track_descr_match::track(const vil_image_view<pixtype> &i
                                int window_size)
 {
   float thresh = 0.003f, sigma = 2.0f;
-  cl_image img_cl = cl_manager::inst()->create_image<pixtype>(img);
-  cl_image smoothed = gs->smooth(img_cl, sigma, 2);
-  img_cl.del(); 
-  
+  cl_image smoothed;
+
+  {
+    cl_image img_cl = cl_manager::inst()->create_image<pixtype>(img);
+    smoothed = gs->smooth(img_cl, sigma, 2);
+  }
+
   cl_buffer kpts2, numkpts2_b;
   cl_image kptmap2;
   hes->detect(smoothed, kptmap2, kpts2, numkpts2_b, max_kpts, thresh, sigma);
@@ -180,5 +184,5 @@ template void track_descr_match::first_frame<vxl_byte, double>(const vil_image_v
 template const vcl_vector<int>& track_descr_match::track(const vil_image_view<vxl_byte> &img,
                                                          vcl_vector<vnl_vector_fixed<double, 2> > &kpts,
                                                          int window_size);
-template void write_tracks_to_file(const char *filename, const vcl_vector<vnl_vector_fixed<double, 2> >  &kpts1, 
+template void write_tracks_to_file(const char *filename, const vcl_vector<vnl_vector_fixed<double, 2> >  &kpts1,
                           const vcl_vector<vnl_vector_fixed<double, 2> > &kpts2, const vcl_vector<int> &indices);

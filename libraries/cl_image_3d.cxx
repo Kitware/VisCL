@@ -13,7 +13,7 @@ cl_image_3d::cl_image_3d(const cl_image_3d_t &image) : img(image)
 
 //*****************************************************************************
 
-size_t cl_image_3d::ni() const
+size_t cl_image_3d::width() const
 {
   size_t width;
   img->getImageInfo<size_t>(CL_IMAGE_WIDTH, &width);
@@ -22,7 +22,7 @@ size_t cl_image_3d::ni() const
 
 //*****************************************************************************
 
-size_t cl_image_3d::nj() const
+size_t cl_image_3d::height() const
 {
   size_t height;
   img->getImageInfo<size_t>(CL_IMAGE_HEIGHT, &height);
@@ -31,7 +31,7 @@ size_t cl_image_3d::nj() const
 
 //*****************************************************************************
 
-size_t cl_image_3d::nd() const
+size_t cl_image_3d::depth() const
 {
   size_t depth;
   img->getImageInfo<size_t>(CL_IMAGE_DEPTH, &depth);

@@ -17,12 +17,11 @@ public:
   cl_image_3d() {}
   cl_image_3d(const cl_image_3d_t &image);
 
-  size_t ni() const;
-  size_t nj() const;
-  size_t nd() const;
+  size_t width() const;
+  size_t height() const;
+  size_t depth() const;
 
   cl::ImageFormat format() const;
-  void del() { img.reset(); }
 
   const cl_image_3d_t &operator()() const {return img;}
 

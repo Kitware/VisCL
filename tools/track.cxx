@@ -30,8 +30,6 @@ int main(int argc, char *argv[])
   vil_convert_planes_to_grey(img2_color, img2);
   vil_convert_planes_to_grey(img3_color, img3);
 
-  //vcl_cout << print_cl_errstring(-30) << "\n";
-
   try
   {
     track_descr_match_t tracker = NEW_VISCL_TASK(track_descr_match);
