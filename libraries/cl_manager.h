@@ -23,8 +23,8 @@ public:
 
   static cl_manager *inst();
 
-  const cl::Context &get_context() const { return context; }
-  const cl::Device &get_device(int device = 0) const { return devices[device]; }
+  const cl::Context &get_context() const { return context_; }
+  const cl::Device &get_device(int device = 0) const { return devices_[device]; }
 
   cl_program_t build_source(const char *source, int device = 0) const;
   cl_queue_t create_queue(int device = 0);
@@ -48,11 +48,11 @@ private:
   void init_opencl();
   void make_pixel_format_map();
 
-  vcl_vector<cl::Platform> platforms;
-  cl::Context context;
-  vcl_vector<cl::Device> devices;
+  vcl_vector<cl::Platform> platforms_;
+  cl::Context context_;
+  vcl_vector<cl::Device> devices_;
 
-  vcl_map<vil_pixel_format, cl::ImageFormat> pixel_format_map;
+  vcl_map<vil_pixel_format, cl::ImageFormat> pixel_format_map_;
 };
 
 const char *print_cl_errstring(cl_int err);
@@ -61,7 +61,7 @@ const char *print_cl_errstring(cl_int err);
 template<class T>
 cl_buffer cl_manager::create_buffer(cl_mem_flags flags, size_t len)
 {
-  return cl_buffer(boost::make_shared<cl::Buffer>(cl::Buffer(context, flags, len * sizeof(T))), len);
+  return cl_buffer(boost::make_shared<cl::Buffer>(cl::Buffer(context_, flags, len * sizeof(T))), len);
 }
 
 #endif

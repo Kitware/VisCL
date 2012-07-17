@@ -34,19 +34,19 @@ void cl_manager::init_opencl()
   try
   {
     // Get available platforms
-    cl::Platform::get(&platforms);
+    cl::Platform::get(&platforms_);
 
     // Select the default platform and create a context using this platform and the GPU
     cl_context_properties cps[3] = {
         CL_CONTEXT_PLATFORM,
-        (cl_context_properties)(platforms[0])(),
+        (cl_context_properties)(platforms_[0])(),
         0
     };
 
-    context =  cl::Context(CL_DEVICE_TYPE_GPU, cps);
+    context_ =  cl::Context(CL_DEVICE_TYPE_GPU, cps);
 
     // Get a list of devices on this platform
-    devices = context.getInfo<CL_CONTEXT_DEVICES>();
+    devices_ = context_.getInfo<CL_CONTEXT_DEVICES>();
   }
   catch(cl::Error &error)
   {
@@ -58,19 +58,19 @@ void cl_manager::init_opencl()
 
 cl_program_t cl_manager::build_source(const char *source, int device) const
 {
-  cl::Program::Sources source_(1, std::make_pair(source, strlen(source)+1));
+  cl::Program::Sources src(1, std::make_pair(source, strlen(source)+1));
 
   // Make program of the source code in the context
-  cl_program_t program = boost::make_shared<cl::Program>(cl::Program(context, source_));
+  cl_program_t program = boost::make_shared<cl::Program>(cl::Program(context_, src));
 
   // Build program for these specific devices
   try {
-    program->build(devices);
+    program->build(devices_);
   }
   catch(cl::Error error)  {
     if(error.err() == CL_BUILD_PROGRAM_FAILURE)
     {
-      vcl_string build_log = program->getBuildInfo<CL_PROGRAM_BUILD_LOG>(devices[device]);
+      vcl_string build_log = program->getBuildInfo<CL_PROGRAM_BUILD_LOG>(devices_[device]);
       vcl_cerr << build_log << vcl_endl;
     }
     throw error;
@@ -83,7 +83,7 @@ cl_program_t cl_manager::build_source(const char *source, int device) const
 
 cl_queue_t cl_manager::create_queue(int device)
 {
-  return boost::make_shared<cl::CommandQueue>(cl::CommandQueue(context, devices[device]));
+  return boost::make_shared<cl::CommandQueue>(cl::CommandQueue(context_, devices_[device]));
 }
 
 //*****************************************************************************
@@ -99,11 +99,11 @@ cl_image cl_manager::create_image(const vil_image_view<T> &img)
 
   vil_pixel_format pf = img.pixel_format();
   vcl_map<vil_pixel_format, cl::ImageFormat>::iterator itr;
-  if ((itr = pixel_format_map.find(pf)) == pixel_format_map.end())
+  if ((itr = pixel_format_map_.find(pf)) == pixel_format_map_.end())
     return cl_image();
 
   const cl::ImageFormat &img_fmt = itr->second;
-  return cl_image(boost::make_shared<cl::Image2D>(cl::Image2D(context,
+  return cl_image(boost::make_shared<cl::Image2D>(cl::Image2D(context_,
                                                   CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
                                                   img_fmt,
                                                   img.ni(),
@@ -116,7 +116,7 @@ cl_image cl_manager::create_image(const vil_image_view<T> &img)
 
 cl_image cl_manager::create_image(const cl::ImageFormat &img_frmt, cl_mem_flags flags, size_t ni, size_t nj)
 {
-  return cl_image(boost::make_shared<cl::Image2D>(cl::Image2D(context,
+  return cl_image(boost::make_shared<cl::Image2D>(cl::Image2D(context_,
                                                               flags,
                                                               img_frmt,
                                                               ni,
@@ -133,13 +133,13 @@ void cl_manager::report_system_specs(int device)
 
   try {
     cl_ulong mem_size;
-    clGetDeviceInfo(devices[device](), CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(cl_ulong), &mem_size, NULL);
+    clGetDeviceInfo(devices_[device](), CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(cl_ulong), &mem_size, NULL);
     vcl_cout << "Device global memory: " << mem_size/1048576 << " mb\n";
 
     const int bufsize = 1024;
     cl_char buf[bufsize];
     size_t len;
-    clGetDeviceInfo(devices[device](), CL_DEVICE_EXTENSIONS, sizeof(cl_char)*bufsize, buf, &len);
+    clGetDeviceInfo(devices_[device](), CL_DEVICE_EXTENSIONS, sizeof(cl_char)*bufsize, buf, &len);
     vcl_istringstream extensions(vcl_string((const char *)buf, len));
     vcl_string double_extension("cl_khr_fp64");
     bool has_double_extension = false;
@@ -154,12 +154,12 @@ void cl_manager::report_system_specs(int device)
     vcl_cout << "Supports double extension? " << (has_double_extension ? "yes" : "no") << "\n";
 
     size_t width, height;
-    clGetDeviceInfo(devices[device](), CL_DEVICE_IMAGE2D_MAX_WIDTH, sizeof(size_t), &width, NULL);
-    clGetDeviceInfo(devices[device](), CL_DEVICE_IMAGE2D_MAX_HEIGHT, sizeof(size_t), &height, NULL);
+    clGetDeviceInfo(devices_[device](), CL_DEVICE_IMAGE2D_MAX_WIDTH, sizeof(size_t), &width, NULL);
+    clGetDeviceInfo(devices_[device](), CL_DEVICE_IMAGE2D_MAX_HEIGHT, sizeof(size_t), &height, NULL);
     vcl_cout << "Max image dimensions: " << width << "x" << height << "\n";
 
     cl_ulong max_alloc;
-    clGetDeviceInfo(devices[device](), CL_DEVICE_MAX_MEM_ALLOC_SIZE, sizeof(cl_ulong), &max_alloc, NULL);
+    clGetDeviceInfo(devices_[device](), CL_DEVICE_MAX_MEM_ALLOC_SIZE, sizeof(cl_ulong), &max_alloc, NULL);
     vcl_cout << "Max memory allocation: " << max_alloc/1048576 << " mb\n";
   }
   catch (cl::Error error) {
@@ -172,8 +172,8 @@ void cl_manager::report_system_specs(int device)
 //http://www.khronos.org/registry/cl/sdk/1.0/docs/man/xhtml/cl_image_format.html
 void cl_manager::make_pixel_format_map()
 {
-  pixel_format_map[VIL_PIXEL_FORMAT_FLOAT] = cl::ImageFormat(CL_INTENSITY, CL_FLOAT);
-  pixel_format_map[VIL_PIXEL_FORMAT_BYTE] = cl::ImageFormat(CL_INTENSITY, CL_UNORM_INT8);
+  pixel_format_map_[VIL_PIXEL_FORMAT_FLOAT] = cl::ImageFormat(CL_INTENSITY, CL_FLOAT);
+  pixel_format_map_[VIL_PIXEL_FORMAT_BYTE] = cl::ImageFormat(CL_INTENSITY, CL_UNORM_INT8);
 }
 
 //*****************************************************************************
