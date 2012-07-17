@@ -50,6 +50,6 @@ function(encode_opencl_sources cxx_file)
       -D CXX_FILE:FILEPATH=${cxx_file}
       -P ${OPENCL_STRINGIFY}
     DEPENDS ${ARGN}
-			${OPENCL_STRINGIFY}
+      ${OPENCL_STRINGIFY}
   )
 endfunction()
