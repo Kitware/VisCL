@@ -27,6 +27,10 @@ encode_opencl_sources(cl_strings.cxx ${OCL_SRC_FILES})
 add_library(viscl ${OCL_SRC_FILES} ${CXX_SRC_FILES} cl_strings.cxx)
 target_link_libraries(viscl ${OPENCL_LIBRARIES} vil vil_algo vnl)
 
+install( TARGETS viscl EXPORT viscl
+  RUNTIME DESTINATION bin LIBRARY DESTINATION lib ARCHIVE DESTINATION lib
+)
+
 if(vistk_FOUND AND vidtk_FOUND)
   add_subdirectory(processes)
 endif()
