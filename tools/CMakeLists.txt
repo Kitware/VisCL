@@ -1,3 +1,6 @@
+add_executable(report_opencl_specs report_opencl_specs.cxx)
+target_link_libraries(report_opencl_specs viscl)
+
 add_executable(track track.cxx )
 target_link_libraries(track ${OPENCL_LIBRARIES} vil vil_algo vul viscl)
 
