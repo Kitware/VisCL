@@ -27,12 +27,20 @@ int main(int argc, char *argv[])
   vul_arg<unsigned> arg_iw("-iw", "Image width", 4096);
   vul_arg<unsigned> arg_ih("-ih", "Image height", 4096);
   vul_arg<unsigned> arg_nj("-nj", "# of iterations", 10);
+  vul_arg<bool>     arg_use_cpu("-cpu", "run CPU timing", false);
+  vul_arg<bool>     arg_use_gpu("-gpu", "run GPU timing", false);
 
   vul_arg_parse(argc, argv);
 
   unsigned iw = arg_iw();
   unsigned ih = arg_ih();
   const unsigned iter = arg_nj();
+
+  if (!arg_use_cpu() && !arg_use_gpu())
+  {
+    vcl_cerr << "must specify either -cpu or -gpu flag, or both" << vcl_endl;
+    return -1;
+  }
 
   cl_manager::inst()->report_opencl_specs();
 
@@ -54,16 +62,30 @@ int main(int argc, char *argv[])
 
   for (int r = 0; r < 3; r++)
   {
-    boost::chrono::system_clock::time_point start = boost::chrono::system_clock::now();
-    for (int i = 0; i < iter; i++)
-      cl_image result = smoother->smooth( img_cl, 2.0, radii[r]);
-    boost::chrono::duration<double> sec = boost::chrono::system_clock::now() - start;
-    vcl_cout << "viscl took " << sec.count() << " seconds to smooth a " << img.ni() << "x" << img.nj() << " img " << iter << "x w/ kernel size=" << 2*radii[r]+1 << ".\n";
-    start = boost::chrono::system_clock::now();
-    for (int i = 0; i < iter; i++)
-      vil_gauss_filter_2d<vxl_byte, vxl_byte>(img, output, 2.0, radii[r]);
-    sec = boost::chrono::system_clock::now() - start;
-    vcl_cout << "VXL took "   << sec.count() << " seconds to smooth a " << img.ni() << "x" << img.nj() << " img " << iter << "x w/ kernel size=" << 2*radii[r]+1 << ".\n";
+    boost::chrono::system_clock::time_point start;
+    boost::chrono::duration<double> sec;
+    if (arg_use_gpu())
+    {
+      start = boost::chrono::system_clock::now();
+      for (int i = 0; i < iter; i++)
+        cl_image result = smoother->smooth( img_cl, 2.0, radii[r]);
+      sec = boost::chrono::system_clock::now() - start;
+      vcl_cout << "viscl took " << sec.count() / iter
+               << " seconds to smooth a "
+               << img.ni() << "x" << img.nj() << " image "
+               << iter << "x w/ kernel size=" << 2*radii[r]+1 << ".\n";
+    }
+    if (arg_use_cpu())
+    {
+      start = boost::chrono::system_clock::now();
+      for (int i = 0; i < iter; i++)
+        vil_gauss_filter_2d<vxl_byte, vxl_byte>(img, output, 2.0, radii[r]);
+      sec = boost::chrono::system_clock::now() - start;
+      vcl_cout << "VXL took "   << sec.count() / iter
+               << " seconds to smooth a "
+               << img.ni() << "x" << img.nj() << " img "
+               << iter << "x w/ kernel size=" << 2*radii[r]+1 << ".\n";
+    }
   }
 
   return 0;
