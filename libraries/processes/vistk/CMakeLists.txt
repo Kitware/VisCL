@@ -26,6 +26,7 @@ add_vistk_plugin(viscl2vistk_processes
   ${processes_porting_srcs})
 # Add any libraries that are necessary here.
 target_link_libraries(viscl2vistk_processes
-  processes
+  viscl_vidtk_processes
   vistk_pipeline
   vistk_utilities)
+
