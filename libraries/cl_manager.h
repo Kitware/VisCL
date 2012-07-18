@@ -38,12 +38,21 @@ public:
   template<class T>
   cl_buffer create_buffer(cl_mem_flags flags, size_t len);
 
-  void report_device_specs(const cl::Device& dev,
-                           const vcl_string& prefix="");
+  /// Print specs for a given device number on the active Platform.
+  void report_device_specs(int device = 0)
+  {
+    report_device_specs(devices_[device]);
+  }
 
+  /// Print specs for all available OpenCL Platforms and Devices.
   void report_opencl_specs();
 
 private:
+
+  /// Print specs for an OpenCL Device.
+  /// Prefix each output line with \a prefix
+  void report_device_specs(const cl::Device& dev,
+                           const vcl_string& prefix="");
 
   cl_manager();
   static cl_manager *inst_;
