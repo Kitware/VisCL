@@ -19,7 +19,7 @@
 
 int main(int argc, char *argv[])
 {
-  cl_manager::inst()->report_system_specs();
+  cl_manager::inst()->report_opencl_specs();
 
   vil_image_view<vxl_byte> img1_color = vil_load(argv[1]);
   vil_image_view<vxl_byte> img2_color = vil_load(argv[2]);

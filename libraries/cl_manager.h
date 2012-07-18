@@ -38,7 +38,10 @@ public:
   template<class T>
   cl_buffer create_buffer(cl_mem_flags flags, size_t len);
 
-  void report_system_specs(int device = 0);
+  void report_device_specs(const cl::Device& dev,
+                           const vcl_string& prefix="");
+
+  void report_opencl_specs();
 
 private:
 

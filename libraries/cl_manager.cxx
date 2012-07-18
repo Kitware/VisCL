@@ -127,43 +127,145 @@ cl_image cl_manager::create_image(const cl::ImageFormat &img_frmt, cl_mem_flags 
 
 //*****************************************************************************
 
-void cl_manager::report_system_specs(int device)
+void cl_manager::report_device_specs(const cl::Device& dev,
+                                     const vcl_string& prefix)
 {
-  vcl_cout << "***********Device Information***********\n";
+  try
+  {
+    vcl_cout << prefix << "Name                : "
+             << dev.getInfo<CL_DEVICE_NAME>() << "\n";
+    vcl_cout << prefix << "Type                : ";
+    cl_device_type type = dev.getInfo<CL_DEVICE_TYPE>();
+    if (type & CL_DEVICE_TYPE_CPU)
+    {
+      vcl_cout << "CPU ";
+    }
+    if (type & CL_DEVICE_TYPE_GPU)
+    {
+      vcl_cout << "GPU ";
+    }
+    if (type & CL_DEVICE_TYPE_ACCELERATOR)
+    {
+      vcl_cout << "Accelerator ";
+    }
+    vcl_cout << "\n";
+    vcl_cout << prefix << "Vendor              : "
+             << dev.getInfo<CL_DEVICE_VENDOR>() << "\n";
+    vcl_cout << prefix << "Device Version      : "
+             << dev.getInfo<CL_DEVICE_VERSION>() << "\n";
+    vcl_cout << prefix << "Driver Version      : "
+             << dev.getInfo<CL_DRIVER_VERSION>() << "\n";
+    vcl_cout << prefix << "Max Clock Frequency : "
+             << dev.getInfo<CL_DEVICE_MAX_CLOCK_FREQUENCY>() << " MHz\n";
+    vcl_cout << prefix << "Max Compute Units   : "
+             << dev.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>() << "\n";
+    vcl_cout << prefix << "Max Work Item Dims  : "
+             << dev.getInfo<CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS>() << "\n";
+    vcl_cout << prefix << "Max Work Item Sizes : ";
+    vcl_vector<size_t> work_sizes = dev.getInfo<CL_DEVICE_MAX_WORK_ITEM_SIZES>();
+    for (size_t i=0; i<work_sizes.size(); ++i)
+    {
+      vcl_cout << work_sizes[i];
+      if (i < work_sizes.size()-1)
+      {
+        vcl_cout << ", ";
+      }
+    }
+    vcl_cout << "\n";
+    vcl_cout << prefix << "Max Work Group Size : "
+             << dev.getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>() << "\n";
+    vcl_cout << prefix << "Global Memory       : "
+             << dev.getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>()/1048576 << " Mb\n";
+    vcl_cout << prefix << "Max Memory Alloc    : "
+             << dev.getInfo<CL_DEVICE_MAX_MEM_ALLOC_SIZE>()/1048576 << " Mb\n";
+    vcl_cout << prefix << "Max Image 2D Dims   : "
+             << dev.getInfo<CL_DEVICE_IMAGE2D_MAX_WIDTH>() << " x "
+             << dev.getInfo<CL_DEVICE_IMAGE2D_MAX_HEIGHT>() << "\n";
+    vcl_cout << prefix << "Max Image 3D Dims   : "
+             << dev.getInfo<CL_DEVICE_IMAGE3D_MAX_WIDTH>() << " x "
+             << dev.getInfo<CL_DEVICE_IMAGE3D_MAX_HEIGHT>() << " x "
+             << dev.getInfo<CL_DEVICE_IMAGE3D_MAX_DEPTH>() << "\n";
+    vcl_cout << prefix << "Out of Order Queue  : "
+             << ((dev.getInfo<CL_DEVICE_QUEUE_PROPERTIES>() &
+                  CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE) ? "Yes" : "No") << "\n";
 
-  try {
-    cl_ulong mem_size;
-    clGetDeviceInfo(devices_[device](), CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(cl_ulong), &mem_size, NULL);
-    vcl_cout << "Device global memory: " << mem_size/1048576 << " mb\n";
 
-    const int bufsize = 1024;
-    cl_char buf[bufsize];
-    size_t len;
-    clGetDeviceInfo(devices_[device](), CL_DEVICE_EXTENSIONS, sizeof(cl_char)*bufsize, buf, &len);
-    vcl_istringstream extensions(vcl_string((const char *)buf, len));
-    vcl_string double_extension("cl_khr_fp64");
-    bool has_double_extension = false;
-
+    vcl_string dev_ext = dev.getInfo<CL_DEVICE_EXTENSIONS>();
+    vcl_istringstream extensions(dev_ext);
     vcl_string extension;
+    vcl_cout << prefix << "Extensions          : ";
+    bool first_ext = true;
     while (extensions >> extension)
     {
-      if (extension == double_extension)
-        has_double_extension = true;
+      if (first_ext)
+      {
+        first_ext = false;
+      }
+      else
+      {
+        vcl_cout << prefix << "                      ";
+      }
+      vcl_cout << extension << "\n";
     }
-
-    vcl_cout << "Supports double extension? " << (has_double_extension ? "yes" : "no") << "\n";
-
-    size_t width, height;
-    clGetDeviceInfo(devices_[device](), CL_DEVICE_IMAGE2D_MAX_WIDTH, sizeof(size_t), &width, NULL);
-    clGetDeviceInfo(devices_[device](), CL_DEVICE_IMAGE2D_MAX_HEIGHT, sizeof(size_t), &height, NULL);
-    vcl_cout << "Max image dimensions: " << width << "x" << height << "\n";
-
-    cl_ulong max_alloc;
-    clGetDeviceInfo(devices_[device](), CL_DEVICE_MAX_MEM_ALLOC_SIZE, sizeof(cl_ulong), &max_alloc, NULL);
-    vcl_cout << "Max memory allocation: " << max_alloc/1048576 << " mb\n";
   }
-  catch (cl::Error error) {
-    vcl_cout << "Error: " << error.what() << " - " << print_cl_errstring(error.err()) << vcl_endl;
+  catch (cl::Error error)
+  {
+    vcl_cout << "Error: " << error.what() << " - "
+             << print_cl_errstring(error.err()) << vcl_endl;
+  }
+}
+
+//*****************************************************************************
+
+void cl_manager::report_opencl_specs()
+{
+  try
+  {
+    vcl_cout << "Found " << platforms_.size() << " Platforms" << vcl_endl;
+    for (size_t i=0; i<platforms_.size(); ++i)
+    {
+      vcl_cout << "Platform[" << i << "]\n";
+      vcl_cout << "  Name       : "
+               << platforms_[i].getInfo<CL_PLATFORM_NAME>() << "\n";
+      vcl_cout << "  Vendor     : "
+               << platforms_[i].getInfo<CL_PLATFORM_VENDOR>() << "\n";
+      vcl_cout << "  Version    : "
+               << platforms_[i].getInfo<CL_PLATFORM_VERSION>() << "\n";
+      vcl_cout << "  Profile    : "
+               << platforms_[i].getInfo<CL_PLATFORM_PROFILE>() << "\n";
+      vcl_string plat_ext = platforms_[i].getInfo<CL_PLATFORM_EXTENSIONS>();
+      vcl_istringstream extensions(plat_ext);
+
+      vcl_string extension;
+      vcl_cout << "  Extensions : ";
+      bool first_ext = true;
+      while (extensions >> extension)
+      {
+        if (first_ext)
+        {
+          first_ext = false;
+        }
+        else
+        {
+          vcl_cout << "               ";
+        }
+        vcl_cout << extension << "\n";
+      }
+
+      vcl_vector<cl::Device> devices;
+      platforms_[i].getDevices(CL_DEVICE_TYPE_ALL, &devices);
+      vcl_cout << "  Found " << devices.size() << " Devices" << vcl_endl;
+      for (size_t j=0; j<devices.size(); ++j)
+      {
+        vcl_cout << "\n  Device[" << j << "]\n";
+        report_device_specs(devices[j], "    ");
+      }
+    }
+  }
+  catch (cl::Error error)
+  {
+    vcl_cout << "Error: " << error.what() << " - "
+             << print_cl_errstring(error.err()) << vcl_endl;
   }
 }
 

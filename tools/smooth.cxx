@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
   unsigned ih = arg_ih();
   const unsigned iter = arg_nj();
 
-  cl_manager::inst()->report_system_specs();
+  cl_manager::inst()->report_opencl_specs();
 
   vil_image_view<vxl_byte> output, img = vil_image_view<vxl_byte>(iw,ih);
   vcl_srand(vcl_time(NULL));
