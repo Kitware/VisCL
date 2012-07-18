@@ -14,8 +14,6 @@
 #include "BRIEF.h"
 #include "gaussian_smooth.h"
 
-#include <vil/vil_image_view.h>
-#include <vnl/vnl_int_2.h>
 
 class track_descr_match : public cl_task
 {
@@ -27,18 +25,14 @@ public:
   track_descr_match(const track_descr_match &t);
   cl_task_t clone();
 
-  template<class pixtype, class loctype>
-  void first_frame(const vil_image_view<pixtype> &img,
-                   vcl_vector<vnl_vector_fixed<loctype, 2> > &kpts);
+  void first_frame(const cl_image &img);
 
-  template<class pixtype, class loctype>
-  const vcl_vector<int>& track(const vil_image_view<pixtype> &img,
-                               vcl_vector<vnl_vector_fixed<loctype, 2> > &kpts,
-                               int window_size);
+  cl_buffer track(const cl_image &img, int window_size);
 
-  //void track(const cl_image &img, int window_size);
+  const cl_buffer& last_keypoints() const { return kpts1; }
 
-  const vcl_vector<int> &get_tracks() const { return tracks; }
+  int last_num_keypoints() const { return numkpts1; }
+
   void set_max_kpts(int max) { max_kpts = max; }
 
 protected:
@@ -59,20 +53,17 @@ private:
   cl_kernel_t track_k;
   cl_queue_t queue;
 
-  vcl_vector<int> tracks;
-
   cl_buffer kpts1;
   cl_buffer descriptors1;
   cl_image kptmap1;
   int numkpts1, max_kpts;
-  vcl_vector<cl_int2> *kpts1_v;
-  vcl_vector<cl_int2> *kpts2_v;
 };
 
 typedef boost::shared_ptr<track_descr_match> track_descr_match_t;
 
-template<class T>
-void write_tracks_to_file(const char *filename, const vcl_vector<vnl_vector_fixed<T, 2> > &kpts1,
-                          const vcl_vector<vnl_vector_fixed<T, 2> > &kpts2, const vcl_vector<int> &indices);
+void write_tracks_to_file(const std::string& filename,
+                          const std::vector<cl_int2> &kpts1,
+                          const std::vector<cl_int2> &kpts2,
+                          const std::vector<int> &indices);
 
 #endif

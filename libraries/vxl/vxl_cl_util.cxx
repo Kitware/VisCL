@@ -4,7 +4,7 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-#include "cl_util.h"
+#include "vxl/vxl_cl_util.h"
 
 #include <vil/vil_image_view.h>
 #include <vil/vil_save.h>
@@ -13,7 +13,7 @@
 //Function for debugging, writes out an open cl image to a file
 //Scales the value range for visualization purposes
 template<class T>
-void save_cl_image(const cl_queue_t &queue, const cl_image &img, const char *filename)
+void viscl::save_cl_image(const cl_queue_t &queue, const cl_image &img, const char *filename)
 {
   size_t width = img.width();
   size_t height = img.height();
@@ -29,7 +29,7 @@ void save_cl_image(const cl_queue_t &queue, const cl_image &img, const char *fil
   region.push_back(1);
 
   vil_image_view<T> downloaded(width, height);
-  queue->enqueueReadImage(*img().get(),  CL_TRUE, origin, region, 0, 0, (float *)downloaded.top_left_ptr());
+  queue->enqueueReadImage(*img().get(),  CL_TRUE, origin, region, 0, 0, (T *)downloaded.top_left_ptr());
   vcl_vector<double> percentiles;
   percentiles.push_back(0.00);
   percentiles.push_back(1.00);
@@ -48,7 +48,7 @@ void save_cl_image(const cl_queue_t &queue, const cl_image &img, const char *fil
 //Function for debugging, writes out an open cl image to a file
 //specilization for unsigned char to not scale image values
 template<>
-void save_cl_image<unsigned char>(const cl_queue_t &queue, const cl_image &img, const char *filename)
+void viscl::save_cl_image<vxl_byte>(const cl_queue_t &queue, const cl_image &img, const char *filename)
 {
   size_t width = img.width();
   size_t height = img.height();
@@ -63,10 +63,10 @@ void save_cl_image<unsigned char>(const cl_queue_t &queue, const cl_image &img, 
   region.push_back(height);
   region.push_back(1);
 
-  vil_image_view<unsigned char> downloaded(width, height);
+  vil_image_view<vxl_byte> downloaded(width, height);
 
-  queue->enqueueReadImage(*img().get(),  CL_TRUE, origin, region, 0, 0, (float *)downloaded.top_left_ptr());
+  queue->enqueueReadImage(*img().get(),  CL_TRUE, origin, region, 0, 0, (vxl_byte *)downloaded.top_left_ptr());
   vil_save(downloaded, filename);
 }
 
-template void save_cl_image<float>(const cl_queue_t &queue, const cl_image &img, const char *filename);
+template void viscl::save_cl_image<float>(const cl_queue_t &queue, const cl_image &img, const char *filename);

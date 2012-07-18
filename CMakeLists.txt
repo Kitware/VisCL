@@ -6,7 +6,6 @@ set(CMAKE_MODULE_PATH "${viscl_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH})
 set(viscl_export_file
   "${viscl_BINARY_DIR}/viscl-config-targets.cmake")
 
-find_package(VXL)
 find_package(OpenCL REQUIRED)
 
 set(viscl_boost_version 1.47)
@@ -22,6 +21,20 @@ if (WIN32)
   add_definitions(-DBOOST_ALL_NO_LIB)
 endif (WIN32)
 
+option(BUILD_VXL_SUPPORT "Build support for interfacing with VXL")
+if (BUILD_VXL_SUPPORT)
+  find_package(VXL REQUIRED)
+
+  # include the standard stuff, such as Dart test
+  set(VXL_PROVIDE_STANDARD_OPTIONS 1)
+  include(${VXL_CMAKE_DIR}/UseVXL.cmake)
+
+  include_directories(SYSTEM ${VXL_BRL_INCLUDE_DIR})
+  include_directories(SYSTEM ${VXL_RPL_INCLUDE_DIR})
+  include_directories(SYSTEM ${VXL_GEL_INCLUDE_DIR}/mrc)
+endif ()
+
+
 find_package(vistk QUIET)
 if (vistk_FOUND)
   include(${vistk_DIR}/vistk-macros.cmake)
@@ -29,13 +42,6 @@ if (vistk_FOUND)
   link_directories(${VISTK_LIBRARY_DIR})
 endif (vistk_FOUND)
 
-# include the standard stuff, such as Dart test
-set(VXL_PROVIDE_STANDARD_OPTIONS 1)
-include(${VXL_CMAKE_DIR}/UseVXL.cmake)
-
-include_directories(SYSTEM ${VXL_BRL_INCLUDE_DIR})
-include_directories(SYSTEM ${VXL_RPL_INCLUDE_DIR})
-include_directories(SYSTEM ${VXL_GEL_INCLUDE_DIR}/mrc)
 include_directories(SYSTEM ${VIDTK_INCLUDE_DIRS})
 
 include_directories(SYSTEM ${OPENCL_INCLUDE_DIR})

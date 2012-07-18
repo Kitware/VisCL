@@ -10,16 +10,12 @@
 #include "cl_task.h"
 #include "cl_image.h"
 
-#include <vil/vil_image_view.h>
-
 class gaussian_smooth : public cl_task
 {
 public:
 
   cl_task_t clone();
 
-  template<class T>
-  void smooth(const vil_image_view<T> &img, vil_image_view<T> &output, float sigma, int kernel_radius) const;
   cl_image smooth(const cl_image &img, float sigma, int kernel_radius) const;
 
 protected:

@@ -10,7 +10,6 @@
 
 #include "cl_task_registry.h"
 #include "cl_manager.h"
-#include "cl_util.h"
 
 #include "gaussian_smooth.h"
 
@@ -43,24 +42,6 @@ cl_task_t hessian::clone()
   hessian_t clone_ = boost::make_shared<hessian>(*this);
   clone_->queue = cl_manager::inst()->create_queue();
   return clone_;
-}
-
-//*****************************************************************************
-
-template <class T>
-void hessian::detect(const vil_image_view<T> &img, int max_kpts, float thresh, float sigma, vcl_vector<cl_int2> &kpts) const
-{
-  cl_image img_cl = cl_manager::inst()->create_image<T>(img);
-  cl_image kptmap;
-  cl_buffer numkpts_b, kpts_b;
-  smooth_and_detect(img_cl, kptmap, kpts_b, numkpts_b, max_kpts, thresh, sigma);
-
-  int buf[1];
-  queue->enqueueReadBuffer(*numkpts_b().get(), CL_TRUE, 0, numkpts_b.mem_size(), buf);
-  int numkpts = buf[0];
-
-  kpts.resize(numkpts);
-  queue->enqueueReadBuffer(*kpts_b().get(), CL_TRUE, 0, sizeof(cl_int2)*numkpts, &kpts[0]);
 }
 
 //*****************************************************************************
@@ -128,7 +109,3 @@ int hessian::num_kpts(const cl_buffer &numkpts_b)
   return buf[0];
 }
 
-//*****************************************************************************
-
-template void hessian::detect(const vil_image_view<float> &img, int max_kpts, float thresh, float sigma, vcl_vector<cl_int2> &kpts) const;
-template void hessian::detect(const vil_image_view<vxl_byte> &img, int max_kpts, float thresh, float sigma, vcl_vector<cl_int2> &kpts) const;

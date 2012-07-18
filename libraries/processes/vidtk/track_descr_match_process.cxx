@@ -6,6 +6,7 @@
 
 #include "track_descr_match_process.h"
 #include "cl_task_registry.h"
+#include <vxl/vxl_tasks.h>
 
 #include <utilities/unchecked_return_value.h>
 
@@ -91,15 +92,15 @@ bool track_descr_match_process::step()
   if( !first_frame_set_ )
   {
     //For the first frame all tracks found are labeled as new
-    vcl_vector<vnl_vector_fixed<double, 2> > kpts;
-    tracker_->first_frame(cur_img_, kpts);
+    vcl_vector<cl_int2> kpts;
+    viscl::track_descr_first_frame(cur_img_, kpts, tracker_);
 
     new_tracks_.reserve(kpts.size());
     for (unsigned int i = 0; i < kpts.size(); i++)
     {
       vidtk::klt_track::point_ p;
-      p.x = kpts[i][0];
-      p.y = kpts[i][1];
+      p.x = kpts[i].x;
+      p.y = kpts[i].y;
       p.frame = 0;
       vidtk::klt_track_ptr tr = vidtk::klt_track::extend_track(p);
       (*tracks_cur_)[i] = tr;
@@ -111,15 +112,18 @@ bool track_descr_match_process::step()
   else
   {
     //Tracker returns indices into the last frame for the current matches
-    vcl_vector<vnl_vector_fixed<double, 2> > kpts;
-    const vcl_vector<int> &indices = tracker_->track<vxl_byte>(cur_img_, kpts, (int)search_range_);
+    vcl_vector<cl_int2> kpts;
+    vcl_vector<int> indices;
+    indices = viscl::track_descr_track(cur_img_, kpts,
+                                       static_cast<int>(search_range_),
+                                       tracker_);
 
     assert(indices.size() == kpts.size());
     for (unsigned int i = 0; i < indices.size(); i++)
     {
       vidtk::klt_track::point_ p;
-      p.x = kpts[i][0];
-      p.y = kpts[i][1];
+      p.x = kpts[i].x;
+      p.y = kpts[i].y;
       p.frame = 0;
 
       //non match are labeled as -1 index

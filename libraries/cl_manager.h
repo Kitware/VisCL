@@ -11,8 +11,8 @@
 
 #include <boost/make_shared.hpp>
 
-#include <vil/vil_image_view.h>
-#include <vcl_map.h>
+#include <map>
+#include <vector>
 
 #include "cl_image.h"
 #include "cl_buffer.h"
@@ -29,9 +29,6 @@ public:
   cl_program_t build_source(const char *source, int device = 0) const;
   cl_queue_t create_queue(int device = 0);
 
-  //This function will reformat image views to interleaved
-  template<class T>
-  cl_image create_image(const vil_image_view<T> &img);
   cl_image create_image(const cl::ImageFormat &img_frmt, cl_mem_flags flags, size_t ni, size_t nj);
   //template<class T>
   //cl_buffer create_buffer(T *, cl_mem_flags flags, size_t len);
@@ -52,19 +49,16 @@ private:
   /// Print specs for an OpenCL Device.
   /// Prefix each output line with \a prefix
   void report_device_specs(const cl::Device& dev,
-                           const vcl_string& prefix="");
+                           const std::string& prefix="");
 
   cl_manager();
   static cl_manager *inst_;
 
   void init_opencl();
-  void make_pixel_format_map();
 
-  vcl_vector<cl::Platform> platforms_;
+  std::vector<cl::Platform> platforms_;
   cl::Context context_;
-  vcl_vector<cl::Device> devices_;
-
-  vcl_map<vil_pixel_format, cl::ImageFormat> pixel_format_map_;
+  std::vector<cl::Device> devices_;
 };
 
 const char *print_cl_errstring(cl_int err);

@@ -16,7 +16,9 @@
 #include "cl_task_registry.h"
 
 #include "gaussian_smooth.h"
+#include <vxl/vxl_transfer.h>
 
+#include <vil/vil_image_view.h>
 #include <vil/vil_save.h>
 
 static void run_test(std::string const& test_name);
@@ -261,7 +263,7 @@ test_smooth_vxl()
                truth_img.top_left_ptr(), sigma, kr);
 
   // create the image on the GPU and upload the test image to it.
-  cl_image img = cl_manager::inst()->create_image(input_img);
+  cl_image img = viscl::upload_image(input_img);
 
   // apply the viscl smoothing task
   cl_image simg = smoother->smooth(img, sigma, kr);

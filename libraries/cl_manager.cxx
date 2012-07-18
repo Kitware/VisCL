@@ -6,9 +6,8 @@
 
 #include "cl_manager.h"
 
-#include <vcl_iostream.h>
-#include <vil/vil_copy.h>
-#include <vcl_sstream.h>
+#include <iostream>
+#include <sstream>
 
 cl_manager *cl_manager::inst_ = 0;
 
@@ -24,7 +23,6 @@ cl_manager *cl_manager::inst()
 cl_manager::cl_manager()
 {
   init_opencl();
-  make_pixel_format_map();
 }
 
 //*****************************************************************************
@@ -50,7 +48,7 @@ void cl_manager::init_opencl()
   }
   catch(cl::Error &error)
   {
-    vcl_cout << "Error: " << error.what() << " - " << print_cl_errstring(error.err()) << vcl_endl;
+    std::cout << "Error: " << error.what() << " - " << print_cl_errstring(error.err()) << std::endl;
   }
 }
 
@@ -70,8 +68,8 @@ cl_program_t cl_manager::build_source(const char *source, int device) const
   catch(cl::Error error)  {
     if(error.err() == CL_BUILD_PROGRAM_FAILURE)
     {
-      vcl_string build_log = program->getBuildInfo<CL_PROGRAM_BUILD_LOG>(devices_[device]);
-      vcl_cerr << build_log << vcl_endl;
+      std::string build_log = program->getBuildInfo<CL_PROGRAM_BUILD_LOG>(devices_[device]);
+      std::cerr << build_log << std::endl;
     }
     throw error;
   }
@@ -84,32 +82,6 @@ cl_program_t cl_manager::build_source(const char *source, int device) const
 cl_queue_t cl_manager::create_queue(int device)
 {
   return boost::make_shared<cl::CommandQueue>(cl::CommandQueue(context_, devices_[device]));
-}
-
-//*****************************************************************************
-
-//Does NOT support multiplane images or non-continuous memory
-template<class T>
-cl_image cl_manager::create_image(const vil_image_view<T> &img)
-{
-  if (!img.top_left_ptr())
-  {
-    vcl_cerr << "No image data!\n";
-  }
-
-  vil_pixel_format pf = img.pixel_format();
-  vcl_map<vil_pixel_format, cl::ImageFormat>::iterator itr;
-  if ((itr = pixel_format_map_.find(pf)) == pixel_format_map_.end())
-    return cl_image();
-
-  const cl::ImageFormat &img_fmt = itr->second;
-  return cl_image(boost::make_shared<cl::Image2D>(cl::Image2D(context_,
-                                                  CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-                                                  img_fmt,
-                                                  img.ni(),
-                                                  img.nj(),
-                                                  0,
-                                                  (T *)img.top_left_ptr())));
 }
 
 //*****************************************************************************
@@ -128,72 +100,72 @@ cl_image cl_manager::create_image(const cl::ImageFormat &img_frmt, cl_mem_flags 
 //*****************************************************************************
 
 void cl_manager::report_device_specs(const cl::Device& dev,
-                                     const vcl_string& prefix)
+                                     const std::string& prefix)
 {
   try
   {
-    vcl_cout << prefix << "Name                : "
-             << dev.getInfo<CL_DEVICE_NAME>() << "\n";
-    vcl_cout << prefix << "Type                : ";
+    std::cout << prefix << "Name                : "
+              << dev.getInfo<CL_DEVICE_NAME>() << "\n";
+    std::cout << prefix << "Type                : ";
     cl_device_type type = dev.getInfo<CL_DEVICE_TYPE>();
     if (type & CL_DEVICE_TYPE_CPU)
     {
-      vcl_cout << "CPU ";
+      std::cout << "CPU ";
     }
     if (type & CL_DEVICE_TYPE_GPU)
     {
-      vcl_cout << "GPU ";
+      std::cout << "GPU ";
     }
     if (type & CL_DEVICE_TYPE_ACCELERATOR)
     {
-      vcl_cout << "Accelerator ";
+      std::cout << "Accelerator ";
     }
-    vcl_cout << "\n";
-    vcl_cout << prefix << "Vendor              : "
-             << dev.getInfo<CL_DEVICE_VENDOR>() << "\n";
-    vcl_cout << prefix << "Device Version      : "
-             << dev.getInfo<CL_DEVICE_VERSION>() << "\n";
-    vcl_cout << prefix << "Driver Version      : "
-             << dev.getInfo<CL_DRIVER_VERSION>() << "\n";
-    vcl_cout << prefix << "Max Clock Frequency : "
-             << dev.getInfo<CL_DEVICE_MAX_CLOCK_FREQUENCY>() << " MHz\n";
-    vcl_cout << prefix << "Max Compute Units   : "
-             << dev.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>() << "\n";
-    vcl_cout << prefix << "Max Work Item Dims  : "
-             << dev.getInfo<CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS>() << "\n";
-    vcl_cout << prefix << "Max Work Item Sizes : ";
-    vcl_vector<size_t> work_sizes = dev.getInfo<CL_DEVICE_MAX_WORK_ITEM_SIZES>();
+    std::cout << "\n";
+    std::cout << prefix << "Vendor              : "
+              << dev.getInfo<CL_DEVICE_VENDOR>() << "\n";
+    std::cout << prefix << "Device Version      : "
+              << dev.getInfo<CL_DEVICE_VERSION>() << "\n";
+    std::cout << prefix << "Driver Version      : "
+              << dev.getInfo<CL_DRIVER_VERSION>() << "\n";
+    std::cout << prefix << "Max Clock Frequency : "
+              << dev.getInfo<CL_DEVICE_MAX_CLOCK_FREQUENCY>() << " MHz\n";
+    std::cout << prefix << "Max Compute Units   : "
+              << dev.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>() << "\n";
+    std::cout << prefix << "Max Work Item Dims  : "
+              << dev.getInfo<CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS>() << "\n";
+    std::cout << prefix << "Max Work Item Sizes : ";
+    std::vector<size_t> work_sizes = dev.getInfo<CL_DEVICE_MAX_WORK_ITEM_SIZES>();
     for (size_t i=0; i<work_sizes.size(); ++i)
     {
-      vcl_cout << work_sizes[i];
+      std::cout << work_sizes[i];
       if (i < work_sizes.size()-1)
       {
-        vcl_cout << ", ";
+        std::cout << ", ";
       }
     }
-    vcl_cout << "\n";
-    vcl_cout << prefix << "Max Work Group Size : "
-             << dev.getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>() << "\n";
-    vcl_cout << prefix << "Global Memory       : "
-             << dev.getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>()/1048576 << " Mb\n";
-    vcl_cout << prefix << "Max Memory Alloc    : "
-             << dev.getInfo<CL_DEVICE_MAX_MEM_ALLOC_SIZE>()/1048576 << " Mb\n";
-    vcl_cout << prefix << "Max Image 2D Dims   : "
-             << dev.getInfo<CL_DEVICE_IMAGE2D_MAX_WIDTH>() << " x "
-             << dev.getInfo<CL_DEVICE_IMAGE2D_MAX_HEIGHT>() << "\n";
-    vcl_cout << prefix << "Max Image 3D Dims   : "
-             << dev.getInfo<CL_DEVICE_IMAGE3D_MAX_WIDTH>() << " x "
-             << dev.getInfo<CL_DEVICE_IMAGE3D_MAX_HEIGHT>() << " x "
-             << dev.getInfo<CL_DEVICE_IMAGE3D_MAX_DEPTH>() << "\n";
-    vcl_cout << prefix << "Out of Order Queue  : "
-             << ((dev.getInfo<CL_DEVICE_QUEUE_PROPERTIES>() &
+    std::cout << "\n";
+    std::cout << prefix << "Max Work Group Size : "
+              << dev.getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>() << "\n";
+    std::cout << prefix << "Global Memory       : "
+              << dev.getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>()/1048576 << " Mb\n";
+    std::cout << prefix << "Max Memory Alloc    : "
+              << dev.getInfo<CL_DEVICE_MAX_MEM_ALLOC_SIZE>()/1048576 << " Mb\n";
+    std::cout << prefix << "Max Image 2D Dims   : "
+              << dev.getInfo<CL_DEVICE_IMAGE2D_MAX_WIDTH>() << " x "
+              << dev.getInfo<CL_DEVICE_IMAGE2D_MAX_HEIGHT>() << "\n";
+    std::cout << prefix << "Max Image 3D Dims   : "
+              << dev.getInfo<CL_DEVICE_IMAGE3D_MAX_WIDTH>() << " x "
+              << dev.getInfo<CL_DEVICE_IMAGE3D_MAX_HEIGHT>() << " x "
+              << dev.getInfo<CL_DEVICE_IMAGE3D_MAX_DEPTH>() << "\n";
+    std::cout << prefix << "Out of Order Queue  : "
+              << ((dev.getInfo<CL_DEVICE_QUEUE_PROPERTIES>() &
                   CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE) ? "Yes" : "No") << "\n";
 
 
-    vcl_string dev_ext = dev.getInfo<CL_DEVICE_EXTENSIONS>();
-    vcl_istringstream extensions(dev_ext);
-    vcl_string extension;
-    vcl_cout << prefix << "Extensions          : ";
+    std::string dev_ext = dev.getInfo<CL_DEVICE_EXTENSIONS>();
+    std::istringstream extensions(dev_ext);
+    std::string extension;
+    std::cout << prefix << "Extensions          : ";
     bool first_ext = true;
     while (extensions >> extension)
     {
@@ -203,15 +175,15 @@ void cl_manager::report_device_specs(const cl::Device& dev,
       }
       else
       {
-        vcl_cout << prefix << "                      ";
+        std::cout << prefix << "                      ";
       }
-      vcl_cout << extension << "\n";
+      std::cout << extension << "\n";
     }
   }
   catch (cl::Error error)
   {
-    vcl_cout << "Error: " << error.what() << " - "
-             << print_cl_errstring(error.err()) << vcl_endl;
+    std::cout << "Error: " << error.what() << " - "
+             << print_cl_errstring(error.err()) << std::endl;
   }
 }
 
@@ -221,23 +193,23 @@ void cl_manager::report_opencl_specs()
 {
   try
   {
-    vcl_cout << "Found " << platforms_.size() << " Platforms" << vcl_endl;
+    std::cout << "Found " << platforms_.size() << " Platforms" << std::endl;
     for (size_t i=0; i<platforms_.size(); ++i)
     {
-      vcl_cout << "Platform[" << i << "]\n";
-      vcl_cout << "  Name       : "
-               << platforms_[i].getInfo<CL_PLATFORM_NAME>() << "\n";
-      vcl_cout << "  Vendor     : "
-               << platforms_[i].getInfo<CL_PLATFORM_VENDOR>() << "\n";
-      vcl_cout << "  Version    : "
-               << platforms_[i].getInfo<CL_PLATFORM_VERSION>() << "\n";
-      vcl_cout << "  Profile    : "
-               << platforms_[i].getInfo<CL_PLATFORM_PROFILE>() << "\n";
-      vcl_string plat_ext = platforms_[i].getInfo<CL_PLATFORM_EXTENSIONS>();
-      vcl_istringstream extensions(plat_ext);
+      std::cout << "Platform[" << i << "]\n";
+      std::cout << "  Name       : "
+                << platforms_[i].getInfo<CL_PLATFORM_NAME>() << "\n";
+      std::cout << "  Vendor     : "
+                << platforms_[i].getInfo<CL_PLATFORM_VENDOR>() << "\n";
+      std::cout << "  Version    : "
+                << platforms_[i].getInfo<CL_PLATFORM_VERSION>() << "\n";
+      std::cout << "  Profile    : "
+                << platforms_[i].getInfo<CL_PLATFORM_PROFILE>() << "\n";
+      std::string plat_ext = platforms_[i].getInfo<CL_PLATFORM_EXTENSIONS>();
+      std::istringstream extensions(plat_ext);
 
-      vcl_string extension;
-      vcl_cout << "  Extensions : ";
+      std::string extension;
+      std::cout << "  Extensions : ";
       bool first_ext = true;
       while (extensions >> extension)
       {
@@ -247,35 +219,26 @@ void cl_manager::report_opencl_specs()
         }
         else
         {
-          vcl_cout << "               ";
+          std::cout << "               ";
         }
-        vcl_cout << extension << "\n";
+        std::cout << extension << "\n";
       }
 
-      vcl_vector<cl::Device> devices;
+      std::vector<cl::Device> devices;
       platforms_[i].getDevices(CL_DEVICE_TYPE_ALL, &devices);
-      vcl_cout << "  Found " << devices.size() << " Devices" << vcl_endl;
+      std::cout << "  Found " << devices.size() << " Devices" << std::endl;
       for (size_t j=0; j<devices.size(); ++j)
       {
-        vcl_cout << "\n  Device[" << j << "]\n";
+        std::cout << "\n  Device[" << j << "]\n";
         report_device_specs(devices[j], "    ");
       }
     }
   }
   catch (cl::Error error)
   {
-    vcl_cout << "Error: " << error.what() << " - "
-             << print_cl_errstring(error.err()) << vcl_endl;
+    std::cout << "Error: " << error.what() << " - "
+              << print_cl_errstring(error.err()) << std::endl;
   }
-}
-
-//*****************************************************************************
-
-//http://www.khronos.org/registry/cl/sdk/1.0/docs/man/xhtml/cl_image_format.html
-void cl_manager::make_pixel_format_map()
-{
-  pixel_format_map_[VIL_PIXEL_FORMAT_FLOAT] = cl::ImageFormat(CL_INTENSITY, CL_FLOAT);
-  pixel_format_map_[VIL_PIXEL_FORMAT_BYTE] = cl::ImageFormat(CL_INTENSITY, CL_UNORM_INT8);
 }
 
 //*****************************************************************************
@@ -334,7 +297,3 @@ const char *print_cl_errstring(cl_int err)
     }
 }
 
-//*****************************************************************************
-
-template cl_image cl_manager::create_image<float>(const vil_image_view<float> &);
-template cl_image cl_manager::create_image<vxl_byte>(const vil_image_view<vxl_byte> &);

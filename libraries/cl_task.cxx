@@ -10,12 +10,12 @@
 #include <fstream>
 #include <boost/make_shared.hpp>
 
-boost::shared_ptr<cl::Kernel> cl_task::make_kernel(const vcl_string &kernel_name)
+boost::shared_ptr<cl::Kernel> cl_task::make_kernel(const std::string &kernel_name)
 {
   return boost::make_shared<cl::Kernel>(cl::Kernel(*program.get(), kernel_name.c_str()));
 }
 
-void cl_task::build_source(const vcl_string &source)
+void cl_task::build_source(const std::string &source)
 {
   program = cl_manager::inst()->build_source(source.c_str());
 }

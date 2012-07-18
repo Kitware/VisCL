@@ -7,9 +7,7 @@
 #ifndef CL_TASK_H_
 #define CL_TASK_H_
 
-#include <vcl_vector.h>
-#include <vcl_map.h>
-#include <vcl_string.h>
+#include <string>
 
 #include "cl_header.h"
 
@@ -29,8 +27,8 @@ protected:
   virtual void init() = 0;
   virtual void init(const cl_program_t &prog) = 0;
 
-  cl_kernel_t make_kernel(const vcl_string &kernel_name);
-  void build_source(const vcl_string &source);
+  cl_kernel_t make_kernel(const std::string &kernel_name);
+  void build_source(const std::string &source);
 
   cl_program_t program;
 };

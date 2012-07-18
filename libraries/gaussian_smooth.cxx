@@ -10,6 +10,8 @@
 
 #include "cl_manager.h"
 
+#include <math.h>
+
 extern const char* gaussian_smooth_source;
 
 //*****************************************************************************
@@ -39,27 +41,6 @@ cl_task_t gaussian_smooth::clone()
   return clone_;
 }
 
-//*****************************************************************************
-
-template <class T>
-void gaussian_smooth::smooth(const vil_image_view<T> &img, vil_image_view<T> &output, float sigma, int kernel_radius) const
-{
-  cl_image img_cl = cl_manager::inst()->create_image<T>(img);
-  cl_image result = smooth( img_cl, sigma, kernel_radius);
-
-  cl::size_t<3> origin;
-  origin.push_back(0);
-  origin.push_back(0);
-  origin.push_back(0);
-
-  cl::size_t<3> region;
-  region.push_back(img.ni());
-  region.push_back(img.nj());
-  region.push_back(1);
-
-  output.set_size(img.ni(), img.nj());
-  queue->enqueueReadImage(*result().get(),  CL_TRUE, origin, region, 0, 0, (float *)output.top_left_ptr());
-}
 
 //*****************************************************************************
 
@@ -80,7 +61,7 @@ cl_image gaussian_smooth::smooth(const cl_image &img, float sigma, int kernel_ra
   }
 
 
-  cl_buffer smoothing_kernel = cl_manager::inst()->create_buffer<float>(CL_MEM_READ_ONLY, 5);
+  cl_buffer smoothing_kernel = cl_manager::inst()->create_buffer<float>(CL_MEM_READ_ONLY, kernel_size);
   queue->enqueueWriteBuffer(*smoothing_kernel().get(), CL_TRUE, 0, smoothing_kernel.mem_size(), filter);
 
   size_t ni = img.width(), nj = img.height();
@@ -113,7 +94,3 @@ cl_image gaussian_smooth::smooth(const cl_image &img, float sigma, int kernel_ra
   return result;
 }
 
-//*****************************************************************************
-
-template void gaussian_smooth::smooth(const vil_image_view<vxl_byte> &, vil_image_view<vxl_byte> &, float, int) const;
-template void gaussian_smooth::smooth(const vil_image_view<float> &, vil_image_view<float> &, float, int) const;

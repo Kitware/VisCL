@@ -17,7 +17,6 @@ set(CXX_SRC_FILES
     BRIEF.h                    BRIEF.cxx
     cl_image.h                 cl_image.cxx
     cl_buffer.h                cl_buffer.cxx
-    cl_util.h                  cl_util.cxx
     cl_header.h                descriptor.h
 )
 
@@ -25,7 +24,7 @@ encode_opencl_sources(cl_strings.cxx ${OCL_SRC_FILES})
 
 
 add_library(viscl ${OCL_SRC_FILES} ${CXX_SRC_FILES} cl_strings.cxx)
-target_link_libraries(viscl ${OPENCL_LIBRARIES} vil vil_algo vnl)
+target_link_libraries(viscl ${OPENCL_LIBRARIES})
 
 install( TARGETS viscl EXPORT viscl_exports
   RUNTIME DESTINATION bin LIBRARY DESTINATION lib ARCHIVE DESTINATION lib
@@ -33,6 +32,12 @@ install( TARGETS viscl EXPORT viscl_exports
 export( TARGETS viscl
   APPEND FILE ${viscl_export_file}
 )
+
+
+if (VXL_FOUND)
+  add_subdirectory(vxl)
+endif ()
+
 
 if(vistk_FOUND AND vidtk_FOUND)
   add_subdirectory(processes)

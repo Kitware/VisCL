@@ -1,9 +1,9 @@
-#include <vcl_cstdlib.h>
-#include <vcl_ctime.h>
-#include <vcl_cstring.h>
-#include <vcl_string.h>
-#include <vcl_iostream.h>
-#include <vcl_vector.h>
+#include <cstdlib>
+#include <ctime>
+#include <cstring>
+#include <string>
+#include <iostream>
+#include <vector>
 #include <vul/vul_arg.h>
 
 #include <boost/chrono.hpp>
@@ -21,31 +21,31 @@ struct ocl_info
 
   ocl_info(unsigned pid, unsigned did)
   {
-    vcl_vector<cl::Platform> platforms;
+    std::vector<cl::Platform> platforms;
     cl::Platform::get(&platforms);
-    vcl_cout << "# Platforms: " << platforms.size() << vcl_endl;
+    std::cout << "# Platforms: " << platforms.size() << std::endl;
     for(size_t i = 0; i < platforms.size(); ++i)
     {
-      vcl_string name;
+      std::string name;
       platforms[i].getInfo(CL_PLATFORM_NAME, &name);
-      vcl_cout << "Platform[" << i << "] : " << name << vcl_endl;
+      std::cout << "Platform[" << i << "] : " << name << std::endl;
     }
     this->p = platforms[pid];
 
-    vcl_cout << vcl_endl;
+    std::cout << std::endl;
 
-    vcl_vector<cl::Device> devices;
+    std::vector<cl::Device> devices;
     this->p.getDevices(CL_DEVICE_TYPE_ALL, &devices);
-    vcl_cout << "# Devices: " << devices.size() << vcl_endl;
+    std::cout << "# Devices: " << devices.size() << std::endl;
     for(size_t i = 0; i < devices.size(); ++i)
     {
-      vcl_string name;
+      std::string name;
       devices[i].getInfo(CL_DEVICE_NAME, &name);
-      vcl_cout << "Device[" << i << "] : " << name << vcl_endl;
+      std::cout << "Device[" << i << "] : " << name << std::endl;
     }
     this->d = devices[did];
 
-    vcl_vector<cl::Device> ctx_devices(1, this->d);
+    std::vector<cl::Device> ctx_devices(1, this->d);
     this->c = cl::Context(ctx_devices);
 
     this->q = cl::CommandQueue(this->c, this->d);
@@ -57,45 +57,45 @@ ocl_info *ocl;
 //******************************************************************************
 
 bool allocateHost(unsigned iw, unsigned ih, unsigned ip, unsigned ie,
-  vcl_vector<cl::Image2D*>   &host_img,
-  vcl_vector<cl::Buffer*>    &host_buf,
-  vcl_vector<unsigned char*> &host_raw,
+  std::vector<cl::Image2D*>   &host_img,
+  std::vector<cl::Buffer*>    &host_buf,
+  std::vector<unsigned char*> &host_raw,
   unsigned ni, bool use_images, bool pinned);
 
 //******************************************************************************
 
 bool freeHost(
-  vcl_vector<cl::Image2D*>   &host_img,
-  vcl_vector<cl::Buffer*>    &host_buf,
-  vcl_vector<unsigned char*> &host_raw,
+  std::vector<cl::Image2D*>   &host_img,
+  std::vector<cl::Buffer*>    &host_buf,
+  std::vector<unsigned char*> &host_raw,
   bool use_images, bool pinned);
 
 //******************************************************************************
 
 bool allocateDevice(unsigned iw, unsigned ih, unsigned ip, unsigned ie,
-  vcl_vector<cl::Image2D*>   &dev_img,
-  vcl_vector<cl::Buffer*>    &dev_buf,
+  std::vector<cl::Image2D*>   &dev_img,
+  std::vector<cl::Buffer*>    &dev_buf,
   unsigned ni, bool use_images);
 
 //******************************************************************************
 
 bool freeDevice(
-  vcl_vector<cl::Image2D*>   &dev_img,
-  vcl_vector<cl::Buffer*>    &dev_buf,
+  std::vector<cl::Image2D*>   &dev_img,
+  std::vector<cl::Buffer*>    &dev_buf,
   bool use_images);
 
 //******************************************************************************
 
-bool fillRand(vcl_vector<unsigned char*> &host_raw, size_t img_len);
+bool fillRand(std::vector<unsigned char*> &host_raw, size_t img_len);
 
 //******************************************************************************
 
 bool copyHostToDev(unsigned iw, unsigned ih, unsigned ip, unsigned ie,
-  vcl_vector<cl::Image2D*>   &host_img,
-  vcl_vector<cl::Buffer*>    &host_buf,
-  vcl_vector<unsigned char*> &host_raw,
-  vcl_vector<cl::Image2D*>   &dev_img,
-  vcl_vector<cl::Buffer*>    &dev_buf,
+  std::vector<cl::Image2D*>   &host_img,
+  std::vector<cl::Buffer*>    &host_buf,
+  std::vector<unsigned char*> &host_raw,
+  std::vector<cl::Image2D*>   &dev_img,
+  std::vector<cl::Buffer*>    &dev_buf,
   bool use_images, bool mapped,
   unsigned nj);
 
@@ -132,26 +132,26 @@ int main(int argc, char **argv)
 
   ocl = new ocl_info(p, d);
 
-  vcl_vector<cl::Image2D*>   host_img;
-  vcl_vector<cl::Buffer*>    host_buf;
-  vcl_vector<unsigned char*> host_raw;
-  vcl_vector<cl::Image2D*>   dev_img;
-  vcl_vector<cl::Buffer*>    dev_buf;
+  std::vector<cl::Image2D*>   host_img;
+  std::vector<cl::Buffer*>    host_buf;
+  std::vector<unsigned char*> host_raw;
+  std::vector<cl::Image2D*>   dev_img;
+  std::vector<cl::Buffer*>    dev_buf;
 
-  vcl_cout << "\n\nAlocating host memory..." << vcl_flush;
+  std::cout << "\n\nAlocating host memory..." << std::flush;
   ret = allocateHost(iw, ih, ip, ie, host_img, host_buf, host_raw,
     ni, use_images, pinned);
-  vcl_cout << "done" << vcl_endl;
+  std::cout << "done" << std::endl;
 
-  vcl_cout << "Randomizing host memory..." << vcl_flush;
+  std::cout << "Randomizing host memory..." << std::flush;
   ret = fillRand(host_raw, iw*ih*ip*ie);
-  vcl_cout << "done" << vcl_endl;
+  std::cout << "done" << std::endl;
 
-  vcl_cout << "Alocating device memory..." << vcl_flush;
+  std::cout << "Alocating device memory..." << std::flush;
   ret = allocateDevice(iw, ih, ip, ie, dev_img, dev_buf, ni, use_images);
-  vcl_cout << "done" << vcl_endl;
+  std::cout << "done" << std::endl;
 
-  vcl_cout << "Copying host to device..." << vcl_flush;
+  std::cout << "Copying host to device..." << std::flush;
   ocl->q.finish();
 
   boost::chrono::system_clock::time_point t_start = boost::chrono::system_clock::now();
@@ -161,28 +161,28 @@ int main(int argc, char **argv)
     use_images, mapped,
     nj);
   boost::chrono::system_clock::time_point t_stop = boost::chrono::system_clock::now();
-  vcl_cout << "done" << vcl_endl;
+  std::cout << "done" << std::endl;
 
-  vcl_cout << "Freeing device memory..." << vcl_flush;
+  std::cout << "Freeing device memory..." << std::flush;
   ret = freeDevice(dev_img, dev_buf, use_images);
-  vcl_cout << "done" << vcl_endl;
+  std::cout << "done" << std::endl;
 
-  vcl_cout << "Freeing host memory..." << vcl_flush;
+  std::cout << "Freeing host memory..." << std::flush;
   ret = freeHost(host_img, host_buf, host_raw, use_images, pinned);
-  vcl_cout << "done" << vcl_endl;
+  std::cout << "done" << std::endl;
 
   // Convert time struct to total seconds
 
   boost::chrono::duration<double> sec = t_stop - t_start;
   double t_seconds = sec.count();
-  vcl_cout << "\n\nImage size: " << iw << 'x' << ih << 'x' << ip << " ("
-           << ((iw*ih*ip*ie) / (1024.0*1024)) << "MB)" << vcl_endl;
-  vcl_cout << ni*nj << " seperate transfers" << vcl_endl;
-  vcl_cout << t_seconds << "s total" << vcl_endl;
-  vcl_cout << (t_seconds/(ni*nj)) << "s per image" << vcl_endl;
+  std::cout << "\n\nImage size: " << iw << 'x' << ih << 'x' << ip << " ("
+           << ((iw*ih*ip*ie) / (1024.0*1024)) << "MB)" << std::endl;
+  std::cout << ni*nj << " seperate transfers" << std::endl;
+  std::cout << t_seconds << "s total" << std::endl;
+  std::cout << (t_seconds/(ni*nj)) << "s per image" << std::endl;
   double img_size = iw*ih*ip*ie;
   double total_size = img_size*ni*nj;
-  vcl_cout << (total_size/t_seconds)/(1024.0*1024.0) << " MB/s" << vcl_endl;
+  std::cout << (total_size/t_seconds)/(1024.0*1024.0) << " MB/s" << std::endl;
 
   delete ocl;
 
@@ -192,9 +192,9 @@ int main(int argc, char **argv)
 //******************************************************************************
 
 bool allocateHost(unsigned iw, unsigned ih, unsigned ip, unsigned ie,
-  vcl_vector<cl::Image2D*>   &host_img,
-  vcl_vector<cl::Buffer*>    &host_buf,
-  vcl_vector<unsigned char*> &host_raw,
+  std::vector<cl::Image2D*>   &host_img,
+  std::vector<cl::Buffer*>    &host_buf,
+  std::vector<unsigned char*> &host_raw,
   unsigned ni, bool use_images, bool pinned)
 {
   cl_channel_order co;
@@ -205,7 +205,7 @@ bool allocateHost(unsigned iw, unsigned ih, unsigned ip, unsigned ie,
     case 3: co = CL_RGB; break;
     case 4: co = CL_RGBA; break;
     default:
-      vcl_cerr << "Unsupported number of planes" << vcl_endl;
+      std::cerr << "Unsupported number of planes" << std::endl;
       return false;
   }
 
@@ -216,7 +216,7 @@ bool allocateHost(unsigned iw, unsigned ih, unsigned ip, unsigned ie,
     case 2: ct = CL_UNORM_INT16; break;
     case 4: ct = CL_FLOAT; break;
     default:
-      vcl_cerr << "Unsupported image element size" << vcl_endl;
+      std::cerr << "Unsupported image element size" << std::endl;
       return false;
   }
 
@@ -270,9 +270,9 @@ bool allocateHost(unsigned iw, unsigned ih, unsigned ip, unsigned ie,
 //******************************************************************************
 
 bool freeHost(
-  vcl_vector<cl::Image2D*>   &host_img,
-  vcl_vector<cl::Buffer*>    &host_buf,
-  vcl_vector<unsigned char*> &host_raw,
+  std::vector<cl::Image2D*>   &host_img,
+  std::vector<cl::Buffer*>    &host_buf,
+  std::vector<unsigned char*> &host_raw,
   bool use_images, bool pinned)
 {
   size_t ni = host_raw.size();
@@ -317,8 +317,8 @@ bool freeHost(
 //******************************************************************************
 
 bool allocateDevice(unsigned iw, unsigned ih, unsigned ip, unsigned ie,
-  vcl_vector<cl::Image2D*>   &dev_img,
-  vcl_vector<cl::Buffer*>    &dev_buf,
+  std::vector<cl::Image2D*>   &dev_img,
+  std::vector<cl::Buffer*>    &dev_buf,
   unsigned ni, bool use_images)
 {
   cl_channel_order co;
@@ -329,7 +329,7 @@ bool allocateDevice(unsigned iw, unsigned ih, unsigned ip, unsigned ie,
     case 3: co = CL_RGB; break;
     case 4: co = CL_RGBA; break;
     default:
-      vcl_cerr << "Unsupported number of planes" << vcl_endl;
+      std::cerr << "Unsupported number of planes" << std::endl;
       return false;
   }
 
@@ -340,7 +340,7 @@ bool allocateDevice(unsigned iw, unsigned ih, unsigned ip, unsigned ie,
     case 2: ct = CL_UNORM_INT16; break;
     case 4: ct = CL_FLOAT; break;
     default:
-      vcl_cerr << "Unsupported image element size" << vcl_endl;
+      std::cerr << "Unsupported image element size" << std::endl;
       return false;
   }
 
@@ -379,8 +379,8 @@ bool allocateDevice(unsigned iw, unsigned ih, unsigned ip, unsigned ie,
 //******************************************************************************
 
 bool freeDevice(
-  vcl_vector<cl::Image2D*>   &dev_img,
-  vcl_vector<cl::Buffer*>    &dev_buf,
+  std::vector<cl::Image2D*>   &dev_img,
+  std::vector<cl::Buffer*>    &dev_buf,
   bool use_images)
 {
   size_t ni = dev_img.size();
@@ -405,9 +405,9 @@ bool freeDevice(
 
 //******************************************************************************
 
-bool fillRand(vcl_vector<unsigned char*> &host_raw, size_t img_len)
+bool fillRand(std::vector<unsigned char*> &host_raw, size_t img_len)
 {
-  vcl_srand(vcl_time(NULL));
+  std::srand(std::time(NULL));
 
   size_t len_4 = img_len / sizeof(int);
 
@@ -416,7 +416,7 @@ bool fillRand(vcl_vector<unsigned char*> &host_raw, size_t img_len)
     int *ptr = reinterpret_cast<int*>(host_raw[j]);
     for(size_t i = 0; i < len_4; ++i)
     {
-      ptr[i] = vcl_rand();
+      ptr[i] = std::rand();
     }
   }
   return true;
@@ -425,11 +425,11 @@ bool fillRand(vcl_vector<unsigned char*> &host_raw, size_t img_len)
 //******************************************************************************
 
 bool copyHostToDev(unsigned iw, unsigned ih, unsigned ip, unsigned ie,
-  vcl_vector<cl::Image2D*>   &host_img,
-  vcl_vector<cl::Buffer*>    &host_buf,
-  vcl_vector<unsigned char*> &host_raw,
-  vcl_vector<cl::Image2D*>   &dev_img,
-  vcl_vector<cl::Buffer*>    &dev_buf,
+  std::vector<cl::Image2D*>   &host_img,
+  std::vector<cl::Buffer*>    &host_buf,
+  std::vector<unsigned char*> &host_raw,
+  std::vector<cl::Image2D*>   &dev_img,
+  std::vector<cl::Buffer*>    &dev_buf,
   bool use_images, bool mapped,
   unsigned nj)
 {
@@ -450,7 +450,7 @@ bool copyHostToDev(unsigned iw, unsigned ih, unsigned ip, unsigned ie,
             ocl->q.enqueueMapImage(*dev_img[i], CL_TRUE, CL_MAP_WRITE,
               origin, region, &row_pitch, NULL));
 
-          vcl_memcpy(dev_raw, host_raw[i], len);
+          std::memcpy(dev_raw, host_raw[i], len);
 
           ocl->q.enqueueUnmapMemObject(*dev_img[i], dev_raw);
         }
@@ -460,7 +460,7 @@ bool copyHostToDev(unsigned iw, unsigned ih, unsigned ip, unsigned ie,
             ocl->q.enqueueMapBuffer(*dev_buf[i], CL_TRUE, CL_MAP_WRITE,
               0, len));
 
-          vcl_memcpy(dev_raw, host_raw[i], len);
+          std::memcpy(dev_raw, host_raw[i], len);
 
           ocl->q.enqueueUnmapMemObject(*dev_buf[i], dev_raw);
         }

@@ -7,8 +7,7 @@
 #include "BRIEF.h"
 
 #include <boost/make_shared.hpp>
-#include <vcl_sstream.h>
-#include <vcl_fstream.h>
+#include <sstream>
 
 #include "cl_task_registry.h"
 #include "gaussian_smooth.h"
@@ -40,14 +39,14 @@ void brief<radius>::init(const cl_program_t &prog)
 //*****************************************************************************
 
 template<int radius>
-vcl_string brief<radius>::generate_meta_source(const vcl_string &source)
+std::string brief<radius>::generate_meta_source(const std::string &source)
 {
   //Boost rand guarantees that the random values generating the comparison map for brief
   //will be constistent otherwise the descriptor algorithm would not be thread safe
   boost::random::mt19937 gen;
   boost::random::uniform_int_distribution<> dist(-radius, radius);
 
-  vcl_stringstream metasource;
+  std::stringstream metasource;
   metasource << "__constant int4 map[128] = {";
   const unsigned int nsamples = 128;
   for (unsigned int i = 0; i < 128; i++)
@@ -78,38 +77,6 @@ cl_task_t brief<radius>::clone()
 
 //*****************************************************************************
 
-template<int radius> template<class T>
-void brief<radius>::compute_descriptors(const vil_image_view<T> &img, const vcl_vector<cl_int2> &kpts, vcl_vector<cl_int4> &descriptors, float sigma)
-{
-  cl_image img_cl = cl_manager::inst()->create_image<T>(img);
-  gaussian_smooth_t gs = NEW_VISCL_TASK(gaussian_smooth);
-  cl_image smoothed_cl = gs->smooth(img_cl, sigma, 2);
-  cl_buffer kpts_cl = cl_manager::inst()->create_buffer<cl_int2>(CL_MEM_READ_ONLY, kpts.size());
-  queue->enqueueWriteBuffer(*kpts_cl().get(), CL_TRUE, 0, kpts_cl.mem_size(), &kpts[0]);
-
-  cl_buffer descriptors_cl;
-  compute_descriptors(smoothed_cl, kpts_cl, kpts.size(), descriptors_cl);
-  descriptors.resize(kpts.size());
-  queue->enqueueReadBuffer(*descriptors_cl().get(), CL_TRUE, 0, descriptors_cl.mem_size(), &descriptors[0]);
-}
-
-//*****************************************************************************
-
-template<int radius> template<class T>
-void brief<radius>::compute_descriptors(const vil_image_view<T> &img, const vcl_vector<cl_int2> &kpts, vcl_vector<cl_int4> &descriptors)
-{
-  cl_image img_cl = cl_manager::inst()->create_image<T>(img);
-  cl_buffer kpts_cl = cl_manager::inst()->create_buffer<cl_int2>(CL_MEM_READ_ONLY, kpts.size());
-  queue->enqueueWriteBuffer(*kpts_cl().get(), CL_TRUE, 0, kpts_cl.mem_size(), &kpts[0]);
-
-  cl_buffer descriptors_cl;
-  compute_descriptors(img_cl, kpts_cl, kpts.size(), descriptors_cl);
-  descriptors.resize(kpts.size());
-  queue->enqueueReadBuffer(*descriptors_cl().get(), CL_TRUE, 0, descriptors_cl.mem_size(), &descriptors[0]);
-}
-
-//*****************************************************************************
-
 template<int radius>
 void brief<radius>::compute_descriptors(const cl_image &img_s, const cl_buffer &kpts, size_t numkpts, cl_buffer &descriptors)
 {
@@ -127,5 +94,3 @@ void brief<radius>::compute_descriptors(const cl_image &img_s, const cl_buffer &
 
 //Should probably move this all to .h for implicit instantiation
 template class brief<10>;
-template void brief<10>::compute_descriptors(const vil_image_view<vxl_byte> &img, const vcl_vector<cl_int2> &kpts, vcl_vector<cl_int4> &descriptors, float sigma);
-template void brief<10>::compute_descriptors(const vil_image_view<vxl_byte> &img, const vcl_vector<cl_int2> &kpts, vcl_vector<cl_int4> &descriptors);
