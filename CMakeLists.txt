@@ -3,6 +3,9 @@ project(viscl)
 
 set(CMAKE_MODULE_PATH "${viscl_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH})
 
+set(viscl_export_file
+  "${viscl_BINARY_DIR}/viscl-config-targets.cmake")
+
 find_package(VXL)
 find_package(OpenCL REQUIRED)
 
@@ -53,5 +56,16 @@ SET(viscl_INCLUDE_DIR_CONFIG ${viscl_SOURCE_DIR})
 CONFIGURE_FILE(${viscl_SOURCE_DIR}/visclConfig.cmake.in
                ${viscl_BINARY_DIR}/visclConfig.cmake @ONLY IMMEDIATE)
 
+if (WIN32)
+  set(cmakedir cmake)
+else (WIN32)
+  set(cmakedir lib${LIB_SUFFIX}/cmake/viscl)
+endif (WIN32)
 
-#----------------------------------
+install(
+  EXPORT      viscl_exports
+  DESTINATION "${cmakedir}"
+  FILE        viscl-config-targets.cmake
+  COMPONENT   development)
+
+
