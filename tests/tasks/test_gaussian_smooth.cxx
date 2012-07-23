@@ -15,6 +15,8 @@
 
 #include "gaussian_smooth.h"
 
+#include <vil/vil_save.h>
+
 static void run_test(std::string const& test_name);
 
 int
@@ -175,7 +177,15 @@ test_smooth()
   {
     TEST_ERROR("GPU and CPU smoothing results differ in "
                << 100.0f*float(diff_count)/(width*height) << "% of pixels");
+
+    vil_image_view<vxl_byte> vil_src(img_data, width, height, 1, 1, width, width*height);
+    vil_save(vil_src, "test_smooth_source.png");
+    vil_image_view<vxl_byte> vil_result(result_data, width, height, 1, 1, width, width*height);
+    vil_save(vil_result, "test_smooth_result.png");
+    vil_image_view<vxl_byte> vil_truth(truth, width, height, 1, 1, width, width*height);
+    vil_save(vil_truth, "test_smooth_truth.png");
   }
+
 }
 
 void
