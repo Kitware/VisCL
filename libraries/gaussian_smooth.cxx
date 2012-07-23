@@ -67,12 +67,18 @@ cl_image gaussian_smooth::smooth(const cl_image &img, float sigma, int kernel_ra
 {
   int kernel_size = 2*kernel_radius+1;
   float *filter = new float[kernel_size];
-  float coeff = 1.0f / sqrt(6.2831853072f * sigma * sigma);
   int i = 0;
+  float sum=0.0f;
   for (float x = -kernel_radius;  x <= kernel_radius; x++, i++)
   {
-    filter[i] = coeff * exp( (- x * x) / (2.0f * sigma * sigma));
+    filter[i] = exp( (- x * x) / (2.0f * sigma * sigma));
+    sum += filter[i];
   }
+  for (i = 0; i < kernel_size; ++i)
+  {
+    filter[i] /= sum;
+  }
+
 
   cl_buffer smoothing_kernel = cl_manager::inst()->create_buffer<float>(CL_MEM_READ_ONLY, 5);
   queue->enqueueWriteBuffer(*smoothing_kernel().get(), CL_TRUE, 0, smoothing_kernel.mem_size(), filter);
