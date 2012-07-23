@@ -90,13 +90,13 @@ cl_image gaussian_smooth::smooth(const cl_image &img, float sigma, int kernel_ra
   // Set arguments to kernel
   conv_x->setArg(0, *img().get());
   conv_x->setArg(1, *smoothing_kernel().get());
-  conv_x->setArg(2, kernel_size);
+  conv_x->setArg(2, kernel_radius);
   conv_x->setArg(3, *working().get());
 
   // Set arguments to kernel
   conv_y->setArg(0, *working().get());
   conv_y->setArg(1, *smoothing_kernel().get());
-  conv_y->setArg(2, kernel_size);
+  conv_y->setArg(2, kernel_radius);
   conv_y->setArg(3, *result().get());
 
   //Run the kernel on specific ND range
