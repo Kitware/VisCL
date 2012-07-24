@@ -67,12 +67,18 @@ cl_image gaussian_smooth::smooth(const cl_image &img, float sigma, int kernel_ra
 {
   int kernel_size = 2*kernel_radius+1;
   float *filter = new float[kernel_size];
-  float coeff = 1.0f / sqrt(6.2831853072f * sigma * sigma);
   int i = 0;
+  float sum=0.0f;
   for (float x = -kernel_radius;  x <= kernel_radius; x++, i++)
   {
-    filter[i] = coeff * exp( (- x * x) / (2.0f * sigma * sigma));
+    filter[i] = exp( (- x * x) / (2.0f * sigma * sigma));
+    sum += filter[i];
   }
+  for (i = 0; i < kernel_size; ++i)
+  {
+    filter[i] /= sum;
+  }
+
 
   cl_buffer smoothing_kernel = cl_manager::inst()->create_buffer<float>(CL_MEM_READ_ONLY, 5);
   queue->enqueueWriteBuffer(*smoothing_kernel().get(), CL_TRUE, 0, smoothing_kernel.mem_size(), filter);
@@ -84,13 +90,13 @@ cl_image gaussian_smooth::smooth(const cl_image &img, float sigma, int kernel_ra
   // Set arguments to kernel
   conv_x->setArg(0, *img().get());
   conv_x->setArg(1, *smoothing_kernel().get());
-  conv_x->setArg(2, kernel_size);
+  conv_x->setArg(2, kernel_radius);
   conv_x->setArg(3, *working().get());
 
   // Set arguments to kernel
   conv_y->setArg(0, *working().get());
   conv_y->setArg(1, *smoothing_kernel().get());
-  conv_y->setArg(2, kernel_size);
+  conv_y->setArg(2, kernel_radius);
   conv_y->setArg(3, *result().get());
 
   //Run the kernel on specific ND range
