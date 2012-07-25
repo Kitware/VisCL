@@ -68,13 +68,27 @@ run_test(std::string const& test_name)
 }
 
 
-void make_test_image(unsigned width, unsigned height, unsigned char* buffer)
+/// Make a simple checkerboard pattern image for use in tests.
+/// Fills a pre-allocated buffer \a buffer of size \a width by \a height.
+/// Each block of the checkerboard is \a blocksize by \a blocksize.
+void make_checkerboard_image(const unsigned width,
+                             const unsigned height,
+                             unsigned char* const buffer,
+                             const unsigned blocksize = 8)
 {
   for (unsigned j=0; j<height; ++j)
   {
     for (unsigned i=0; i<width; ++i)
     {
-      buffer[j*width + i] = static_cast<unsigned char>(((i/8)%2 + (j/8)%2) * 255);
+      // index into the image buffer
+      const unsigned index = j * width + i;
+      // block cell coordinates
+      const unsigned bi = i / blocksize;
+      const unsigned bj = j / blocksize;
+      // checkerboard boolean value (true for white, false for black)
+      const bool val = (bi % 2 + bj % 2) % 2;
+      // scale bool to byte image range
+      buffer[index] = static_cast<unsigned char>(val * 255);
     }
   }
 }
@@ -144,7 +158,7 @@ test_smooth()
   gaussian_smooth_t smoother = NEW_VISCL_TASK(gaussian_smooth);
   cl::ImageFormat img_frmt = cl::ImageFormat(CL_INTENSITY, CL_UNORM_INT8);
   unsigned char img_data[width*height];
-  make_test_image(width, height, img_data);
+  make_checkerboard_image(width, height, img_data);
   unsigned char truth[width*height];
   smooth_image(width, height, img_data, truth, sigma, kr);
 
@@ -199,7 +213,7 @@ test_smooth_vxl()
   const int kr = 2;
   gaussian_smooth_t smoother = NEW_VISCL_TASK(gaussian_smooth);
   vil_image_view<vxl_byte> vil_img(width, height);
-  make_test_image(width, height, vil_img.top_left_ptr());
+  make_checkerboard_image(width, height, vil_img.top_left_ptr());
   cl_image img = cl_manager::inst()->create_image(vil_img);
   cl_image simg = smoother->smooth(img, sigma, kr);
 }
