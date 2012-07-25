@@ -4,7 +4,7 @@ enable_testing()
 include(CTest)
 
 set(test_output_path
-  "${viscl_BINARY_DIR}/bin")
+  "${viscl_BINARY_DIR}/bin/${CMAKE_CFG_INTDIR}")
 set(test_base_output_path
   "${test_output_path}")
 set(test_working_path
