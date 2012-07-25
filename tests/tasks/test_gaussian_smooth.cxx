@@ -168,18 +168,28 @@ void smooth_image(const unsigned width,
 void
 test_smooth()
 {
+  // test parameters
   const unsigned width = 100;
   const unsigned height = 100;
   const float sigma = 1.0f;
   const int kr = 2;
+
+  // create the viscl task
   gaussian_smooth_t smoother = NEW_VISCL_TASK(gaussian_smooth);
+
+  // create a test image with a checkerboard pattern
+  const size_t buffer_size = width * height;
   cl::ImageFormat img_frmt = cl::ImageFormat(CL_INTENSITY, CL_UNORM_INT8);
-  unsigned char img_data[width*height];
+  unsigned char img_data[buffer_size];
   make_checkerboard_image(width, height, img_data);
-  unsigned char truth[width*height];
+
+  // smooth the image with the CPU function for ground truth
+  unsigned char truth[buffer_size];
   smooth_image(width, height, img_data, truth, sigma, kr);
 
-  cl_image img = cl_manager::inst()->create_image(img_frmt, CL_MEM_READ_ONLY, width, height);
+  // create the image on the GPU and upload the test image to it.
+  cl_image img = cl_manager::inst()->create_image(img_frmt, CL_MEM_READ_ONLY,
+                                                  width, height);
   cl_queue_t queue = cl_manager::inst()->create_queue();
 
   cl::size_t<3> origin;
@@ -192,14 +202,19 @@ test_smooth()
   region.push_back(height);
   region.push_back(1);
 
-  queue->enqueueWriteImage(*img().get(), CL_TRUE, origin, region, 0, 0, img_data);
+  queue->enqueueWriteImage(*img().get(), CL_TRUE, origin, region,
+                           0, 0, img_data);
+
+  // apply the viscl smoothing task
   cl_image simg = smoother->smooth(img, sigma, kr);
 
-  unsigned char result_data[width*height];
-  queue->enqueueReadImage(*simg().get(), CL_TRUE, origin, region, 0, 0, result_data);
+  // create a result image and download the result to it
+  unsigned char result_data[buffer_size];
+  queue->enqueueReadImage(*simg().get(), CL_TRUE, origin, region,
+                          0, 0, result_data);
 
   unsigned long diff_count = 0;
-  for( unsigned i=0; i<width*height; ++i )
+  for( unsigned i=0; i<buffer_size; ++i )
   {
     if (result_data[i] != truth[i])
     {
@@ -209,13 +224,16 @@ test_smooth()
   if (diff_count > 0)
   {
     TEST_ERROR("GPU and CPU smoothing results differ in "
-               << 100.0f*float(diff_count)/(width*height) << "% of pixels");
+               << (100.0f*diff_count)/buffer_size << "% of pixels");
 
-    vil_image_view<vxl_byte> vil_src(img_data, width, height, 1, 1, width, width*height);
+    vil_image_view<vxl_byte> vil_src(img_data, width, height, 1,
+                                     1, width, buffer_size);
     vil_save(vil_src, "test_smooth_source.png");
-    vil_image_view<vxl_byte> vil_result(result_data, width, height, 1, 1, width, width*height);
+    vil_image_view<vxl_byte> vil_result(result_data, width, height, 1,
+                                        1, width, buffer_size);
     vil_save(vil_result, "test_smooth_result.png");
-    vil_image_view<vxl_byte> vil_truth(truth, width, height, 1, 1, width, width*height);
+    vil_image_view<vxl_byte> vil_truth(truth, width, height, 1,
+                                       1, width, buffer_size);
     vil_save(vil_truth, "test_smooth_truth.png");
   }
 
