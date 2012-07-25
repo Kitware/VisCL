@@ -6,7 +6,9 @@
 
 
 #include <iostream>
-#include <math.h>
+#include <cmath>
+#include <cstdlib>
+#include <exception>
 
 #include <test_common.h>
 

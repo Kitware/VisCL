@@ -11,6 +11,9 @@
 
 #include "cl_manager.h"
 
+#include <cstdlib>
+#include <exception>
+
 
 static void run_test(std::string const& test_name);
 
