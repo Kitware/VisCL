@@ -3,10 +3,10 @@ project(viscl_tests)
 enable_testing()
 include(CTest)
 
-set(test_output_path
-  "${viscl_BINARY_DIR}/bin/${CMAKE_CFG_INTDIR}")
 set(test_base_output_path
-  "${test_output_path}")
+  "${viscl_BINARY_DIR}/bin")
+set(test_output_path
+  "${test_base_output_path}/${CMAKE_CFG_INTDIR}")
 set(test_working_path
   "${viscl_BINARY_DIR}/tests")
 
