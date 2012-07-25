@@ -236,21 +236,71 @@ test_smooth()
                                        1, width, buffer_size);
     vil_save(vil_truth, "test_smooth_truth.png");
   }
-
 }
+
 
 void
 test_smooth_vxl()
 {
+  // test parameters
   const unsigned width = 100;
   const unsigned height = 100;
   const float sigma = 1.0f;
   const int kr = 2;
+
+  // create the viscl task
   gaussian_smooth_t smoother = NEW_VISCL_TASK(gaussian_smooth);
-  vil_image_view<vxl_byte> vil_img(width, height);
-  make_checkerboard_image(width, height, vil_img.top_left_ptr());
-  cl_image img = cl_manager::inst()->create_image(vil_img);
+
+  // create a test image with a checkerboard pattern
+  vil_image_view<vxl_byte> input_img(width, height);
+  make_checkerboard_image(width, height, input_img.top_left_ptr());
+
+  // smooth the image with the CPU function for ground truth
+  vil_image_view<vxl_byte> truth_img(width, height);
+  smooth_image(width, height, input_img.top_left_ptr(),
+               truth_img.top_left_ptr(), sigma, kr);
+
+  // create the image on the GPU and upload the test image to it.
+  cl_image img = cl_manager::inst()->create_image(input_img);
+
+  // apply the viscl smoothing task
   cl_image simg = smoother->smooth(img, sigma, kr);
+
+  // create a result image and download the result to it
+  vil_image_view<vxl_byte> result_img(width, height);
+  cl_queue_t queue = cl_manager::inst()->create_queue();
+  cl::size_t<3> origin;
+  origin.push_back(0);
+  origin.push_back(0);
+  origin.push_back(0);
+
+  cl::size_t<3> region;
+  region.push_back(width);
+  region.push_back(height);
+  region.push_back(1);
+  queue->enqueueReadImage(*simg().get(), CL_TRUE, origin, region,
+                          0, 0, result_img.top_left_ptr());
+
+  unsigned long diff_count = 0;
+  for( unsigned j=0; j<height; ++j )
+  {
+    for( unsigned i=0; i<width; ++i )
+    {
+      if (result_img(i,j) != truth_img(i,j))
+      {
+        ++diff_count;
+      }
+    }
+  }
+  if (diff_count > 0)
+  {
+    TEST_ERROR("GPU and CPU smoothing results differ in "
+               << (100.0f*diff_count)/(width*height) << "% of pixels");
+
+    vil_save(input_img, "test_smooth_source.png");
+    vil_save(result_img, "test_smooth_result.png");
+    vil_save(truth_img, "test_smooth_truth.png");
+  }
 }
 
 
