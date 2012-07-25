@@ -94,17 +94,31 @@ void make_checkerboard_image(const unsigned width,
 }
 
 
-void smooth_image(unsigned width, unsigned height, const unsigned char* input,
-                  unsigned char* output,
-                  float sigma, int kernel_radius)
+/// Clampe a value \a input between \a min_val and \a max_val.
+template <typename T>
+T clamp(const T& input, const T& min_val, const T& max_val)
 {
-  int kernel_size = 2*kernel_radius+1;
+  return (input < min_val) ? min_val
+                           : ( (input > max_val) ? max_val
+                                                 : input );
+}
+
+
+/// Smooth an image with a Gaussian filter on the CPU for comparison with GPU.
+void smooth_image(const unsigned width,
+                  const unsigned height,
+                  const unsigned char* const input,
+                  unsigned char* const output,
+                  const float sigma, const int kernel_radius)
+{
+  // Compute the Gaussian kernel
+  const int kernel_size = 2 * kernel_radius + 1;
   float *filter = new float[kernel_size];
   int i = 0;
   float sum=0.0f;
   for (int i = 0; i < kernel_size; ++i)
   {
-    float x = static_cast<float>(i - kernel_radius);
+    const float x = static_cast<float>(i - kernel_radius);
     filter[i] = exp( (- x * x) / (2.0f * sigma * sigma));
     sum += filter[i];
   }
@@ -113,8 +127,12 @@ void smooth_image(unsigned width, unsigned height, const unsigned char* input,
     filter[i] /= sum;
   }
 
-  unsigned char* work = new unsigned char[width*height];
+  const size_t buffer_size = width * height;
+  const int max_i = width-1;
+  const int max_j = height-1;
+  unsigned char* work = new unsigned char[buffer_size];
   // smooth horizontally
+  // store intermediate results into the working buffer
   for (int j=0; j<height; ++j)
   {
     for (int i=0; i<width; ++i)
@@ -122,14 +140,14 @@ void smooth_image(unsigned width, unsigned height, const unsigned char* input,
       float val = 0.0f;
       for (int offset = -kernel_radius; offset <= kernel_radius; ++offset)
       {
-        int x = i + offset;
-        x = (x < 0) ? 0 : ( (x >= width) ? width-1 : x );
+        const int x = clamp(i + offset, 0, max_i);
         val += input[j*width + x] * filter[offset + kernel_radius];
       }
       work[j*width + i] = static_cast<unsigned int>(val+0.5);
     }
   }
-  //smooth vertically
+  // smooth vertically
+  // apply to the working buffer and store in the output buffer
   for (int j=0; j<height; ++j)
   {
     for (int i=0; i<width; ++i)
@@ -137,8 +155,7 @@ void smooth_image(unsigned width, unsigned height, const unsigned char* input,
       float val = 0.0f;
       for (int offset = -kernel_radius; offset <= kernel_radius; ++offset)
       {
-        int y = j + offset;
-        y = (y < 0) ? 0 : ( (y >= height) ? height-1 : y );
+        int y = clamp(j + offset, 0, max_j);
         val += work[y*width + i] * filter[offset + kernel_radius];
       }
       output[j*width + i] = static_cast<unsigned int>(val+0.5);
