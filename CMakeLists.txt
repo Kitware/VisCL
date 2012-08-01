@@ -42,6 +42,11 @@ include_directories(libraries)
 add_subdirectory(libraries)
 add_subdirectory(tools)
 
+option(VISCL_ENABLE_TESTING "Build tests" OFF)
+if (VISCL_ENABLE_TESTING)
+  add_subdirectory(tests)
+endif (VISCL_ENABLE_TESTING)
+
 # Save library dependencies.
 SET(viscl_LIBRARY_DEPENDS_FILE ${viscl_BINARY_DIR}/visclLibraryDepends.cmake)
 EXPORT_LIBRARY_DEPENDENCIES(${viscl_LIBRARY_DEPENDS_FILE})
