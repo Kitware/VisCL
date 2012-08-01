@@ -34,14 +34,13 @@ function (viscl_make_test testname instance)
   add_test(
     NAME    test-${testname}-${instance}
     COMMAND ${test_runner}
-            "${test_output_path}/test-${testname}"
+            "${test_base_output_path}/test-${testname}"
             ${instance}
             ${ARGN})
   set_tests_properties(test-${testname}-${instance}
     PROPERTIES
       WORKING_DIRECTORY       "${test_working_path}"
-      FAIL_REGULAR_EXPRESSION "^Error: ;\nError: "
-      REQUIRED_FILES          "${test_output_path}/test-${testname}")
+      FAIL_REGULAR_EXPRESSION "^Error: ;\nError: ")
 
   if (NOT WIN32)
     add_custom_target(test-${testname}-${instance})
