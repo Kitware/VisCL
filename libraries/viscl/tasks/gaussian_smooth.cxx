@@ -8,7 +8,7 @@
 
 #include <boost/make_shared.hpp>
 
-#include "cl_manager.h"
+#include <viscl/core/cl_manager.h>
 
 #include <math.h>
 
@@ -93,4 +93,3 @@ cl_image gaussian_smooth::smooth(const cl_image &img, float sigma, int kernel_ra
 
   return result;
 }
-

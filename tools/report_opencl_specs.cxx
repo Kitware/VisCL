@@ -4,7 +4,7 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-#include "cl_manager.h"
+#include <viscl/core/cl_manager.h>
 
 
 int main(int argc, char *argv[])

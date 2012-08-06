@@ -8,8 +8,8 @@
 
 #include <boost/make_shared.hpp>
 
-#include "cl_task_registry.h"
-#include "cl_manager.h"
+#include <viscl/core/cl_task_registry.h>
+#include <viscl/core/cl_manager.h>
 
 #include "gaussian_smooth.h"
 
@@ -108,4 +108,3 @@ int hessian::num_kpts(const cl_buffer &numkpts_b)
   queue->enqueueReadBuffer(*numkpts_b().get(), CL_TRUE, 0, numkpts_b.mem_size(), buf);
   return buf[0];
 }
-

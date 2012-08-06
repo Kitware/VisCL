@@ -11,11 +11,11 @@
 #include <vil/vil_save.h>
 #include <vil/vil_convert.h>
 
-#include "cl_manager.h"
-#include "cl_task_registry.h"
-#include "hessian.h"
-#include "BRIEF.h"
-#include "track_descr_match.h"
+#include <viscl/core/cl_manager.h>
+#include <viscl/core/cl_task_registry.h>
+#include <viscl/tasks/hessian.h>
+#include <viscl/tasks/BRIEF.h>
+#include <viscl/tasks/track_descr_match.h>
 #include <vxl/vxl_tasks.h>
 
 int main(int argc, char *argv[])

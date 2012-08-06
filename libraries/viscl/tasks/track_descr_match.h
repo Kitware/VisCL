@@ -7,8 +7,8 @@
 #ifndef TRACK_DESCR_MATCH_H_
 #define TRACK_DESCR_MATCH_H_
 
-#include "cl_task.h"
-#include "cl_image.h"
+#include <viscl/core/cl_task.h>
+#include <viscl/core/cl_image.h>
 
 #include "hessian.h"
 #include "BRIEF.h"

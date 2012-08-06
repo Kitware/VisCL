@@ -14,7 +14,7 @@
 
 #include <vil/vil_image_view.h>
 
-#include "track_descr_match.h"
+#include <viscl/tasks/track_descr_match.h>
 
 /// \brief Track features across images using descriptor matches.
 ///

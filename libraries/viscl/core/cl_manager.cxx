@@ -296,4 +296,3 @@ const char *print_cl_errstring(cl_int err)
         default:                                  return "Unknown";
     }
 }
-

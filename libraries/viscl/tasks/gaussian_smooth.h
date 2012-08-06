@@ -7,8 +7,8 @@
 #ifndef GAUSSIAN_SMOOTH_H_
 #define GAUSSIAN_SMOOTH_H_
 
-#include "cl_task.h"
-#include "cl_image.h"
+#include <viscl/core/cl_task.h>
+#include <viscl/core/cl_image.h>
 
 class gaussian_smooth : public cl_task
 {

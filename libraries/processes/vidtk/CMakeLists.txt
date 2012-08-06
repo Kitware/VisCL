@@ -5,7 +5,7 @@ set(CXX_SRC_FILES
 
 add_library(viscl_vidtk_processes ${CXX_SRC_FILES})
 target_link_libraries(viscl_vidtk_processes
-  viscl vil vgl vnl rrel vidtk_process_framework vidtk_kwklt)
+  viscl_tasks viscl_vxl vil vgl vnl rrel vidtk_process_framework vidtk_kwklt)
 
 install( TARGETS viscl_vidtk_processes EXPORT viscl_exports
   RUNTIME DESTINATION bin LIBRARY DESTINATION lib ARCHIVE DESTINATION lib

@@ -7,8 +7,8 @@
 #ifndef CL_UTIL_H_
 #define CL_UTIL_H_
 
-#include "cl_header.h"
-#include "cl_image.h"
+#include <viscl/core/cl_header.h>
+#include <viscl/core/cl_image.h>
 
 namespace viscl
 {

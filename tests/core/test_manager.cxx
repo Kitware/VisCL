@@ -9,7 +9,7 @@
 
 #include <test_common.h>
 
-#include "cl_manager.h"
+#include <viscl/core/cl_manager.h>
 
 #include <cstdlib>
 #include <exception>

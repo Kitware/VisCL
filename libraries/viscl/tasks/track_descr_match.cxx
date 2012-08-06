@@ -5,9 +5,9 @@
  */
 
 #include "track_descr_match.h"
-#include "cl_manager.h"
+#include <viscl/core/cl_manager.h>
 
-#include "cl_task_registry.h"
+#include <viscl/core/cl_task_registry.h>
 
 #include <fstream>
 #include <boost/make_shared.hpp>
@@ -140,4 +140,3 @@ void write_tracks_to_file(const std::string& filename,
   }
   outfile.close();
 }
-

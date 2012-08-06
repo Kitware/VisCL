@@ -13,13 +13,13 @@
 #include <vcl_vector.h>
 
 
-#include "cl_image.h"
-#include "cl_manager.h"
-#include "cl_task_registry.h"
-#include "hessian.h"
-#include "BRIEF.h"
-#include "gaussian_smooth.h"
-#include "track_descr_match.h"
+#include <viscl/core/cl_image.h>
+#include <viscl/core/cl_manager.h>
+#include <viscl/core/cl_task_registry.h>
+#include <viscl/tasks/hessian.h>
+#include <viscl/tasks/BRIEF.h>
+#include <viscl/tasks/gaussian_smooth.h>
+#include <viscl/tasks/track_descr_match.h>
 
 
 namespace viscl

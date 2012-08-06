@@ -12,9 +12,9 @@
 
 #include <vil/algo/vil_gauss_filter.h>
 
-#include "cl_manager.h"
-#include "cl_task_registry.h"
-#include "gaussian_smooth.h"
+#include <viscl/core/cl_manager.h>
+#include <viscl/core/cl_task_registry.h>
+#include <viscl/tasks/gaussian_smooth.h>
 #include <vxl/vxl_transfer.h>
 
 #include <boost/chrono.hpp>

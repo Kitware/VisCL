@@ -7,7 +7,7 @@
 #ifndef CL_VXL_TRANSFER_H_
 #define CL_VXL_TRANSFER_H_
 
-#include "cl_image.h"
+#include <viscl/core/cl_image.h>
 
 #include <vil/vil_image_view.h>
 

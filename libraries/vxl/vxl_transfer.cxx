@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-#include "cl_manager.h"
+#include <viscl/core/cl_manager.h>
 
 
 //*****************************************************************************

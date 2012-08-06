@@ -12,10 +12,10 @@
 
 #include <test_common.h>
 
-#include "cl_manager.h"
-#include "cl_task_registry.h"
+#include <viscl/core/cl_manager.h>
+#include <viscl/core/cl_task_registry.h>
 
-#include "gaussian_smooth.h"
+#include <viscl/tasks/gaussian_smooth.h>
 #include <vxl/vxl_transfer.h>
 
 #include <vil/vil_image_view.h>

@@ -9,9 +9,9 @@
 #include <boost/make_shared.hpp>
 #include <sstream>
 
-#include "cl_task_registry.h"
+#include <viscl/core/cl_task_registry.h>
 #include "gaussian_smooth.h"
-#include "cl_manager.h"
+#include <viscl/core/cl_manager.h>
 
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>

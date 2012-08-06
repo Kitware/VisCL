@@ -7,9 +7,9 @@
 #ifndef HESSIAN_H_
 #define HESSIAN_H_
 
-#include "cl_task.h"
-#include "cl_image.h"
-#include "cl_buffer.h"
+#include <viscl/core/cl_task.h>
+#include <viscl/core/cl_image.h>
+#include <viscl/core/cl_buffer.h>
 
 
 class hessian : public cl_task

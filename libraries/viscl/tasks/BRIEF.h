@@ -7,9 +7,9 @@
 #ifndef BRIEF_H_
 #define BRIEF_H_
 
-#include "cl_task.h"
-#include "cl_image.h"
-#include "cl_buffer.h"
+#include <viscl/core/cl_task.h>
+#include <viscl/core/cl_image.h>
+#include <viscl/core/cl_buffer.h>
 
 template<int radius>
 class brief : public cl_task

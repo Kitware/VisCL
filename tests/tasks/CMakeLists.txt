@@ -1,6 +1,6 @@
 
 set(libraries
-  viscl viscl_vxl)
+  viscl_tasks viscl_vxl)
 
 viscl_build_test(gaussian_smooth libraries test_gaussian_smooth.cxx)
 
