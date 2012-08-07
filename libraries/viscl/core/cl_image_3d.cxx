@@ -6,6 +6,10 @@
 
 #include "cl_image_3d.h"
 
+namespace viscl
+{
+
+
 cl_image_3d::cl_image_3d(const cl_image_3d_t &image) : img(image)
 {
 
@@ -49,3 +53,5 @@ cl::ImageFormat cl_image_3d::format() const
 }
 
 //*****************************************************************************
+
+}

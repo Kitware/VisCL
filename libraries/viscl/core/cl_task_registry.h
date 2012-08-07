@@ -11,12 +11,17 @@
 #include <map>
 #include <boost/make_shared.hpp>
 
+
 //Cloning a task does not deep copy its kernel, therefore if a task is used in multiple threads
 //there will be a race-condition for the kernel args.  Thus deep_clone should be used when
 //using a kernel in a different thread
 
-#define NEW_VISCL_TASK(T) cl_task_registry::inst()->new_task<T>(std::string(#T), 0)
-#define NEW_THREAD_SAFE_VISCL_TASK(T, thread_id) cl_task_registry::inst()->new_task<T>(std::string(#T), (thread_id));
+#define NEW_VISCL_TASK(T) viscl::cl_task_registry::inst()->new_task<viscl::T>(std::string(#T), 0)
+#define NEW_THREAD_SAFE_VISCL_TASK(T, thread_id) viscl::cl_task_registry::inst()->new_task<viscl::T>(std::string(#T), (thread_id));
+
+
+namespace viscl
+{
 
 class cl_task_registry
 {
@@ -62,5 +67,7 @@ private:
 
   std::map<std::string, std::map<int, cl_task_t > > tasks;
 };
+
+}
 
 #endif

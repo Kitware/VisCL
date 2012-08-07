@@ -15,6 +15,9 @@
 #include "gaussian_smooth.h"
 
 
+namespace viscl
+{
+
 class track_descr_match : public cl_task
 {
 public:
@@ -65,5 +68,7 @@ void write_tracks_to_file(const std::string& filename,
                           const std::vector<cl_int2> &kpts1,
                           const std::vector<cl_int2> &kpts2,
                           const std::vector<int> &indices);
+
+}
 
 #endif

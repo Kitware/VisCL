@@ -13,6 +13,10 @@
 
 #include "gaussian_smooth.h"
 
+
+namespace viscl
+{
+
 extern const char* hessian_source;
 
 //*****************************************************************************
@@ -107,4 +111,6 @@ int hessian::num_kpts(const cl_buffer &numkpts_b)
   int buf[1];
   queue->enqueueReadBuffer(*numkpts_b().get(), CL_TRUE, 0, numkpts_b.mem_size(), buf);
   return buf[0];
+}
+
 }

@@ -6,6 +6,9 @@
 
 #include "cl_image.h"
 
+namespace viscl
+{
+
 cl_image::cl_image(const boost::shared_ptr<cl::Image2D> &image) : img(image)
 {
 
@@ -39,3 +42,6 @@ cl::ImageFormat cl_image::format() const
 }
 
 //*****************************************************************************
+
+
+}

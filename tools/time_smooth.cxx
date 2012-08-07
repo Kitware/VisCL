@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     return -1;
   }
 
-  cl_manager::inst()->report_opencl_specs();
+  viscl::cl_manager::inst()->report_opencl_specs();
 
   vil_image_view<vxl_byte> output, img = vil_image_view<vxl_byte>(iw,ih);
   std::srand(std::time(NULL));
@@ -53,8 +53,8 @@ int main(int argc, char *argv[])
 
   int radii[3] = {2, 3, 4};
 
-  gaussian_smooth_t smoother = NEW_VISCL_TASK(gaussian_smooth);
-  cl_image img_cl = viscl::upload_image(img);
+  viscl::gaussian_smooth_t smoother = NEW_VISCL_TASK(gaussian_smooth);
+  viscl::cl_image img_cl = viscl::upload_image(img);
 
 
   for (int r = 0; r < 3; r++)
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     {
       start = boost::chrono::system_clock::now();
       for (int i = 0; i < iter; i++)
-        cl_image result = smoother->smooth( img_cl, 2.0, radii[r]);
+        viscl::cl_image result = smoother->smooth( img_cl, 2.0, radii[r]);
       sec = boost::chrono::system_clock::now() - start;
       std::cout << "viscl took " << sec.count() / iter
                << " seconds to smooth a "

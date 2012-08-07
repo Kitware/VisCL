@@ -11,6 +11,9 @@
 #include <viscl/core/cl_image.h>
 #include <viscl/core/cl_buffer.h>
 
+namespace viscl
+{
+
 template<int radius>
 class brief : public cl_task
 {
@@ -38,6 +41,6 @@ private:
   cl_queue_t queue;
 };
 
-
+}
 
 #endif

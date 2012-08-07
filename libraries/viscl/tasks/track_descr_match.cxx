@@ -13,6 +13,10 @@
 #include <boost/make_shared.hpp>
 #include <algorithm>
 
+
+namespace viscl
+{
+
 extern const char* track_descr_match_source;
 
 //*****************************************************************************
@@ -139,4 +143,6 @@ void write_tracks_to_file(const std::string& filename,
     }
   }
   outfile.close();
+}
+
 }

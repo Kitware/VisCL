@@ -16,6 +16,10 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
 
+
+namespace viscl
+{
+
 extern const char* BRIEF_source;
 
 //*****************************************************************************
@@ -94,3 +98,5 @@ void brief<radius>::compute_descriptors(const cl_image &img_s, const cl_buffer &
 
 //Should probably move this all to .h for implicit instantiation
 template class brief<10>;
+
+}

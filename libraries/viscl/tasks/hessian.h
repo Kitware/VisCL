@@ -12,6 +12,9 @@
 #include <viscl/core/cl_buffer.h>
 
 
+namespace viscl
+{
+
 class hessian : public cl_task
 {
 public:
@@ -41,5 +44,7 @@ private:
 };
 
 typedef boost::shared_ptr<hessian> hessian_t;
+
+}
 
 #endif

@@ -9,6 +9,10 @@
 #include <iostream>
 #include <sstream>
 
+namespace viscl
+{
+
+
 cl_manager *cl_manager::inst_ = 0;
 
 //*****************************************************************************
@@ -295,4 +299,6 @@ const char *print_cl_errstring(cl_int err)
         case CL_INVALID_MIP_LEVEL:                return "Invalid mip-map level";
         default:                                  return "Unknown";
     }
+}
+
 }

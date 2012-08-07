@@ -11,6 +11,9 @@
 
 #include "cl_header.h"
 
+namespace viscl
+{
+
 class cl_task;
 typedef boost::shared_ptr<cl_task> cl_task_t;
 
@@ -33,5 +36,6 @@ protected:
   cl_program_t program;
 };
 
+}
 
 #endif

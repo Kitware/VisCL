@@ -10,6 +10,9 @@
 #include "cl_header.h"
 #include <boost/shared_ptr.hpp>
 
+namespace viscl
+{
+
 class cl_image_3d
 {
 public:
@@ -29,5 +32,7 @@ private:
 
   cl_image_3d_t img;
 };
+
+}
 
 #endif

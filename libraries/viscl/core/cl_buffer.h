@@ -10,6 +10,9 @@
 #include "cl_header.h"
 #include <boost/shared_ptr.hpp>
 
+namespace viscl
+{
+
 class cl_buffer
 {
 public:
@@ -27,5 +30,7 @@ private:
   cl_buffer_t buf;
   size_t len_;
 };
+
+}
 
 #endif

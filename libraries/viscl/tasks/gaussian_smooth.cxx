@@ -12,6 +12,10 @@
 
 #include <math.h>
 
+
+namespace viscl
+{
+
 extern const char* gaussian_smooth_source;
 
 //*****************************************************************************
@@ -92,4 +96,6 @@ cl_image gaussian_smooth::smooth(const cl_image &img, float sigma, int kernel_ra
   delete [] filter;
 
   return result;
+}
+
 }

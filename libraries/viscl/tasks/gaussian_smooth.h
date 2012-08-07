@@ -10,6 +10,10 @@
 #include <viscl/core/cl_task.h>
 #include <viscl/core/cl_image.h>
 
+namespace viscl
+{
+
+
 class gaussian_smooth : public cl_task
 {
 public:
@@ -34,5 +38,7 @@ private:
 };
 
 typedef boost::shared_ptr<gaussian_smooth> gaussian_smooth_t;
+
+}
 
 #endif

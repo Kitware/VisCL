@@ -17,6 +17,9 @@
 #include "cl_image.h"
 #include "cl_buffer.h"
 
+namespace viscl
+{
+
 class cl_manager
 {
 public:
@@ -68,6 +71,8 @@ template<class T>
 cl_buffer cl_manager::create_buffer(cl_mem_flags flags, size_t len)
 {
   return cl_buffer(boost::make_shared<cl::Buffer>(cl::Buffer(context_, flags, len * sizeof(T))), len);
+}
+
 }
 
 #endif

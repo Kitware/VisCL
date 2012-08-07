@@ -17,7 +17,7 @@
 
 //Does NOT support multiplane images or non-continuous memory
 template<class T>
-cl_image viscl::upload_image(const vil_image_view<T> &img)
+viscl::cl_image viscl::upload_image(const vil_image_view<T> &img)
 {
   if (!img.top_left_ptr())
   {
@@ -51,5 +51,5 @@ cl_image viscl::upload_image(const vil_image_view<T> &img)
 
 //*****************************************************************************
 
-template cl_image viscl::upload_image<float>(const vil_image_view<float> &);
-template cl_image viscl::upload_image<vxl_byte>(const vil_image_view<vxl_byte> &);
+template viscl::cl_image viscl::upload_image<float>(const vil_image_view<float> &);
+template viscl::cl_image viscl::upload_image<vxl_byte>(const vil_image_view<vxl_byte> &);

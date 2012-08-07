@@ -20,7 +20,7 @@
 
 int main(int argc, char *argv[])
 {
-  cl_manager::inst()->report_opencl_specs();
+  viscl::cl_manager::inst()->report_opencl_specs();
 
   vil_image_view<vxl_byte> img1_color = vil_load(argv[1]);
   vil_image_view<vxl_byte> img2_color = vil_load(argv[2]);
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 
   try
   {
-    track_descr_match_t tracker = NEW_VISCL_TASK(track_descr_match);
+    viscl::track_descr_match_t tracker = NEW_VISCL_TASK(track_descr_match);
 
     std::vector<cl_int2> kpts1, kpts2, kpts3;
     std::cout << "start" <<std::endl;
@@ -45,12 +45,12 @@ int main(int argc, char *argv[])
     indices32 = viscl::track_descr_track(img3, kpts3, 100, tracker);
     std::cout << "tracked 3" <<std::endl;
 
-    write_tracks_to_file("tracks.txt", kpts2, kpts3, indices32);
+    viscl::write_tracks_to_file("tracks.txt", kpts2, kpts3, indices32);
   }
   catch(const cl::Error &e)
   {
     std::cerr << "ERROR: " << e.what() << " (" << e.err() << " : "
-             << print_cl_errstring(e.err()) << ")" << std::endl;
+             << viscl::print_cl_errstring(e.err()) << ")" << std::endl;
     return 1;
   }
   return 0;

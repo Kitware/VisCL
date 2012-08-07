@@ -9,6 +9,9 @@
 
 #include <vcl_string.h>
 
+namespace viscl
+{
+
 class descriptor
 {
 public:
@@ -18,5 +21,7 @@ public:
 private:
 
 };
+
+}
 
 #endif

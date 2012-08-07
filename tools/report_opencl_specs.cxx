@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[])
 {
-  cl_manager::inst()->report_opencl_specs();
+  viscl::cl_manager::inst()->report_opencl_specs();
 
   return 0;
 }
