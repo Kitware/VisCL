@@ -4,8 +4,8 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-#include "cl_task.h"
-#include "cl_manager.h"
+#include <viscl/core/task.h>
+#include <viscl/core/manager.h>
 
 #include <fstream>
 #include <boost/make_shared.hpp>
@@ -13,14 +13,14 @@
 namespace viscl
 {
 
-boost::shared_ptr<cl::Kernel> cl_task::make_kernel(const std::string &kernel_name)
+boost::shared_ptr<cl::Kernel> task::make_kernel(const std::string &kernel_name)
 {
   return boost::make_shared<cl::Kernel>(cl::Kernel(*program.get(), kernel_name.c_str()));
 }
 
-void cl_task::build_source(const std::string &source)
+void task::build_source(const std::string &source)
 {
-  program = cl_manager::inst()->build_source(source.c_str());
+  program = manager::inst()->build_source(source.c_str());
 }
 
 }

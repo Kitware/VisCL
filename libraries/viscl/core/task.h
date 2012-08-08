@@ -9,23 +9,23 @@
 
 #include <string>
 
-#include "cl_header.h"
+#include <viscl/core/header.h>
 
 namespace viscl
 {
 
-class cl_task;
-typedef boost::shared_ptr<cl_task> cl_task_t;
+class task;
+typedef boost::shared_ptr<task> task_t;
 
-class cl_task
+class task
 {
 public:
 
-  virtual cl_task_t clone() = 0;
+  virtual task_t clone() = 0;
 
 protected:
 
-  friend class cl_task_registry;
+  friend class task_registry;
 
   virtual void init() = 0;
   virtual void init(const cl_program_t &prog) = 0;

@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-#include <viscl/core/cl_manager.h>
+#include <viscl/core/manager.h>
 
 
 //*****************************************************************************
@@ -17,7 +17,7 @@
 
 //Does NOT support multiplane images or non-continuous memory
 template<class T>
-viscl::cl_image viscl::upload_image(const vil_image_view<T> &img)
+viscl::image viscl::upload_image(const vil_image_view<T> &img)
 {
   if (!img.top_left_ptr())
   {
@@ -36,20 +36,21 @@ viscl::cl_image viscl::upload_image(const vil_image_view<T> &img)
       break;
     default:
       std::cerr << "unsupported vil image format" << std::endl;;
-      return cl_image();
+      return viscl::image();
   }
 
-  return cl_image(boost::make_shared<cl::Image2D>(cl::Image2D(cl_manager::inst()->get_context(),
-                                                  CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-                                                  img_fmt,
-                                                  img.ni(),
-                                                  img.nj(),
-                                                  0,
-                                                  (T *)img.top_left_ptr())));
+  return viscl::image(boost::make_shared<cl::Image2D>(
+            cl::Image2D(viscl::manager::inst()->get_context(),
+            CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+            img_fmt,
+            img.ni(),
+            img.nj(),
+            0,
+            (T *)img.top_left_ptr())));
 }
 
 
 //*****************************************************************************
 
-template viscl::cl_image viscl::upload_image<float>(const vil_image_view<float> &);
-template viscl::cl_image viscl::upload_image<vxl_byte>(const vil_image_view<vxl_byte> &);
+template viscl::image viscl::upload_image<float>(const vil_image_view<float> &);
+template viscl::image viscl::upload_image<vxl_byte>(const vil_image_view<vxl_byte> &);

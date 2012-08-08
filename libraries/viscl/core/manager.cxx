@@ -4,7 +4,7 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-#include "cl_manager.h"
+#include <viscl/core/manager.h>
 
 #include <iostream>
 #include <sstream>
@@ -13,25 +13,25 @@ namespace viscl
 {
 
 
-cl_manager *cl_manager::inst_ = 0;
+manager *manager::inst_ = 0;
 
 //*****************************************************************************
 
-cl_manager *cl_manager::inst()
+manager *manager::inst()
 {
-  return inst_ ? inst_ : inst_ = new cl_manager;
+  return inst_ ? inst_ : inst_ = new manager;
 }
 
 //*****************************************************************************
 
-cl_manager::cl_manager()
+manager::manager()
 {
   init_opencl();
 }
 
 //*****************************************************************************
 
-void cl_manager::init_opencl()
+void manager::init_opencl()
 {
   try
   {
@@ -58,7 +58,7 @@ void cl_manager::init_opencl()
 
 //*****************************************************************************
 
-cl_program_t cl_manager::build_source(const char *source, int device) const
+cl_program_t manager::build_source(const char *source, int device) const
 {
   cl::Program::Sources src(1, std::make_pair(source, strlen(source)+1));
 
@@ -83,16 +83,16 @@ cl_program_t cl_manager::build_source(const char *source, int device) const
 
 //*****************************************************************************
 
-cl_queue_t cl_manager::create_queue(int device)
+cl_queue_t manager::create_queue(int device)
 {
   return boost::make_shared<cl::CommandQueue>(cl::CommandQueue(context_, devices_[device]));
 }
 
 //*****************************************************************************
 
-cl_image cl_manager::create_image(const cl::ImageFormat &img_frmt, cl_mem_flags flags, size_t ni, size_t nj)
+image manager::create_image(const cl::ImageFormat &img_frmt, cl_mem_flags flags, size_t ni, size_t nj)
 {
-  return cl_image(boost::make_shared<cl::Image2D>(cl::Image2D(context_,
+  return image(boost::make_shared<cl::Image2D>(cl::Image2D(context_,
                                                               flags,
                                                               img_frmt,
                                                               ni,
@@ -103,7 +103,7 @@ cl_image cl_manager::create_image(const cl::ImageFormat &img_frmt, cl_mem_flags 
 
 //*****************************************************************************
 
-void cl_manager::report_device_specs(const cl::Device& dev,
+void manager::report_device_specs(const cl::Device& dev,
                                      const std::string& prefix)
 {
   try
@@ -193,7 +193,7 @@ void cl_manager::report_device_specs(const cl::Device& dev,
 
 //*****************************************************************************
 
-void cl_manager::report_opencl_specs()
+void manager::report_opencl_specs()
 {
   try
   {

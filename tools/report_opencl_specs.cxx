@@ -4,12 +4,12 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-#include <viscl/core/cl_manager.h>
+#include <viscl/core/manager.h>
 
 
 int main(int argc, char *argv[])
 {
-  viscl::cl_manager::inst()->report_opencl_specs();
+  viscl::manager::inst()->report_opencl_specs();
 
   return 0;
 }

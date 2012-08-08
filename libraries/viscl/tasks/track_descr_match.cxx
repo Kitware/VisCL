@@ -5,9 +5,9 @@
  */
 
 #include "track_descr_match.h"
-#include <viscl/core/cl_manager.h>
+#include <viscl/core/manager.h>
 
-#include <viscl/core/cl_task_registry.h>
+#include <viscl/core/task_registry.h>
 
 #include <fstream>
 #include <boost/make_shared.hpp>
@@ -30,7 +30,7 @@ track_descr_match::track_descr_match()
 
 void track_descr_match::init()
 {
-  cl_task::build_source(track_descr_match_source);
+  task::build_source(track_descr_match_source);
   track_k = make_kernel("track");
 }
 
@@ -50,10 +50,10 @@ track_descr_match::~track_descr_match()
 
 //*****************************************************************************
 
-cl_task_t track_descr_match::clone()
+task_t track_descr_match::clone()
 {
   track_descr_match_t clone_ = boost::make_shared<track_descr_match>(*this);
-  clone_->queue = cl_manager::inst()->create_queue();
+  clone_->queue = manager::inst()->create_queue();
   return clone_;
 }
 
@@ -69,15 +69,15 @@ track_descr_match::track_descr_match(const track_descr_match &t)
 
 //*****************************************************************************
 
-void track_descr_match::first_frame(const cl_image &img)
+void track_descr_match::first_frame(const image &img)
 {
   float thresh = 0.003f, sigma = 2.0f;
   gs = NEW_VISCL_TASK(gaussian_smooth);
   hes = NEW_VISCL_TASK(hessian);
   brf = NEW_VISCL_TASK(brief<10>);
-  cl_image smoothed = gs->smooth(img, sigma, 2);
+  image smoothed = gs->smooth(img, sigma, 2);
 
-  cl_buffer numkpts_b;
+  buffer numkpts_b;
 
   hes->detect(smoothed, kptmap1, kpts1, numkpts_b, max_kpts, thresh, sigma);
   numkpts1 = hes->num_kpts(numkpts_b);
@@ -87,22 +87,22 @@ void track_descr_match::first_frame(const cl_image &img)
 
 //*****************************************************************************
 
-cl_buffer track_descr_match::track(const cl_image &img,
+buffer track_descr_match::track(const image &img,
                                    int window_size)
 {
   float thresh = 0.003f, sigma = 2.0f;
-  cl_image smoothed = gs->smooth(img, sigma, 2);
+  image smoothed = gs->smooth(img, sigma, 2);
 
-  cl_buffer kpts2, numkpts2_b;
-  cl_image kptmap2;
+  buffer kpts2, numkpts2_b;
+  image kptmap2;
   hes->detect(smoothed, kptmap2, kpts2, numkpts2_b, max_kpts, thresh, sigma);
   int numkpts2 = hes->num_kpts(numkpts2_b);
   std::cout << numkpts2 << "\n";
 
-  cl_buffer descriptors2;
+  buffer descriptors2;
   brf->compute_descriptors(smoothed, kpts2, numkpts2, descriptors2);
 
-  cl_buffer tracks_b = cl_manager::inst()->create_buffer<int>(CL_MEM_WRITE_ONLY, numkpts2);
+  buffer tracks_b = manager::inst()->create_buffer<int>(CL_MEM_WRITE_ONLY, numkpts2);
 
   track_k->setArg(0, *kpts2().get());
   track_k->setArg(1, *kptmap1().get());

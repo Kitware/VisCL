@@ -5,7 +5,7 @@
  */
 
 #include "track_descr_match_process.h"
-#include <viscl/core/cl_task_registry.h>
+#include <viscl/core/task_registry.h>
 #include <vxl/vxl_tasks.h>
 
 #include <utilities/unchecked_return_value.h>

@@ -7,20 +7,20 @@
 #ifndef GAUSSIAN_SMOOTH_H_
 #define GAUSSIAN_SMOOTH_H_
 
-#include <viscl/core/cl_task.h>
-#include <viscl/core/cl_image.h>
+#include <viscl/core/task.h>
+#include <viscl/core/image.h>
 
 namespace viscl
 {
 
 
-class gaussian_smooth : public cl_task
+class gaussian_smooth : public task
 {
 public:
 
-  cl_task_t clone();
+  task_t clone();
 
-  cl_image smooth(const cl_image &img, float sigma, int kernel_radius) const;
+  image smooth(const image &img, float sigma, int kernel_radius) const;
 
 protected:
 
@@ -30,7 +30,7 @@ protected:
 private:
 
   //This makes it so only the task registry can compile the .cl code
-  friend class cl_task_registry;
+  friend class task_registry;
   gaussian_smooth() {}
 
   cl_kernel_t conv_x, conv_y;

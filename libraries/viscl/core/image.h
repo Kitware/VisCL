@@ -7,18 +7,18 @@
 #ifndef CL_IMAGE_H_
 #define CL_IMAGE_H_
 
-#include "cl_header.h"
+#include <viscl/core/header.h>
 #include <boost/shared_ptr.hpp>
 
 namespace viscl
 {
 
-class cl_image
+class image
 {
 public:
 
-  cl_image() {}
-  cl_image(const cl_image_t &image);
+  image() {}
+  image(const cl_image_t &image);
 
   size_t width() const;
   size_t height() const;

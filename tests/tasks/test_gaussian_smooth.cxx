@@ -12,8 +12,8 @@
 
 #include <test_common.h>
 
-#include <viscl/core/cl_manager.h>
-#include <viscl/core/cl_task_registry.h>
+#include <viscl/core/manager.h>
+#include <viscl/core/task_registry.h>
 
 #include <viscl/tasks/gaussian_smooth.h>
 #include <vxl/vxl_transfer.h>
@@ -190,9 +190,9 @@ test_smooth()
   smooth_image(width, height, img_data, truth, sigma, kr);
 
   // create the image on the GPU and upload the test image to it.
-  viscl::cl_image img = viscl::cl_manager::inst()->create_image(img_frmt, CL_MEM_READ_ONLY,
-                                                  width, height);
-  viscl::cl_queue_t queue = viscl::cl_manager::inst()->create_queue();
+  viscl::image img = viscl::manager::inst()->create_image(img_frmt, CL_MEM_READ_ONLY,
+                                                          width, height);
+  viscl::cl_queue_t queue = viscl::manager::inst()->create_queue();
 
   cl::size_t<3> origin;
   origin.push_back(0);
@@ -208,7 +208,7 @@ test_smooth()
                            0, 0, img_data);
 
   // apply the viscl smoothing task
-  viscl::cl_image simg = smoother->smooth(img, sigma, kr);
+  viscl::image simg = smoother->smooth(img, sigma, kr);
 
   // create a result image and download the result to it
   unsigned char result_data[buffer_size];
@@ -263,14 +263,14 @@ test_smooth_vxl()
                truth_img.top_left_ptr(), sigma, kr);
 
   // create the image on the GPU and upload the test image to it.
-  viscl::cl_image img = viscl::upload_image(input_img);
+  viscl::image img = viscl::upload_image(input_img);
 
   // apply the viscl smoothing task
-  viscl::cl_image simg = smoother->smooth(img, sigma, kr);
+  viscl::image simg = smoother->smooth(img, sigma, kr);
 
   // create a result image and download the result to it
   vil_image_view<vxl_byte> result_img(width, height);
-  viscl::cl_queue_t queue = viscl::cl_manager::inst()->create_queue();
+  viscl::cl_queue_t queue = viscl::manager::inst()->create_queue();
   cl::size_t<3> origin;
   origin.push_back(0);
   origin.push_back(0);

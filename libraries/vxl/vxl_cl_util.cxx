@@ -13,7 +13,7 @@
 //Function for debugging, writes out an open cl image to a file
 //Scales the value range for visualization purposes
 template<class T>
-void viscl::save_cl_image(const cl_queue_t &queue, const cl_image &img, const char *filename)
+void viscl::save_cl_image(const cl_queue_t &queue, const image &img, const char *filename)
 {
   size_t width = img.width();
   size_t height = img.height();
@@ -48,7 +48,7 @@ void viscl::save_cl_image(const cl_queue_t &queue, const cl_image &img, const ch
 //Function for debugging, writes out an open cl image to a file
 //specilization for unsigned char to not scale image values
 template<>
-void viscl::save_cl_image<vxl_byte>(const cl_queue_t &queue, const cl_image &img, const char *filename)
+void viscl::save_cl_image<vxl_byte>(const cl_queue_t &queue, const image &img, const char *filename)
 {
   size_t width = img.width();
   size_t height = img.height();
@@ -69,4 +69,4 @@ void viscl::save_cl_image<vxl_byte>(const cl_queue_t &queue, const cl_image &img
   vil_save(downloaded, filename);
 }
 
-template void viscl::save_cl_image<float>(const cl_queue_t &queue, const cl_image &img, const char *filename);
+template void viscl::save_cl_image<float>(const cl_queue_t &queue, const image &img, const char *filename);

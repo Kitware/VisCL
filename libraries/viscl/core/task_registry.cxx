@@ -4,16 +4,16 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-#include "cl_task_registry.h"
+#include "task_registry.h"
 
 namespace viscl
 {
 
-cl_task_registry *cl_task_registry::inst_ = 0;
+task_registry *task_registry::inst_ = 0;
 
-cl_task_registry *cl_task_registry::inst()
+task_registry *task_registry::inst()
 {
-  return inst_ ? inst_ : inst_ = new cl_task_registry;
+  return inst_ ? inst_ : inst_ = new task_registry;
 }
 
 }

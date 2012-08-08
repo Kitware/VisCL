@@ -11,8 +11,8 @@
 #include <vil/vil_save.h>
 #include <vil/vil_convert.h>
 
-#include <viscl/core/cl_manager.h>
-#include <viscl/core/cl_task_registry.h>
+#include <viscl/core/manager.h>
+#include <viscl/core/task_registry.h>
 #include <viscl/tasks/hessian.h>
 #include <viscl/tasks/BRIEF.h>
 #include <viscl/tasks/track_descr_match.h>
@@ -20,7 +20,7 @@
 
 int main(int argc, char *argv[])
 {
-  viscl::cl_manager::inst()->report_opencl_specs();
+  viscl::manager::inst()->report_opencl_specs();
 
   vil_image_view<vxl_byte> img1_color = vil_load(argv[1]);
   vil_image_view<vxl_byte> img2_color = vil_load(argv[2]);

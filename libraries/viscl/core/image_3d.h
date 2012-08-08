@@ -7,18 +7,18 @@
 #ifndef CL_IMAGE_3D_H_
 #define CL_IMAGE_3D_H_
 
-#include "cl_header.h"
+#include <viscl/core/header.h>
 #include <boost/shared_ptr.hpp>
 
 namespace viscl
 {
 
-class cl_image_3d
+class image_3d
 {
 public:
 
-  cl_image_3d() {}
-  cl_image_3d(const cl_image_3d_t &image);
+  image_3d() {}
+  image_3d(const cl_image_3d_t &image);
 
   size_t width() const;
   size_t height() const;

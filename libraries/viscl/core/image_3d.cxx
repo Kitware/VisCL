@@ -4,20 +4,20 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-#include "cl_image_3d.h"
+#include <viscl/core/image_3d.h>
 
 namespace viscl
 {
 
 
-cl_image_3d::cl_image_3d(const cl_image_3d_t &image) : img(image)
+image_3d::image_3d(const cl_image_3d_t &image) : img(image)
 {
 
 }
 
 //*****************************************************************************
 
-size_t cl_image_3d::width() const
+size_t image_3d::width() const
 {
   size_t width;
   img->getImageInfo<size_t>(CL_IMAGE_WIDTH, &width);
@@ -26,7 +26,7 @@ size_t cl_image_3d::width() const
 
 //*****************************************************************************
 
-size_t cl_image_3d::height() const
+size_t image_3d::height() const
 {
   size_t height;
   img->getImageInfo<size_t>(CL_IMAGE_HEIGHT, &height);
@@ -35,7 +35,7 @@ size_t cl_image_3d::height() const
 
 //*****************************************************************************
 
-size_t cl_image_3d::depth() const
+size_t image_3d::depth() const
 {
   size_t depth;
   img->getImageInfo<size_t>(CL_IMAGE_DEPTH, &depth);
@@ -45,7 +45,7 @@ size_t cl_image_3d::depth() const
 
 //*****************************************************************************
 
-cl::ImageFormat cl_image_3d::format() const
+cl::ImageFormat image_3d::format() const
 {
   cl::ImageFormat imgf;
   img->getImageInfo<cl::ImageFormat>(CL_IMAGE_FORMAT, &imgf);

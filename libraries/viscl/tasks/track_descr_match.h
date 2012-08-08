@@ -7,8 +7,8 @@
 #ifndef TRACK_DESCR_MATCH_H_
 #define TRACK_DESCR_MATCH_H_
 
-#include <viscl/core/cl_task.h>
-#include <viscl/core/cl_image.h>
+#include <viscl/core/task.h>
+#include <viscl/core/image.h>
 
 #include "hessian.h"
 #include "BRIEF.h"
@@ -18,7 +18,7 @@
 namespace viscl
 {
 
-class track_descr_match : public cl_task
+class track_descr_match : public task
 {
 public:
 
@@ -26,13 +26,13 @@ public:
 
   //Copy constructor for cloning
   track_descr_match(const track_descr_match &t);
-  cl_task_t clone();
+  task_t clone();
 
-  void first_frame(const cl_image &img);
+  void first_frame(const image &img);
 
-  cl_buffer track(const cl_image &img, int window_size);
+  buffer track(const image &img, int window_size);
 
-  const cl_buffer& last_keypoints() const { return kpts1; }
+  const buffer& last_keypoints() const { return kpts1; }
 
   int last_num_keypoints() const { return numkpts1; }
 
@@ -46,7 +46,7 @@ protected:
 private:
 
   //This makes it so only the task registry can compile the .cl code
-  friend class cl_task_registry;
+  friend class task_registry;
   track_descr_match();
 
   hessian_t hes;
@@ -56,9 +56,9 @@ private:
   cl_kernel_t track_k;
   cl_queue_t queue;
 
-  cl_buffer kpts1;
-  cl_buffer descriptors1;
-  cl_image kptmap1;
+  buffer kpts1;
+  buffer descriptors1;
+  image kptmap1;
   int numkpts1, max_kpts;
 };
 

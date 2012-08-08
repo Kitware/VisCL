@@ -9,9 +9,9 @@
 #include <boost/make_shared.hpp>
 #include <sstream>
 
-#include <viscl/core/cl_task_registry.h>
+#include <viscl/core/task_registry.h>
 #include "gaussian_smooth.h"
-#include <viscl/core/cl_manager.h>
+#include <viscl/core/manager.h>
 
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
@@ -27,7 +27,7 @@ namespace viscl
 template<int radius>
 void brief<radius>::init()
 {
-  cl_task::build_source(generate_meta_source(BRIEF_source));
+  task::build_source(generate_meta_source(BRIEF_source));
   brief_k = make_kernel("brief");
 }
 
@@ -72,19 +72,19 @@ std::string brief<radius>::generate_meta_source(const std::string &source)
 //*****************************************************************************
 
 template<int radius>
-cl_task_t brief<radius>::clone()
+task_t brief<radius>::clone()
 {
   type clone_ = boost::make_shared<brief<radius> >(*this);
-  clone_->queue = cl_manager::inst()->create_queue();
+  clone_->queue = manager::inst()->create_queue();
   return clone_;
 }
 
 //*****************************************************************************
 
 template<int radius>
-void brief<radius>::compute_descriptors(const cl_image &img_s, const cl_buffer &kpts, size_t numkpts, cl_buffer &descriptors)
+void brief<radius>::compute_descriptors(const image &img_s, const buffer &kpts, size_t numkpts, buffer &descriptors)
 {
-  descriptors = cl_manager::inst()->create_buffer<cl_int4>(CL_MEM_READ_WRITE, numkpts);
+  descriptors = manager::inst()->create_buffer<cl_int4>(CL_MEM_READ_WRITE, numkpts);
   brief_k->setArg(0, *img_s().get());
   brief_k->setArg(1, *kpts().get());
   brief_k->setArg(2, *descriptors().get());

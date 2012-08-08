@@ -4,21 +4,21 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-#include "cl_buffer.h"
+#include <viscl/core/buffer.h>
 
 namespace viscl
 {
 
 //*****************************************************************************
 
-cl_buffer::cl_buffer(const boost::shared_ptr<cl::Buffer> &buffer, size_t length) : buf(buffer), len_(length)
+buffer::buffer(const boost::shared_ptr<cl::Buffer> &buffer, size_t length) : buf(buffer), len_(length)
 {
 
 }
 
 //*****************************************************************************
 
-size_t cl_buffer::mem_size() const
+size_t buffer::mem_size() const
 {
   size_t mem;
   buf->getInfo<size_t>(CL_MEM_SIZE, &mem);

@@ -7,23 +7,23 @@
 #ifndef BRIEF_H_
 #define BRIEF_H_
 
-#include <viscl/core/cl_task.h>
-#include <viscl/core/cl_image.h>
-#include <viscl/core/cl_buffer.h>
+#include <viscl/core/task.h>
+#include <viscl/core/image.h>
+#include <viscl/core/buffer.h>
 
 namespace viscl
 {
 
 template<int radius>
-class brief : public cl_task
+class brief : public task
 {
 public:
 
   typedef boost::shared_ptr<brief<radius> > type;
 
-  cl_task_t clone();
+  task_t clone();
 
-  void compute_descriptors(const cl_image &img_s, const cl_buffer &kpts, size_t numkpts, cl_buffer &descriptors);
+  void compute_descriptors(const image &img_s, const buffer &kpts, size_t numkpts, buffer &descriptors);
 
 protected:
 
@@ -32,7 +32,7 @@ protected:
 
 private:
 
-  friend class cl_task_registry;
+  friend class task_registry;
   brief() {}
 
   std::string generate_meta_source(const std::string &source);

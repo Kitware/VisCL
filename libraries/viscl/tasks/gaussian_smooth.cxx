@@ -8,7 +8,7 @@
 
 #include <boost/make_shared.hpp>
 
-#include <viscl/core/cl_manager.h>
+#include <viscl/core/manager.h>
 
 #include <math.h>
 
@@ -22,7 +22,7 @@ namespace viscl
 
 void gaussian_smooth::init()
 {
-  cl_task::build_source(gaussian_smooth_source);
+  task::build_source(gaussian_smooth_source);
   conv_x = make_kernel("convolveHoriz1D");
   conv_y = make_kernel("convolveVert1D");
 }
@@ -38,17 +38,17 @@ void gaussian_smooth::init(const cl_program_t &prog)
 
 //*****************************************************************************
 
-cl_task_t gaussian_smooth::clone()
+task_t gaussian_smooth::clone()
 {
   gaussian_smooth_t clone_ = boost::make_shared<gaussian_smooth>(*this);
-  clone_->queue = cl_manager::inst()->create_queue();
+  clone_->queue = manager::inst()->create_queue();
   return clone_;
 }
 
 
 //*****************************************************************************
 
-cl_image gaussian_smooth::smooth(const cl_image &img, float sigma, int kernel_radius) const
+image gaussian_smooth::smooth(const image &img, float sigma, int kernel_radius) const
 {
   int kernel_size = 2*kernel_radius+1;
   float *filter = new float[kernel_size];
@@ -65,12 +65,12 @@ cl_image gaussian_smooth::smooth(const cl_image &img, float sigma, int kernel_ra
   }
 
 
-  cl_buffer smoothing_kernel = cl_manager::inst()->create_buffer<float>(CL_MEM_READ_ONLY, kernel_size);
+  buffer smoothing_kernel = manager::inst()->create_buffer<float>(CL_MEM_READ_ONLY, kernel_size);
   queue->enqueueWriteBuffer(*smoothing_kernel().get(), CL_TRUE, 0, smoothing_kernel.mem_size(), filter);
 
   size_t ni = img.width(), nj = img.height();
-  cl_image working = cl_manager::inst()->create_image(img.format(), CL_MEM_READ_WRITE, ni, nj);
-  cl_image result = cl_manager::inst()->create_image(img.format(), CL_MEM_READ_WRITE, ni, nj);
+  image working = manager::inst()->create_image(img.format(), CL_MEM_READ_WRITE, ni, nj);
+  image result = manager::inst()->create_image(img.format(), CL_MEM_READ_WRITE, ni, nj);
 
   // Set arguments to kernel
   conv_x->setArg(0, *img().get());
