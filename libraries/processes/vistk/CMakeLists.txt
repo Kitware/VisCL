@@ -29,4 +29,3 @@ target_link_libraries(viscl2vistk_processes
   viscl_vidtk_processes
   vistk_pipeline
   vistk_utilities)
-

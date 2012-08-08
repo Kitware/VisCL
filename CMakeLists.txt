@@ -67,5 +67,3 @@ install(
   DESTINATION "${cmakedir}"
   FILE        viscl-config-targets.cmake
   COMPONENT   development)
-
-
