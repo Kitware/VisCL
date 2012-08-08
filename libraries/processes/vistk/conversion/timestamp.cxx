@@ -10,18 +10,20 @@ timestamp_conversion::vistk_t
 timestamp_conversion
 ::operator () (vidtk_t const& from) const
 {
-  vistk_t vistk_ts;
-
-  if (from.has_time())
+  if (from.has_time() && from.has_frame_number())
   {
-    vistk_ts.set_time(from.time());
+    return vistk_t(from.time(), from.frame_number());
   }
-  if (from.has_frame_number())
+  else if (from.has_time())
   {
-    vistk_ts.set_frame(from.frame_number());
+    return vistk_t(from.time());
+  }
+  else if (from.has_frame_number())
+  {
+    return vistk_t(from.frame_number());
   }
 
-  return vistk_ts;
+  return vistk_t();
 }
 
 timestamp_conversion::vidtk_t

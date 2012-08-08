@@ -32,9 +32,9 @@ class vistk_process
   public:
     vistk_process(vistk::config_t const& conf);
 
-    static constraint_t const constraint_vidtk;
+    static property_t const constraint_vidtk;
   protected:
-    virtual constraints_t _constraints() const;
+    virtual properties_t _properties() const;
 
     typedef vidtk::process* vidtk_process_t;
 

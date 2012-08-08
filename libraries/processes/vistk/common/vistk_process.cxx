@@ -23,7 +23,7 @@
 namespace viscl
 {
 
-vistk::process::constraint_t const vistk_process::constraint_vidtk = "_vidtk";
+vistk::process::property_t const vistk_process::constraint_vidtk = "_vidtk";
 
 vistk_process
 ::vistk_process(vistk::config_t const& conf)
@@ -31,15 +31,15 @@ vistk_process
 {
 }
 
-vistk::process::constraints_t
+vistk::process::properties_t
 vistk_process
-::_constraints() const
+::_properties() const
 {
-  constraints_t base_constraints = vistk::process::_constraints();
+  properties_t base_properties = vistk::process::_properties();
 
-  base_constraints.insert(constraint_vidtk);
+  base_properties.insert(constraint_vidtk);
 
-  return base_constraints;
+  return base_properties;
 }
 
 void
