@@ -17,10 +17,10 @@
 #include <boost/random/uniform_int_distribution.hpp>
 
 
+extern const char* BRIEF_source;
+
 namespace viscl
 {
-
-extern const char* BRIEF_source;
 
 //*****************************************************************************
 

@@ -13,10 +13,10 @@
 #include <math.h>
 
 
+extern const char* gaussian_smooth_source;
+
 namespace viscl
 {
-
-extern const char* gaussian_smooth_source;
 
 //*****************************************************************************
 

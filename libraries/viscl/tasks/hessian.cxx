@@ -14,10 +14,10 @@
 #include "gaussian_smooth.h"
 
 
+extern const char* hessian_source;
+
 namespace viscl
 {
-
-extern const char* hessian_source;
 
 //*****************************************************************************
 

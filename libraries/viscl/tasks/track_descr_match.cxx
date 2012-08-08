@@ -14,10 +14,10 @@
 #include <algorithm>
 
 
+extern const char* track_descr_match_source;
+
 namespace viscl
 {
-
-extern const char* track_descr_match_source;
 
 //*****************************************************************************
 
