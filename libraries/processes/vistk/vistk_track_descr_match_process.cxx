@@ -23,11 +23,11 @@ vistk_track_descr_match_process::vistk_track_descr_match_process(vistk::config_t
   required_nodep.insert(flag_required);
   required_nodep.insert(flag_input_nodep);
 
-  this->declare_input_port("image", boost::make_shared<port_info>("image/vil/byte/gray", required, "input image"));
-  this->declare_input_port("reset", boost::make_shared<port_info>("bool", required_nodep, "Whether to reset the process or not."));
+  this->declare_input_port("image", "image/vil/byte/gray", required, "input image");
+  this->declare_input_port("reset", "bool", required_nodep, "Whether to reset the process or not.");
 
-  this->declare_output_port("created_tracks", boost::make_shared<port_info>("tracks/klt/vidtk:created", required, "created tracks"));
-  this->declare_output_port("active_tracks", boost::make_shared<port_info>("tracks/klt/vidtk:active", required, "active tracks"));
+  this->declare_output_port("created_tracks", "tracks/klt/vidtk:created", required, "created tracks");
+  this->declare_output_port("active_tracks", "tracks/klt/vidtk:active", required, "active tracks");
 }
 
 //*****************************************************************************
