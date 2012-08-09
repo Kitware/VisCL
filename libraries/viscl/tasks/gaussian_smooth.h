@@ -34,7 +34,6 @@ private:
   gaussian_smooth() {}
 
   cl_kernel_t conv_x, conv_y;
-  cl_queue_t queue;
 };
 
 typedef boost::shared_ptr<gaussian_smooth> gaussian_smooth_t;
