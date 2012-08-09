@@ -4,11 +4,24 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-#include "cl_task_registry.h"
+#ifndef DESCRIPTOR_H_
+#define DESCRIPTOR_H_
 
-cl_task_registry *cl_task_registry::inst_ = 0;
+#include <vcl_string.h>
 
-cl_task_registry *cl_task_registry::inst()
+namespace viscl
 {
-  return inst_ ? inst_ : inst_ = new cl_task_registry;
+
+class descriptor
+{
+public:
+
+  // Add interface to descriptors
+
+private:
+
+};
+
 }
+
+#endif

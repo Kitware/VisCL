@@ -7,26 +7,26 @@
 #ifndef HESSIAN_H_
 #define HESSIAN_H_
 
-#include "cl_task.h"
-#include "cl_image.h"
-#include "cl_buffer.h"
+#include <viscl/core/task.h>
+#include <viscl/core/image.h>
+#include <viscl/core/buffer.h>
 
-#include <vil/vil_image_view.h>
 
-class hessian : public cl_task
+namespace viscl
+{
+
+class hessian : public task
 {
 public:
 
-  cl_task_t clone();
+  task_t clone();
 
-  template <class T>
-  void detect(const vil_image_view<T> &img, int max_kpts, float thresh, float sigma, vcl_vector<cl_int2> &kpts) const;
-  void smooth_and_detect(const cl_image &img, cl_image &kptmap, cl_buffer &kpts, cl_buffer &numkpts,
+  void smooth_and_detect(const image &img, image &kptmap, buffer &kpts, buffer &numkpts,
                          int max_kpts, float thresh, float sigma) const;
-  void detect(const cl_image &img, cl_image &kptmap, cl_buffer &kpts, cl_buffer &numkpts,
+  void detect(const image &img, image &kptmap, buffer &kpts, buffer &numkpts,
               int max_kpts, float thresh, float scale) const;
 
-  int num_kpts(const cl_buffer &numkpts_b);
+  int num_kpts(const buffer &numkpts_b);
 
 protected:
 
@@ -36,13 +36,14 @@ protected:
 private:
 
   //This makes it so only the task registry can compile the .cl code
-  friend class cl_task_registry;
+  friend class task_registry;
   hessian() {};
 
   cl_kernel_t det_hessian, detect_extrema, init_kpt_map;
-  cl_queue_t queue;
 };
 
 typedef boost::shared_ptr<hessian> hessian_t;
+
+}
 
 #endif

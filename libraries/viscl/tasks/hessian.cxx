@@ -8,19 +8,22 @@
 
 #include <boost/make_shared.hpp>
 
-#include "cl_task_registry.h"
-#include "cl_manager.h"
-#include "cl_util.h"
+#include <viscl/core/task_registry.h>
+#include <viscl/core/manager.h>
 
 #include "gaussian_smooth.h"
 
+
 extern const char* hessian_source;
+
+namespace viscl
+{
 
 //*****************************************************************************
 
 void hessian::init()
 {
-  cl_task::build_source(hessian_source);
+  task::build_source(hessian_source);
   det_hessian = make_kernel("det_hessian");
   detect_extrema = make_kernel("detect_extrema");
   init_kpt_map = make_kernel("init_kpt_map");
@@ -38,57 +41,39 @@ void hessian::init(const cl_program_t &prog)
 
 //*****************************************************************************
 
-cl_task_t hessian::clone()
+task_t hessian::clone()
 {
   hessian_t clone_ = boost::make_shared<hessian>(*this);
-  clone_->queue = cl_manager::inst()->create_queue();
+  clone_->queue = manager::inst()->create_queue();
   return clone_;
 }
 
 //*****************************************************************************
 
-template <class T>
-void hessian::detect(const vil_image_view<T> &img, int max_kpts, float thresh, float sigma, vcl_vector<cl_int2> &kpts) const
-{
-  cl_image img_cl = cl_manager::inst()->create_image<T>(img);
-  cl_image kptmap;
-  cl_buffer numkpts_b, kpts_b;
-  smooth_and_detect(img_cl, kptmap, kpts_b, numkpts_b, max_kpts, thresh, sigma);
-
-  int buf[1];
-  queue->enqueueReadBuffer(*numkpts_b().get(), CL_TRUE, 0, numkpts_b.mem_size(), buf);
-  int numkpts = buf[0];
-
-  kpts.resize(numkpts);
-  queue->enqueueReadBuffer(*kpts_b().get(), CL_TRUE, 0, sizeof(cl_int2)*numkpts, &kpts[0]);
-}
-
-//*****************************************************************************
-
-void hessian::smooth_and_detect(const cl_image &img, cl_image &kptmap, cl_buffer &kpts, cl_buffer &numkpts,
+void hessian::smooth_and_detect(const image &img, image &kptmap, buffer &kpts, buffer &numkpts,
                          int max_kpts, float thresh, float sigma) const
 {
   float scale = 2.0f;
   gaussian_smooth_t gs = NEW_VISCL_TASK(gaussian_smooth);
-  cl_image smoothed = gs->smooth(img, scale, 2);
+  image smoothed = gs->smooth(img, scale, 2);
   detect(smoothed, kptmap, kpts, numkpts, max_kpts, thresh, sigma);
 }
 
 //*****************************************************************************
 
-void hessian::detect(const cl_image &smoothed, cl_image &kptmap, cl_buffer &kpts, cl_buffer &numkpts,
+void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts, buffer &numkpts,
                      int max_kpts, float thresh, float sigma) const
 {
   size_t ni = smoothed.width(), nj = smoothed.height();
   cl::ImageFormat detimg_fmt(CL_INTENSITY, CL_FLOAT);
-  cl_image detimg = cl_manager::inst()->create_image(detimg_fmt, CL_MEM_READ_WRITE, ni, nj);
+  image detimg = manager::inst()->create_image(detimg_fmt, CL_MEM_READ_WRITE, ni, nj);
   cl::ImageFormat kptimg_fmt(CL_R, CL_SIGNED_INT32);
-  kptmap = cl_manager::inst()->create_image(kptimg_fmt, CL_MEM_READ_WRITE, ni >> 1, nj >> 1);
-  kpts = cl_manager::inst()->create_buffer<cl_int2>(CL_MEM_READ_WRITE, max_kpts);
+  kptmap = manager::inst()->create_image(kptimg_fmt, CL_MEM_READ_WRITE, ni >> 1, nj >> 1);
+  kpts = manager::inst()->create_buffer<cl_int2>(CL_MEM_READ_WRITE, max_kpts);
 
   int init[1];
   init[0] = 0;
-  numkpts = cl_manager::inst()->create_buffer<int>(CL_MEM_READ_WRITE, 1);
+  numkpts = manager::inst()->create_buffer<int>(CL_MEM_READ_WRITE, 1);
   queue->enqueueWriteBuffer(*numkpts().get(), CL_TRUE, 0, numkpts.mem_size(), init);
 
   // Set arguments to kernel
@@ -121,14 +106,11 @@ void hessian::detect(const cl_image &smoothed, cl_image &kptmap, cl_buffer &kpts
 
 //*****************************************************************************
 
-int hessian::num_kpts(const cl_buffer &numkpts_b)
+int hessian::num_kpts(const buffer &numkpts_b)
 {
   int buf[1];
   queue->enqueueReadBuffer(*numkpts_b().get(), CL_TRUE, 0, numkpts_b.mem_size(), buf);
   return buf[0];
 }
 
-//*****************************************************************************
-
-template void hessian::detect(const vil_image_view<float> &img, int max_kpts, float thresh, float sigma, vcl_vector<cl_int2> &kpts) const;
-template void hessian::detect(const vil_image_view<vxl_byte> &img, int max_kpts, float thresh, float sigma, vcl_vector<cl_int2> &kpts) const;
+}

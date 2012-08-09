@@ -4,30 +4,34 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-#ifndef CL_IMAGE_3D_H_
-#define CL_IMAGE_3D_H_
+#ifndef CL_IMAGE_H_
+#define CL_IMAGE_H_
 
-#include "cl_header.h"
+#include <viscl/core/header.h>
 #include <boost/shared_ptr.hpp>
 
-class cl_image_3d
+namespace viscl
+{
+
+class image
 {
 public:
 
-  cl_image_3d() {}
-  cl_image_3d(const cl_image_3d_t &image);
+  image() {}
+  image(const cl_image_t &image);
 
   size_t width() const;
   size_t height() const;
-  size_t depth() const;
 
   cl::ImageFormat format() const;
 
-  const cl_image_3d_t &operator()() const {return img;}
+  const boost::shared_ptr<cl::Image2D> &operator()() const {return img;}
 
 private:
 
-  cl_image_3d_t img;
+  cl_image_t img;
 };
+
+}
 
 #endif

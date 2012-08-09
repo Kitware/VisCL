@@ -7,33 +7,37 @@
 #ifndef CL_TASK_H_
 #define CL_TASK_H_
 
-#include <vcl_vector.h>
-#include <vcl_map.h>
-#include <vcl_string.h>
+#include <string>
 
-#include "cl_header.h"
+#include <viscl/core/header.h>
 
-class cl_task;
-typedef boost::shared_ptr<cl_task> cl_task_t;
+namespace viscl
+{
 
-class cl_task
+class task;
+typedef boost::shared_ptr<task> task_t;
+
+class task
 {
 public:
 
-  virtual cl_task_t clone() = 0;
+  virtual task_t clone() = 0;
+  cl_queue_t get_queue() const { return queue; }
 
 protected:
 
-  friend class cl_task_registry;
+  friend class task_registry;
 
   virtual void init() = 0;
   virtual void init(const cl_program_t &prog) = 0;
 
-  cl_kernel_t make_kernel(const vcl_string &kernel_name);
-  void build_source(const vcl_string &source);
+  cl_kernel_t make_kernel(const std::string &kernel_name);
+  void build_source(const std::string &source);
 
   cl_program_t program;
+  cl_queue_t queue;
 };
 
+}
 
 #endif

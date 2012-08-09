@@ -7,13 +7,17 @@
 #ifndef CL_UTIL_H_
 #define CL_UTIL_H_
 
-#include "cl_header.h"
-#include "cl_image.h"
+#include <viscl/core/header.h>
+#include <viscl/core/image.h>
 
+namespace viscl
+{
 
 template<class T>
-void save_cl_image(const cl_queue_t &queue, const cl_image &img, const char *filename);
+void save_cl_image(const cl_queue_t &queue, const image &img, const char *filename);
 template<>
-void save_cl_image<unsigned char>(const cl_queue_t &queue, const cl_image &img, const char *filename);
+void save_cl_image<unsigned char>(const cl_queue_t &queue, const image &img, const char *filename);
+
+} // end namespace viscl
 
 #endif

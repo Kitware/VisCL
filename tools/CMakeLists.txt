@@ -3,29 +3,39 @@
 ###################################################################
 
 add_executable(viscl_report_opencl_specs report_opencl_specs.cxx)
-target_link_libraries(viscl_report_opencl_specs viscl)
+target_link_libraries(viscl_report_opencl_specs viscl_core)
 
 install(TARGETS viscl_report_opencl_specs DESTINATION bin)
 
 
-add_executable(viscl_time_smooth time_smooth.cxx)
-target_link_libraries(viscl_time_smooth
-  viscl vil vil_algo vul  ${Boost_CHRONO_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+if (VXL_FOUND)
 
-install(TARGETS viscl_time_smooth DESTINATION bin)
+  add_executable(viscl_time_smooth time_smooth.cxx)
+  target_link_libraries(viscl_time_smooth
+    viscl_tasks viscl_vxl vil_algo vul  ${Boost_CHRONO_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+
+  install(TARGETS viscl_time_smooth DESTINATION bin)
 
 
-add_executable(viscl_time_memory_transfer time_memory_transfer.cxx)
-target_link_libraries(viscl_time_memory_transfer
-  viscl vul ${Boost_CHRONO_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+  # TODO: Make this not dependent on VXL.
+  # This only depends on VXL for command line parsing.
+  add_executable(viscl_time_memory_transfer time_memory_transfer.cxx)
+  target_link_libraries(viscl_time_memory_transfer
+    vul ${OPENCL_LIBRARIES} ${Boost_CHRONO_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 
-install(TARGETS viscl_time_memory_transfer DESTINATION bin)
+  install(TARGETS viscl_time_memory_transfer DESTINATION bin)
+
+endif (VXL_FOUND)
 
 
 ###################################################################
 # Developer testing executables which are not meant for install
 ###################################################################
 
-add_executable(track track.cxx )
-target_link_libraries(track
-  viscl vil vil_algo vul )
+if (VXL_FOUND)
+
+  add_executable(track track.cxx )
+  target_link_libraries(track
+    viscl_tasks viscl_vxl vul )
+
+endif (VXL_FOUND)

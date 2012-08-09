@@ -1,6 +1,6 @@
 
 set(libraries
-  viscl)
+  viscl_core)
 
 viscl_build_test(manager libraries test_manager.cxx)
 

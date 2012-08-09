@@ -55,4 +55,3 @@ __kernel void brief(__read_only image2d_t input, __global int2 *kpts, __global b
 
   descr[index] = d;
 }
-

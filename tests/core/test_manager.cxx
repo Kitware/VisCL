@@ -9,7 +9,7 @@
 
 #include <test_common.h>
 
-#include "cl_manager.h"
+#include <viscl/core/manager.h>
 
 #include <cstdlib>
 #include <exception>
@@ -66,14 +66,14 @@ run_test(std::string const& test_name)
 void
 test_report_opencl_specs()
 {
-  cl_manager::inst()->report_opencl_specs();
+  viscl::manager::inst()->report_opencl_specs();
 }
 
 void
 test_create_image()
 {
   cl::ImageFormat img_frmt = cl::ImageFormat(CL_INTENSITY, CL_FLOAT);
-  cl_manager::inst()->create_image(img_frmt, CL_MEM_READ_ONLY, 100, 100);
+  viscl::manager::inst()->create_image(img_frmt, CL_MEM_READ_ONLY, 100, 100);
 }
 
 

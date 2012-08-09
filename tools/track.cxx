@@ -4,22 +4,23 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-#include <vcl_iostream.h>
+#include <iostream>
 
 #include <vil/vil_image_view.h>
 #include <vil/vil_load.h>
 #include <vil/vil_save.h>
 #include <vil/vil_convert.h>
 
-#include "cl_manager.h"
-#include "cl_task_registry.h"
-#include "hessian.h"
-#include "BRIEF.h"
-#include "track_descr_match.h"
+#include <viscl/core/manager.h>
+#include <viscl/core/task_registry.h>
+#include <viscl/tasks/hessian.h>
+#include <viscl/tasks/BRIEF.h>
+#include <viscl/tasks/track_descr_match.h>
+#include <vxl/vxl_tasks.h>
 
 int main(int argc, char *argv[])
 {
-  cl_manager::inst()->report_opencl_specs();
+  viscl::manager::inst()->report_opencl_specs();
 
   vil_image_view<vxl_byte> img1_color = vil_load(argv[1]);
   vil_image_view<vxl_byte> img2_color = vil_load(argv[2]);
@@ -32,19 +33,24 @@ int main(int argc, char *argv[])
 
   try
   {
-    track_descr_match_t tracker = NEW_VISCL_TASK(track_descr_match);
+    viscl::track_descr_match_t tracker = NEW_VISCL_TASK(track_descr_match);
 
-    vcl_vector<vnl_vector_fixed<double, 2> > kpts1, kpts2, kpts3;
-    tracker->first_frame(img1, kpts1);
-    vcl_vector<int> indices21(tracker->track(img2, kpts2, 100));
-    vcl_vector<int> indices32(tracker->track(img3, kpts3, 100));
+    std::vector<cl_int2> kpts1, kpts2, kpts3;
+    std::cout << "start" <<std::endl;
+    viscl::track_descr_first_frame(img1, kpts1, tracker);
+    std::cout << "tracked 1" <<std::endl;
+    std::vector<int> indices21, indices32;
+    indices21 = viscl::track_descr_track(img2, kpts2, 100, tracker);
+    std::cout << "tracked 2" <<std::endl;
+    indices32 = viscl::track_descr_track(img3, kpts3, 100, tracker);
+    std::cout << "tracked 3" <<std::endl;
 
-    write_tracks_to_file("tracks.txt", kpts2, kpts3, indices32);
+    viscl::write_tracks_to_file("tracks.txt", kpts2, kpts3, indices32);
   }
   catch(const cl::Error &e)
   {
-    vcl_cerr << "ERROR: " << e.what() << " (" << e.err() << " : "
-             << print_cl_errstring(e.err()) << ")" << vcl_endl;
+    std::cerr << "ERROR: " << e.what() << " (" << e.err() << " : "
+             << viscl::print_cl_errstring(e.err()) << ")" << std::endl;
     return 1;
   }
   return 0;

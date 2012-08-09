@@ -12,7 +12,9 @@
 #include <process_framework/pipeline_aid.h>
 #include <kwklt/klt_track.h>
 
-#include "track_descr_match.h"
+#include <vil/vil_image_view.h>
+
+#include <viscl/tasks/track_descr_match.h>
 
 /// \brief Track features across images using descriptor matches.
 ///
@@ -57,7 +59,7 @@ protected:
   /// The current frame.
   vil_image_view<vxl_byte> cur_img_;
 
-  track_descr_match_t tracker_;
+  viscl::track_descr_match_t tracker_;
 
   /// Set of tracks corresponding to still active features
   vcl_vector< vidtk::klt_track_ptr > *tracks_last_, *tracks_cur_;
