@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 project(viscl)
 
-set(CMAKE_MODULE_PATH "${viscl_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH})
+set(viscl_cmake_dir "${viscl_SOURCE_DIR}/CMake")
+set(CMAKE_MODULE_PATH ${viscl_cmake_dir} ${CMAKE_MODULE_PATH})
 
 set(viscl_export_file
   "${viscl_BINARY_DIR}/viscl-config-targets.cmake")
@@ -74,6 +75,22 @@ else (WIN32)
   set(cmakedir lib${LIB_SUFFIX}/cmake/viscl)
 endif (WIN32)
 
+
+configure_file("${viscl_cmake_dir}/viscl-macros.cmake"
+               "${viscl_BINARY_DIR}/viscl-macros.cmake"
+               COPYONLY)
+configure_file("${viscl_cmake_dir}/viscl-stringify.cmake"
+               "${viscl_BINARY_DIR}/viscl-stringify.cmake"
+               COPYONLY)
+
+install(
+  FILES       "${viscl_BINARY_DIR}/viscl-macros.cmake"
+  DESTINATION "${cmakedir}"
+  COMPONENT   development)
+install(
+  FILES       "${viscl_BINARY_DIR}/viscl-stringify.cmake"
+  DESTINATION "${cmakedir}"
+  COMPONENT   development)
 install(
   EXPORT      viscl_exports
   DESTINATION "${cmakedir}"

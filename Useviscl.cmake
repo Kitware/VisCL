@@ -22,6 +22,9 @@ INCLUDE_DIRECTORIES(${viscl_INCLUDE_DIR})
 # Add link directories needed to use viscl.
 LINK_DIRECTORIES(${viscl_LIBRARY_DIR}/libraries)
 
+# include the vistk macros
+include(${viscl_DIR}/viscl-macros.cmake)
+
 # Use VXL.
 IF(NOT viscl_NO_USE_VXL)
   SET(VXL_DIR ${viscl_VXL_DIR})
