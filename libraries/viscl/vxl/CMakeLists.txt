@@ -7,7 +7,7 @@ set(CXX_SRC_FILES
 )
 
 
-add_library(viscl_vxl ${CXX_SRC_FILES})
+add_library(viscl_vxl ${SRC_FILES})
 target_link_libraries(viscl_vxl viscl_core vil vil_algo vnl)
 
 
@@ -17,3 +17,12 @@ install( TARGETS viscl_vxl EXPORT viscl_exports
 export( TARGETS viscl_vxl
   APPEND FILE ${viscl_export_file}
 )
+
+foreach(fname in ${SRC_FILES})
+  string(REGEX MATCH ".*\\.h" hfile ${fname})
+  list(APPEND HEADER_FILES ${hfile})
+endforeach()
+
+install( FILES  ${HEADER_FILES}
+  DESTINATION "include/viscl/vxl"
+  COMPONENT   development)

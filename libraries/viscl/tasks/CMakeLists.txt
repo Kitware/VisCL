@@ -26,3 +26,12 @@ install( TARGETS viscl_tasks EXPORT viscl_exports
 export( TARGETS viscl_tasks
   APPEND FILE ${viscl_export_file}
 )
+
+foreach(fname in ${CXX_SRC_FILES})
+  string(REGEX MATCH ".*\\.h" hfile ${fname})
+  list(APPEND HEADER_FILES ${hfile})
+endforeach()
+
+install( FILES  ${HEADER_FILES}
+  DESTINATION "include/viscl/tasks"
+  COMPONENT   development)
