@@ -5,6 +5,8 @@ set(CMAKE_MODULE_PATH "${viscl_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH})
 
 set(viscl_export_file
   "${viscl_BINARY_DIR}/viscl-config-targets.cmake")
+# clear the export file before we start appending to it
+file(REMOVE ${viscl_export_file})
 
 find_package(VXL)
 find_package(OpenCL REQUIRED)
