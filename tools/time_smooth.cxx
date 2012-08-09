@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
   int radii[3] = {2, 3, 4};
 
-  viscl::gaussian_smooth_t smoother = NEW_VISCL_TASK(gaussian_smooth);
+  viscl::gaussian_smooth_t smoother = NEW_VISCL_TASK(viscl::gaussian_smooth);
   viscl::image img_cl = viscl::upload_image(img);
 
 

@@ -177,7 +177,7 @@ test_smooth()
   const int kr = 2;
 
   // create the viscl task
-  viscl::gaussian_smooth_t smoother = NEW_VISCL_TASK(gaussian_smooth);
+  viscl::gaussian_smooth_t smoother = NEW_VISCL_TASK(viscl::gaussian_smooth);
 
   // create a test image with a checkerboard pattern
   const size_t buffer_size = width * height;
@@ -251,7 +251,7 @@ test_smooth_vxl()
   const int kr = 2;
 
   // create the viscl task
-  viscl::gaussian_smooth_t smoother = NEW_VISCL_TASK(gaussian_smooth);
+  viscl::gaussian_smooth_t smoother = NEW_VISCL_TASK(viscl::gaussian_smooth);
 
   // create a test image with a checkerboard pattern
   vil_image_view<vxl_byte> input_img(width, height);

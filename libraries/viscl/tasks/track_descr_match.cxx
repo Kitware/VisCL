@@ -73,9 +73,9 @@ track_descr_match::track_descr_match(const track_descr_match &t)
 void track_descr_match::first_frame(const image &img)
 {
   float thresh = 0.003f, sigma = 2.0f;
-  gs = NEW_VISCL_TASK(gaussian_smooth);
-  hes = NEW_VISCL_TASK(hessian);
-  brf = NEW_VISCL_TASK(brief<10>);
+  gs = NEW_VISCL_TASK(viscl::gaussian_smooth);
+  hes = NEW_VISCL_TASK(viscl::hessian);
+  brf = NEW_VISCL_TASK(viscl::brief<10>);
   image smoothed = gs->smooth(img, sigma, 2);
 
   buffer numkpts_b;

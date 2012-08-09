@@ -22,7 +22,7 @@ track_descr_match_process::track_descr_match_process( vcl_string const& name )
 {
   config_.add( "num_features", "1000" );
   config_.add( "search_range", "100" );
-  tracker_ = NEW_VISCL_TASK(track_descr_match);
+  tracker_ = NEW_VISCL_TASK(viscl::track_descr_match);
   tracks_last_ = new vcl_vector< vidtk::klt_track_ptr >;
   tracks_cur_ = new vcl_vector< vidtk::klt_track_ptr >;
 }

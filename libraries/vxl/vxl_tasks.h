@@ -30,7 +30,7 @@ void cl_hessian_detect(const vil_image_view<T> &img, int max_kpts, float thresh,
                        float sigma, vcl_vector<cl_int2> &kpts)
 {
   image img_cl = upload_image(img);
-  hessian_t hes = NEW_VISCL_TASK(hessian);
+  hessian_t hes = NEW_VISCL_TASK(viscl::hessian);
   image kptmap;
   buffer numkpts_b, kpts_b;
   hes->smooth_and_detect(img_cl, kptmap, kpts_b, numkpts_b, max_kpts, thresh, sigma);
@@ -52,7 +52,7 @@ void cl_gaussian_smooth(const vil_image_view<T> &img, vil_image_view<T> &output,
                         float sigma, int kernel_radius)
 {
   image img_cl = upload_image(img);
-  gaussian_smooth_t gs = NEW_VISCL_TASK(gaussian_smooth);
+  gaussian_smooth_t gs = NEW_VISCL_TASK(viscl::gaussian_smooth);
   image result = gs->smooth( img_cl, sigma, kernel_radius);
 
   cl::size_t<3> origin;
@@ -121,8 +121,8 @@ void compute_brief_descriptors(const vil_image_view<T> &img,
                                vcl_vector<cl_int4> &descriptors,
                                float sigma)
 {
-  typename brief<R>::type brf = NEW_VISCL_TASK(brief<R>);
-  gaussian_smooth_t gs = NEW_VISCL_TASK(gaussian_smooth);
+  typename brief<R>::type brf = NEW_VISCL_TASK(viscl::brief<R>);
+  gaussian_smooth_t gs = NEW_VISCL_TASK(viscl::gaussian_smooth);
   cl_queue_t queue = brf->get_queue();
 
   image img_cl = upload_image(img);
@@ -143,7 +143,7 @@ void compute_brief_descriptors(const vil_image_view<T> &img,
                                const vcl_vector<cl_int2> &kpts,
                                vcl_vector<cl_int4> &descriptors)
 {
-  typename brief<R>::type brf = NEW_VISCL_TASK(brief<R>);
+  typename brief<R>::type brf = NEW_VISCL_TASK(viscl::brief<R>);
   cl_queue_t queue = brf->get_queue();
 
   image img_cl = upload_image(img);

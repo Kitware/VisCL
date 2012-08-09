@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 
   try
   {
-    viscl::track_descr_match_t tracker = NEW_VISCL_TASK(track_descr_match);
+    viscl::track_descr_match_t tracker = NEW_VISCL_TASK(viscl::track_descr_match);
 
     std::vector<cl_int2> kpts1, kpts2, kpts3;
     std::cout << "start" <<std::endl;
