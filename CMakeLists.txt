@@ -60,7 +60,7 @@ endif (VISCL_ENABLE_TESTING)
 
 
 # Construct the include directories.
-SET(viscl_INCLUDE_DIR_CONFIG ${viscl_SOURCE_DIR})
+SET(viscl_INCLUDE_DIR_CONFIG ${viscl_SOURCE_DIR}/libraries)
 
 
 CONFIGURE_FILE(${viscl_SOURCE_DIR}/visclConfig.cmake.in
