@@ -12,6 +12,7 @@
 #include <fstream>
 #include <boost/make_shared.hpp>
 #include <algorithm>
+#include <iostream>
 
 
 extern const char* track_descr_match_source;
@@ -137,8 +138,8 @@ void write_tracks_to_file(const std::string& filename,
     {
       const cl_int2& kpt1 = kpts1[indices[i]];
       const cl_int2& kpt2 = kpts2[i];
-      outfile << kpt1.x << " " << kpt1.y << " "
-              << kpt2.x << " " << kpt2.y << " "
+      outfile << kpt1.s[0] << " " << kpt1.s[1] << " "
+              << kpt2.s[0] << " " << kpt2.s[1] << " "
               << indices[i] << "\n";
     }
   }

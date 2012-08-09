@@ -54,7 +54,6 @@ private:
   gaussian_smooth_t gs;
 
   cl_kernel_t track_k;
-  cl_queue_t queue;
 
   buffer kpts1;
   buffer descriptors1;

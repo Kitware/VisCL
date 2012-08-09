@@ -40,7 +40,6 @@ private:
   hessian() {};
 
   cl_kernel_t det_hessian, detect_extrema, init_kpt_map;
-  cl_queue_t queue;
 };
 
 typedef boost::shared_ptr<hessian> hessian_t;

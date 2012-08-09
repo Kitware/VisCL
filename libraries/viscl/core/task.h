@@ -22,6 +22,7 @@ class task
 public:
 
   virtual task_t clone() = 0;
+  cl_queue_t get_queue() const { return queue; }
 
 protected:
 
@@ -34,6 +35,7 @@ protected:
   void build_source(const std::string &source);
 
   cl_program_t program;
+  cl_queue_t queue;
 };
 
 }

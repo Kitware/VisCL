@@ -35,7 +35,7 @@ void cl_hessian_detect(const vil_image_view<T> &img, int max_kpts, float thresh,
   buffer numkpts_b, kpts_b;
   hes->smooth_and_detect(img_cl, kptmap, kpts_b, numkpts_b, max_kpts, thresh, sigma);
 
-  cl_queue_t queue = manager::inst()->create_queue();
+  cl_queue_t queue = hes->get_queue();
   int buf[1];
   queue->enqueueReadBuffer(*numkpts_b().get(), CL_TRUE, 0, numkpts_b.mem_size(), buf);
   int numkpts = buf[0];
@@ -66,7 +66,7 @@ void cl_gaussian_smooth(const vil_image_view<T> &img, vil_image_view<T> &output,
   region.push_back(1);
 
   output.set_size(img.ni(), img.nj());
-  cl_queue_t queue = manager::inst()->create_queue();
+  cl_queue_t queue = gs->get_queue();
   queue->enqueueReadImage(*result().get(),  CL_TRUE, origin, region, 0, 0, (float *)output.top_left_ptr());
 }
 
@@ -84,7 +84,7 @@ void track_descr_first_frame(const vil_image_view<pixtype> &img,
   int numkpts = tdm->last_num_keypoints();
   kpts.clear();
   kpts.resize(numkpts);
-  cl_queue_t queue = manager::inst()->create_queue();
+  cl_queue_t queue = tdm->get_queue();
   queue->enqueueReadBuffer(*kpts1().get(), CL_TRUE, 0, sizeof(cl_int2)*numkpts, &kpts[0]);
 }
 
@@ -103,7 +103,7 @@ vcl_vector<int> track_descr_track(const vil_image_view<pixtype> &img,
 
   vcl_vector<int> tracks;
   tracks.resize(numkpts);
-  cl_queue_t queue = manager::inst()->create_queue();
+  cl_queue_t queue = tdm->get_queue();
   queue->enqueueReadBuffer(*tracks_b(), CL_TRUE, 0, tracks_b.mem_size(), &tracks[0]);
 
   kpts.clear();
@@ -121,15 +121,16 @@ void compute_brief_descriptors(const vil_image_view<T> &img,
                                vcl_vector<cl_int4> &descriptors,
                                float sigma)
 {
-  image img_cl = upload_image(img);
+  typename brief<R>::type brf = NEW_VISCL_TASK(brief<R>);
   gaussian_smooth_t gs = NEW_VISCL_TASK(gaussian_smooth);
+  cl_queue_t queue = brf->get_queue();
+
+  image img_cl = upload_image(img);
   image smoothed_cl = gs->smooth(img_cl, sigma, 2);
   buffer kpts_cl = manager::inst()->create_buffer<cl_int2>(CL_MEM_READ_ONLY, kpts.size());
-  cl_queue_t queue = manager::inst()->create_queue();
   queue->enqueueWriteBuffer(*kpts_cl().get(), CL_TRUE, 0, kpts_cl.mem_size(), &kpts[0]);
 
   buffer descriptors_cl;
-  typename brief<R>::type brf = NEW_VISCL_TASK(brief<R>);
   brf->compute_descriptors(smoothed_cl, kpts_cl, kpts.size(), descriptors_cl);
   descriptors.resize(kpts.size());
   queue->enqueueReadBuffer(*descriptors_cl().get(), CL_TRUE, 0, descriptors_cl.mem_size(), &descriptors[0]);
@@ -142,13 +143,14 @@ void compute_brief_descriptors(const vil_image_view<T> &img,
                                const vcl_vector<cl_int2> &kpts,
                                vcl_vector<cl_int4> &descriptors)
 {
+  typename brief<R>::type brf = NEW_VISCL_TASK(brief<R>);
+  cl_queue_t queue = brf->get_queue();
+
   image img_cl = upload_image(img);
   buffer kpts_cl = manager::inst()->create_buffer<cl_int2>(CL_MEM_READ_ONLY, kpts.size());
-  cl_queue_t queue = manager::inst()->create_queue();
   queue->enqueueWriteBuffer(*kpts_cl().get(), CL_TRUE, 0, kpts_cl.mem_size(), &kpts[0]);
 
   buffer descriptors_cl;
-  typename brief<R>::type brf = NEW_VISCL_TASK(brief<R>);
   brf->compute_descriptors(img_cl, kpts_cl, kpts.size(), descriptors_cl);
   descriptors.resize(kpts.size());
   queue->enqueueReadBuffer(*descriptors_cl().get(), CL_TRUE, 0, descriptors_cl.mem_size(), &descriptors[0]);

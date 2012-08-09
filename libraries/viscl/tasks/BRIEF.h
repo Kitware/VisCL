@@ -38,7 +38,6 @@ private:
   std::string generate_meta_source(const std::string &source);
 
   cl_kernel_t brief_k, brief_dist_k;
-  cl_queue_t queue;
 };
 
 }

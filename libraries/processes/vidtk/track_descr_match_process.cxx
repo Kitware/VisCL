@@ -99,8 +99,8 @@ bool track_descr_match_process::step()
     for (unsigned int i = 0; i < kpts.size(); i++)
     {
       vidtk::klt_track::point_ p;
-      p.x = kpts[i].x;
-      p.y = kpts[i].y;
+      p.x = kpts[i].s[0];
+      p.y = kpts[i].s[1];
       p.frame = 0;
       vidtk::klt_track_ptr tr = vidtk::klt_track::extend_track(p);
       (*tracks_cur_)[i] = tr;
@@ -122,8 +122,8 @@ bool track_descr_match_process::step()
     for (unsigned int i = 0; i < indices.size(); i++)
     {
       vidtk::klt_track::point_ p;
-      p.x = kpts[i].x;
-      p.y = kpts[i].y;
+      p.x = kpts[i].s[0];
+      p.y = kpts[i].s[1];
       p.frame = 0;
 
       //non match are labeled as -1 index
