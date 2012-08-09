@@ -4,8 +4,8 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-#ifndef CL_UTIL_H_
-#define CL_UTIL_H_
+#ifndef VISCL_VXL_UTIL_H_
+#define VISCL_VXL_UTIL_H_
 
 #include <viscl/core/header.h>
 #include <viscl/core/image.h>
@@ -20,4 +20,4 @@ void save_cl_image<unsigned char>(const cl_queue_t &queue, const image &img, con
 
 } // end namespace viscl
 
-#endif
+#endif // VISCL_VXL_UTIL_H_

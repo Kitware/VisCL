@@ -4,8 +4,8 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-#ifndef CL_VXL_TRANSFER_H_
-#define CL_VXL_TRANSFER_H_
+#ifndef VISCL_VXL_TRANSFER_H_
+#define VISCL_VXL_TRANSFER_H_
 
 #include <viscl/core/image.h>
 
@@ -22,4 +22,4 @@ image upload_image(const vil_image_view<T> &img);
 
 } // end namespace viscl
 
-#endif // CL_VXL_TRANSFER_H_
+#endif // VISCL_VXL_TRANSFER_H_
