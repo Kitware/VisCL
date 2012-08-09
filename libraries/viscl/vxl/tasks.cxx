@@ -5,7 +5,7 @@
  */
 
 
-#include "vxl_tasks.h"
+#include "tasks.h"
 
 
 template void viscl::cl_hessian_detect(const vil_image_view<float> &img,

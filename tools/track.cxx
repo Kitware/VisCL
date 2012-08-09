@@ -16,7 +16,7 @@
 #include <viscl/tasks/hessian.h>
 #include <viscl/tasks/BRIEF.h>
 #include <viscl/tasks/track_descr_match.h>
-#include <vxl/vxl_tasks.h>
+#include <viscl/vxl/tasks.h>
 
 int main(int argc, char *argv[])
 {

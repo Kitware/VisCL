@@ -7,7 +7,7 @@
 #ifndef CL_VXL_TASKS_H_
 #define CL_VXL_TASKS_H_
 
-#include <vxl/vxl_transfer.h>
+#include <viscl/vxl/transfer.h>
 #include <vil/vil_image_view.h>
 
 #include <vcl_vector.h>

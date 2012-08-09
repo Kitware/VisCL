@@ -16,7 +16,7 @@
 #include <viscl/core/task_registry.h>
 
 #include <viscl/tasks/gaussian_smooth.h>
-#include <vxl/vxl_transfer.h>
+#include <viscl/vxl/transfer.h>
 
 #include <vil/vil_image_view.h>
 #include <vil/vil_save.h>
