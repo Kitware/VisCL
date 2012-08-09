@@ -19,9 +19,6 @@ ENDIF(viscl_BUILD_SETTINGS_FILE)
 # Use the standard viscl include directories.
 INCLUDE_DIRECTORIES(${viscl_INCLUDE_DIR})
 
-# Add link directories needed to use viscl.
-LINK_DIRECTORIES(${viscl_LIBRARY_DIR}/libraries)
-
 # include the vistk macros
 include(${viscl_DIR}/viscl-macros.cmake)
 
