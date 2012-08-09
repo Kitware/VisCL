@@ -10,6 +10,8 @@ file(REMOVE ${viscl_export_file})
 
 find_package(OpenCL REQUIRED)
 
+include(viscl-macros)
+
 set(viscl_boost_version 1.47)
 set(BOOST_ROOT "" CACHE PATH "The root path to Boost")
 option(Boost_USE_STATIC_LIBS "Use a statically-linked Boost" OFF)
