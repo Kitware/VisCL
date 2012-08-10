@@ -16,8 +16,8 @@
 //there will be a race-condition for the kernel args.  Thus deep_clone should be used when
 //using a kernel in a different thread
 
-#define NEW_VISCL_TASK(T) viscl::task_registry::inst()->new_task<viscl::T>(std::string(#T), 0)
-#define NEW_THREAD_SAFE_VISCL_TASK(T, thread_id) viscl::task_registry::inst()->new_task<viscl::T>(std::string(#T), (thread_id));
+#define NEW_VISCL_TASK(T) viscl::task_registry::inst()->new_task<T>(std::string(#T), 0)
+#define NEW_THREAD_SAFE_VISCL_TASK(T, thread_id) viscl::task_registry::inst()->new_task<T>(std::string(#T), (thread_id));
 
 
 namespace viscl

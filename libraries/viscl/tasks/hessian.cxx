@@ -54,7 +54,7 @@ void hessian::smooth_and_detect(const image &img, image &kptmap, buffer &kpts, b
                          int max_kpts, float thresh, float sigma) const
 {
   float scale = 2.0f;
-  gaussian_smooth_t gs = NEW_VISCL_TASK(gaussian_smooth);
+  gaussian_smooth_t gs = NEW_VISCL_TASK(viscl::gaussian_smooth);
   image smoothed = gs->smooth(img, scale, 2);
   detect(smoothed, kptmap, kpts, numkpts, max_kpts, thresh, sigma);
 }
