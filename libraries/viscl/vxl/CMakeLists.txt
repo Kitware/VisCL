@@ -1,6 +1,6 @@
 
 
-set(CXX_SRC_FILES
+set(SRC_FILES
     transfer.h                 transfer.cxx
     tasks.h                    tasks.cxx
     util.h                     util.cxx
