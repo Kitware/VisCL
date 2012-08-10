@@ -4,10 +4,10 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-#ifndef CL_VXL_TASKS_H_
-#define CL_VXL_TASKS_H_
+#ifndef VISCL_VXL_TASKS_H_
+#define VISCL_VXL_TASKS_H_
 
-#include <vxl/vxl_transfer.h>
+#include <viscl/vxl/transfer.h>
 #include <vil/vil_image_view.h>
 
 #include <vcl_vector.h>
@@ -160,4 +160,4 @@ void compute_brief_descriptors(const vil_image_view<T> &img,
 
 } // end namespace viscl
 
-#endif // CL_VXL_TASKS_H_
+#endif // VISCL_VXL_TASKS_H_

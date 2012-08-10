@@ -15,7 +15,7 @@
 #include <viscl/core/manager.h>
 #include <viscl/core/task_registry.h>
 #include <viscl/tasks/gaussian_smooth.h>
-#include <vxl/vxl_transfer.h>
+#include <viscl/vxl/transfer.h>
 
 #include <boost/chrono.hpp>
 

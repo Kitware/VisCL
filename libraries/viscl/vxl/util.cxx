@@ -4,7 +4,7 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-#include "vxl/vxl_cl_util.h"
+#include "util.h"
 
 #include <vil/vil_image_view.h>
 #include <vil/vil_save.h>

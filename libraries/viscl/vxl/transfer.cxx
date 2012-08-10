@@ -5,7 +5,7 @@
  */
 
 
-#include "vxl_transfer.h"
+#include "transfer.h"
 
 #include <iostream>
 

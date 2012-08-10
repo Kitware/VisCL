@@ -1,9 +1,9 @@
 
 
 set(CXX_SRC_FILES
-    vxl_transfer.h             vxl_transfer.cxx
-    vxl_tasks.h                vxl_tasks.cxx
-    vxl_cl_util.h              vxl_cl_util.cxx
+    transfer.h                 transfer.cxx
+    tasks.h                    tasks.cxx
+    util.h                     util.cxx
 )
 
 
