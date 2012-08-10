@@ -8,7 +8,7 @@ set(SRC_FILES
 
 
 add_library(viscl_vxl ${SRC_FILES})
-target_link_libraries(viscl_vxl viscl_core vil vil_algo vnl)
+target_link_libraries(viscl_vxl viscl_tasks vil vil_algo vnl)
 
 
 install( TARGETS viscl_vxl EXPORT viscl_exports
