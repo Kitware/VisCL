@@ -33,7 +33,6 @@ track_descr_first_frame(const vil_image_view<vxl_byte> &img,
 template vcl_vector<int> viscl::
 track_descr_track(const vil_image_view<vxl_byte> &img,
                   vcl_vector<cl_int2> &kpts,
-                  int window_size,
                   track_descr_match_t& tdm);
 
 //*****************************************************************************

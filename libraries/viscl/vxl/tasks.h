@@ -93,11 +93,10 @@ void track_descr_first_frame(const vil_image_view<pixtype> &img,
 template<class pixtype>
 vcl_vector<int> track_descr_track(const vil_image_view<pixtype> &img,
                                   vcl_vector<cl_int2> &kpts,
-                                  int window_size,
                                   track_descr_match_t& tdm)
 {
   image img_cl = upload_image(img);
-  buffer tracks_b = tdm->track(img_cl, window_size);
+  buffer tracks_b = tdm->track(img_cl);
   const buffer& kpts1 = tdm->last_keypoints();
   int numkpts = tdm->last_num_keypoints();
 

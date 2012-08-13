@@ -30,13 +30,37 @@ public:
 
   void first_frame(const image &img);
 
-  buffer track(const image &img, int window_size);
+  buffer track(const image &img);
 
   const buffer& last_keypoints() const { return kpts1; }
 
   int last_num_keypoints() const { return numkpts1; }
 
-  void set_max_kpts(int max) { max_kpts = max; }
+  /// Set the maximum number of keypoints to track
+  void set_max_kpts(int mk) { max_kpts_ = mk; }
+
+  /// Set the search box radius.
+  /// The search box is square region with width and height of 2*radius+1.
+  void set_search_box_radius(unsigned sbr) { search_box_radius_ = sbr; }
+
+  /// Set the Hessian determinant detection threshold
+  void set_detect_thresh(float dt) { detect_thresh_ = dt; }
+
+  /// Set the Guassian smoothing sigma
+  void set_smooth_sigma(float ss) { smooth_sigma_ = ss; }
+
+
+  /// Get the maximum number of keypoints to track
+  int max_kpts() const { return max_kpts_; }
+
+  /// Get the search box radius.
+  unsigned search_box_radius() const { return search_box_radius_; }
+
+  /// Get the Hessian determinant detection threshold
+  float detect_thresh() const { return detect_thresh_; }
+
+  /// Get the Guassian smoothing sigma
+  float smooth_sigma() const { return smooth_sigma_; }
 
 protected:
 
@@ -58,7 +82,12 @@ private:
   buffer kpts1;
   buffer descriptors1;
   image kptmap1;
-  int numkpts1, max_kpts;
+  int numkpts1;
+
+  int max_kpts_;
+  unsigned search_box_radius_;
+  float detect_thresh_;
+  float smooth_sigma_;
 };
 
 typedef boost::shared_ptr<track_descr_match> track_descr_match_t;
