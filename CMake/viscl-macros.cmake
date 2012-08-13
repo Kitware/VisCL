@@ -5,7 +5,7 @@ if (NOT EXISTS ${OPENCL_STRINGIFY})
 endif()
 
 
-function(encode_opencl_sources cxx_file)
+function(viscl_encode_opencl_sources cxx_file)
   add_custom_command(OUTPUT ${cxx_file}
     COMMAND ${CMAKE_COMMAND}
       -D SRC_PATH:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}

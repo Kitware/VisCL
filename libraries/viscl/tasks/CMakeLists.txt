@@ -14,7 +14,7 @@ set(CXX_SRC_FILES
     track_descr_match.h        track_descr_match.cxx
 )
 
-encode_opencl_sources(cl_strings.cxx ${OCL_SRC_FILES})
+viscl_encode_opencl_sources(cl_strings.cxx ${OCL_SRC_FILES})
 
 
 add_library(viscl_tasks ${CXX_SRC_FILES} cl_strings.cxx)
