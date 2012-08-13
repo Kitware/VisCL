@@ -45,17 +45,18 @@ public:
 
   hessian();
   void smooth_and_detect(const image &img, image &kptmap, buffer &kpts, buffer &numkpts,
-                         int max_kpts, float thresh, float sigma) const;
+                         float thresh, float sigma) const;
   void detect(const image &img, image &kptmap, buffer &kpts, buffer &numkpts,
-              int max_kpts, float thresh, float scale) const;
+              float thresh, float scale) const;
 
-  int num_kpts(const buffer &numkpts_b);
+  unsigned num_kpts(const buffer &numkpts_b) const;
 
 private:
 
 
 
   cl_kernel_t det_hessian, detect_extrema, init_kpt_map;
+  mutable unsigned kpts_buffer_size_;
 };
 
 typedef boost::shared_ptr<hessian> hessian_t;

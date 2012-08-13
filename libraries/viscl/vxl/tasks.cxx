@@ -33,10 +33,10 @@
 
 
 template void viscl::cl_hessian_detect(const vil_image_view<float> &img,
-                                       int max_kpts, float thresh, float sigma,
+                                       float thresh, float sigma,
                                        vcl_vector<cl_int2> &kpts);
 template void viscl::cl_hessian_detect(const vil_image_view<vxl_byte> &img,
-                                       int max_kpts, float thresh, float sigma,
+                                       float thresh, float sigma,
                                        vcl_vector<cl_int2> &kpts);
 
 //*****************************************************************************

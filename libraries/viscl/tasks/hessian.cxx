@@ -30,6 +30,7 @@
 
 #include "hessian.h"
 
+#include <algorithm>
 #include <boost/make_shared.hpp>
 
 #include <viscl/core/program_registry.h>
@@ -50,31 +51,39 @@ hessian::hessian()
   det_hessian = make_kernel("det_hessian");
   detect_extrema = make_kernel("detect_extrema");
   init_kpt_map = make_kernel("init_kpt_map");
+  kpts_buffer_size_ = 0;
   queue = manager::inst()->create_queue();
 }
 
 //*****************************************************************************
 
 void hessian::smooth_and_detect(const image &img, image &kptmap, buffer &kpts, buffer &numkpts,
-                         int max_kpts, float thresh, float sigma) const
+                                float thresh, float sigma) const
 {
   float scale = 2.0f;
   gaussian_smooth_t gs = NEW_VISCL_TASK(viscl::gaussian_smooth);
   image smoothed = gs->smooth(img, scale, 2);
-  detect(smoothed, kptmap, kpts, numkpts, max_kpts, thresh, sigma);
+  detect(smoothed, kptmap, kpts, numkpts, thresh, sigma);
 }
 
 //*****************************************************************************
 
 void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts, buffer &numkpts,
-                     int max_kpts, float thresh, float sigma) const
+                     float thresh, float sigma) const
 {
-  size_t ni = smoothed.width(), nj = smoothed.height();
+  const size_t ni = smoothed.width(), nj = smoothed.height();
+  // a hard upper bound on the number of keypoints that can be detected
+  const unsigned max_kpts = ni * nj / 4;
+  if (kpts_buffer_size_ < 1)
+  {
+    // an initial guess for the total number of keypoints
+    kpts_buffer_size_ = max_kpts / 100;
+  }
   cl::ImageFormat detimg_fmt(CL_INTENSITY, CL_FLOAT);
   image detimg = manager::inst()->create_image(detimg_fmt, CL_MEM_READ_WRITE, ni, nj);
   cl::ImageFormat kptimg_fmt(CL_R, CL_SIGNED_INT32);
   kptmap = manager::inst()->create_image(kptimg_fmt, CL_MEM_READ_WRITE, ni >> 1, nj >> 1);
-  kpts = manager::inst()->create_buffer<cl_int2>(CL_MEM_READ_WRITE, max_kpts);
+  kpts = manager::inst()->create_buffer<cl_int2>(CL_MEM_READ_WRITE, kpts_buffer_size_);
 
   int init[1];
   init[0] = 0;
@@ -93,7 +102,7 @@ void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts, buffer 
   detect_extrema->setArg(1, *kptmap().get());
   detect_extrema->setArg(2, *kpts().get());
   detect_extrema->setArg(3, *numkpts().get());
-  detect_extrema->setArg(4, max_kpts);
+  detect_extrema->setArg(4, kpts_buffer_size_);
   detect_extrema->setArg(5, thresh);
 
   //Run the kernel on specific ND range
@@ -106,12 +115,27 @@ void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts, buffer 
   queue->enqueueBarrier();
 
   queue->enqueueNDRangeKernel(*detect_extrema.get(), cl::NullRange, global, cl::NullRange);
-  queue->finish();
+  queue->enqueueBarrier();
+  unsigned num_detected = this->num_kpts(numkpts);
+  // if the keypoint buffer was too small, we need to allocate more memory and try again
+  if (num_detected >= kpts_buffer_size_)
+  {
+    queue->enqueueWriteBuffer(*numkpts().get(), CL_TRUE, 0, numkpts.mem_size(), init);
+    kpts = manager::inst()->create_buffer<cl_int2>(CL_MEM_READ_WRITE, num_detected);
+    detect_extrema->setArg(2, *kpts().get());
+    detect_extrema->setArg(4, num_detected);
+    queue->enqueueNDRangeKernel(*init_kpt_map.get(), cl::NullRange, initsize, cl::NullRange);
+    queue->enqueueBarrier();
+    queue->enqueueNDRangeKernel(*detect_extrema.get(), cl::NullRange, global, cl::NullRange);
+    queue->finish();
+  }
+  // allocate 1.5x as much memory for the next frame to provided a buffer.
+  kpts_buffer_size_ = std::min(3*num_detected/2, max_kpts);
 }
 
 //*****************************************************************************
 
-int hessian::num_kpts(const buffer &numkpts_b)
+unsigned hessian::num_kpts(const buffer &numkpts_b) const
 {
   int buf[1];
   queue->enqueueReadBuffer(*numkpts_b().get(), CL_TRUE, 0, numkpts_b.mem_size(), buf);

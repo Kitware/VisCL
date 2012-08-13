@@ -78,7 +78,7 @@ void track_descr_match::first_frame(const image &img)
   buffer numkpts_b;
 
   hes->detect(smoothed, kptmap1, kpts1, numkpts_b,
-              max_kpts_, detect_thresh_, smooth_sigma_);
+              detect_thresh_, smooth_sigma_);
   numkpts1 = hes->num_kpts(numkpts_b);
   std::cout << numkpts1 << "\n";
   brf->compute_descriptors(smoothed, kpts1, numkpts1, descriptors1);
@@ -93,7 +93,7 @@ buffer track_descr_match::track(const image &img)
   buffer kpts2, numkpts2_b;
   image kptmap2;
   hes->detect(smoothed, kptmap2, kpts2, numkpts2_b,
-              max_kpts_, detect_thresh_, smooth_sigma_);
+              detect_thresh_, smooth_sigma_);
   int numkpts2 = hes->num_kpts(numkpts2_b);
   std::cout << numkpts2 << "\n";
 

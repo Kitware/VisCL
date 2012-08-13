@@ -54,14 +54,14 @@ namespace viscl
 {
 
 template <class T>
-void cl_hessian_detect(const vil_image_view<T> &img, int max_kpts, float thresh,
+void cl_hessian_detect(const vil_image_view<T> &img, float thresh,
                        float sigma, vcl_vector<cl_int2> &kpts)
 {
   image img_cl = upload_image(img);
   hessian_t hes = NEW_VISCL_TASK(viscl::hessian);
   image kptmap;
   buffer numkpts_b, kpts_b;
-  hes->smooth_and_detect(img_cl, kptmap, kpts_b, numkpts_b, max_kpts, thresh, sigma);
+  hes->smooth_and_detect(img_cl, kptmap, kpts_b, numkpts_b, thresh, sigma);
 
   cl_queue_t queue = hes->get_queue();
   int buf[1];

@@ -69,14 +69,9 @@ __kernel void detect_extrema(__read_only  image2d_t  detimg,
                              __write_only image2d_t  kptmap,
                              __global     int2      *kpts,
                              __global     int       *numkpts,
-                                          int        max_kpts,
+                                          unsigned   kpts_size,
                                           float      thresh)
 {
-  if (numkpts[0] >= max_kpts)
-  {
-    return;
-  }
-
   int2 pixel = (int2)(get_global_id(0), get_global_id(1));
   float val = read_imagef(detimg, imageSampler, pixel).x;
   if (val < thresh)
@@ -97,14 +92,10 @@ __kernel void detect_extrema(__read_only  image2d_t  detimg,
   }
 
   int index = atomic_add(numkpts, 1);
-  if (index < max_kpts)
+  if (index < kpts_size)
   {
     kpts[index] = pixel;
     int2 mappixel = pixel >> 1;
     write_imagei(kptmap, mappixel, index);
-  }
-  else
-  {
-    numkpts[0] = max_kpts;
   }
 }
