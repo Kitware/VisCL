@@ -34,15 +34,16 @@ int main(int argc, char *argv[])
   try
   {
     viscl::track_descr_match_t tracker = NEW_VISCL_TASK(viscl::track_descr_match);
+    tracker->set_search_box_radius(50);
 
     std::vector<cl_int2> kpts1, kpts2, kpts3;
     std::cout << "start" <<std::endl;
     viscl::track_descr_first_frame(img1, kpts1, tracker);
     std::cout << "tracked 1" <<std::endl;
     std::vector<int> indices21, indices32;
-    indices21 = viscl::track_descr_track(img2, kpts2, 100, tracker);
+    indices21 = viscl::track_descr_track(img2, kpts2, tracker);
     std::cout << "tracked 2" <<std::endl;
-    indices32 = viscl::track_descr_track(img3, kpts3, 100, tracker);
+    indices32 = viscl::track_descr_track(img3, kpts3, tracker);
     std::cout << "tracked 3" <<std::endl;
 
     viscl::write_tracks_to_file("tracks.txt", kpts2, kpts3, indices32);

@@ -23,8 +23,11 @@ namespace viscl
 //*****************************************************************************
 
 track_descr_match::track_descr_match()
+ : max_kpts_(5000),
+   search_box_radius_(50),
+   detect_thresh_(0.003f),
+   smooth_sigma_(2.0f)
 {
-  max_kpts = 5000;
 }
 
 //*****************************************************************************
@@ -65,22 +68,25 @@ track_descr_match::track_descr_match(const track_descr_match &t)
 {
   this->program = t.program;
   this->track_k = t.track_k;
-  this->max_kpts = t.max_kpts;
+  this->max_kpts_ = t.max_kpts_;
+  this->search_box_radius_ = t.search_box_radius_;
+  this->detect_thresh_ = t.detect_thresh_;
+  this->smooth_sigma_ = t.smooth_sigma_;
 }
 
 //*****************************************************************************
 
 void track_descr_match::first_frame(const image &img)
 {
-  float thresh = 0.003f, sigma = 2.0f;
   gs = NEW_VISCL_TASK(viscl::gaussian_smooth);
   hes = NEW_VISCL_TASK(viscl::hessian);
   brf = NEW_VISCL_TASK(viscl::brief<10>);
-  image smoothed = gs->smooth(img, sigma, 2);
+  image smoothed = gs->smooth(img, smooth_sigma_, 2);
 
   buffer numkpts_b;
 
-  hes->detect(smoothed, kptmap1, kpts1, numkpts_b, max_kpts, thresh, sigma);
+  hes->detect(smoothed, kptmap1, kpts1, numkpts_b,
+              max_kpts_, detect_thresh_, smooth_sigma_);
   numkpts1 = hes->num_kpts(numkpts_b);
   std::cout << numkpts1 << "\n";
   brf->compute_descriptors(smoothed, kpts1, numkpts1, descriptors1);
@@ -88,15 +94,14 @@ void track_descr_match::first_frame(const image &img)
 
 //*****************************************************************************
 
-buffer track_descr_match::track(const image &img,
-                                   int window_size)
+buffer track_descr_match::track(const image &img)
 {
-  float thresh = 0.003f, sigma = 2.0f;
-  image smoothed = gs->smooth(img, sigma, 2);
+  image smoothed = gs->smooth(img, smooth_sigma_, 2);
 
   buffer kpts2, numkpts2_b;
   image kptmap2;
-  hes->detect(smoothed, kptmap2, kpts2, numkpts2_b, max_kpts, thresh, sigma);
+  hes->detect(smoothed, kptmap2, kpts2, numkpts2_b,
+              max_kpts_, detect_thresh_, smooth_sigma_);
   int numkpts2 = hes->num_kpts(numkpts2_b);
   std::cout << numkpts2 << "\n";
 
@@ -110,7 +115,7 @@ buffer track_descr_match::track(const image &img,
   track_k->setArg(2, *descriptors1().get());
   track_k->setArg(3, *descriptors2().get());
   track_k->setArg(4, *tracks_b().get());
-  track_k->setArg(5, window_size / 2);
+  track_k->setArg(5, search_box_radius_);
 
   cl::NDRange global(numkpts2);
   queue->enqueueNDRangeKernel(*track_k.get(), cl::NullRange, global, cl::NullRange);

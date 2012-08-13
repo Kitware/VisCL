@@ -21,7 +21,7 @@ track_descr_match_process::track_descr_match_process( vcl_string const& name )
     first_frame_set_(false)
 {
   config_.add( "num_features", "1000" );
-  config_.add( "search_range", "100" );
+  config_.add( "search_range", "50" );
   tracker_ = NEW_VISCL_TASK(viscl::track_descr_match);
   tracks_last_ = new vcl_vector< vidtk::klt_track_ptr >;
   tracks_cur_ = new vcl_vector< vidtk::klt_track_ptr >;
@@ -47,6 +47,7 @@ bool track_descr_match_process::set_params( vidtk::config_block const& blk )
     blk.get( "num_features", num_feat_ );
     blk.get( "search_range", search_range_ );
     tracker_->set_max_kpts(num_feat_);
+    tracker_->set_search_box_radius(search_range_);
   }
   catch( vidtk::unchecked_return_value& )
   {
@@ -115,7 +116,6 @@ bool track_descr_match_process::step()
     vcl_vector<cl_int2> kpts;
     vcl_vector<int> indices;
     indices = viscl::track_descr_track(cur_img_, kpts,
-                                       static_cast<int>(search_range_),
                                        tracker_);
 
     assert(indices.size() == kpts.size());
