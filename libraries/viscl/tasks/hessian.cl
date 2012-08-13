@@ -28,9 +28,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-__constant sampler_t imageSampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_NEAREST;
+__constant sampler_t imageSampler = CLK_NORMALIZED_COORDS_FALSE |
+                                    CLK_ADDRESS_CLAMP_TO_EDGE |
+                                    CLK_FILTER_NEAREST;
 
-__kernel void det_hessian(__read_only image2d_t input, __write_only image2d_t output, float scale2)
+__kernel void det_hessian(__read_only  image2d_t input,
+                          __write_only image2d_t output,
+                                       float     scale2)
 {
   int2 pixel = (int2)(get_global_id(0), get_global_id(1));
   float3 H = 0.0f;
@@ -40,7 +44,7 @@ __kernel void det_hessian(__read_only image2d_t input, __write_only image2d_t ou
         read_imagef(input, imageSampler, pixel + (int2)(-1,0)).x;
   H.y = read_imagef(input, imageSampler, pixel + (int2)(0,1)).x - center2 +
         read_imagef(input, imageSampler, pixel + (int2)(0,-1)).x;
-  H.z = (read_imagef(input, imageSampler, pixel + (int2)(1,1)).x -
+  H.z =(read_imagef(input, imageSampler, pixel + (int2)(1,1)).x -
         read_imagef(input, imageSampler, pixel + (int2)(1,-1)).x -
         read_imagef(input, imageSampler, pixel + (int2)(-1,1)).x +
         read_imagef(input, imageSampler, pixel + (int2)(-1,-1)).x)/4.0f;
@@ -61,7 +65,12 @@ __kernel void init_kpt_map(__write_only image2d_t kptmap)
 
 /*****************************************************************************/
 
-__kernel void detect_extrema(__read_only image2d_t detimg, __write_only image2d_t kptmap, __global int2 *kpts, __global int *numkpts, int max_kpts, float thresh)
+__kernel void detect_extrema(__read_only  image2d_t  detimg,
+                             __write_only image2d_t  kptmap,
+                             __global     int2      *kpts,
+                             __global     int       *numkpts,
+                                          int        max_kpts,
+                                          float      thresh)
 {
   if (numkpts[0] >= max_kpts)
   {
