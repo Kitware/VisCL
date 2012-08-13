@@ -1,7 +1,7 @@
 
 set(OPENCL_STRINGIFY ${CMAKE_CURRENT_LIST_DIR}/viscl-stringify.cmake)
 if (NOT EXISTS ${OPENCL_STRINGIFY})
-  message(FATAL_ERROR "stringify.cmake not found in ${CMAKE_CURRENT_LIST_DIR}")
+  message(FATAL_ERROR "viscl-stringify.cmake not found in ${CMAKE_CURRENT_LIST_DIR}")
 endif()
 
 
