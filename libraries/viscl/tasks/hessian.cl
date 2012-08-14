@@ -32,6 +32,32 @@ __constant sampler_t imageSampler = CLK_NORMALIZED_COORDS_FALSE |
                                     CLK_ADDRESS_CLAMP_TO_EDGE |
                                     CLK_FILTER_NEAREST;
 
+/*****************************************************************************/
+
+/* Return the 8-connected neighbors of an image pixel as a float8.
+ *   Order of the neighbors is show in the 3x3 grid below
+ *     4  2  6
+ *     0  X  1
+ *     7  3  5
+ */
+float8 read_imagef_8neighbors(__read_only  image2d_t input,
+                                           int2      pixel)
+{
+#define GET_NEIGHBOR(i,j) read_imagef(input, imageSampler, pixel + (int2)(i, j)).x
+
+  return (float8) { GET_NEIGHBOR(-1, 0),
+                    GET_NEIGHBOR( 1, 0),
+                    GET_NEIGHBOR( 0,-1),
+                    GET_NEIGHBOR( 0, 1),
+                    GET_NEIGHBOR(-1,-1),
+                    GET_NEIGHBOR( 1, 1),
+                    GET_NEIGHBOR( 1,-1),
+                    GET_NEIGHBOR(-1, 1) };
+#undef GET_NEIGHBOR
+}
+
+/*****************************************************************************/
+
 __kernel void det_hessian(__read_only  image2d_t input,
                           __write_only image2d_t output,
                                        float     scale2)
@@ -40,14 +66,10 @@ __kernel void det_hessian(__read_only  image2d_t input,
   float3 H = 0.0f;
 
   float center2 = 2*read_imagef(input, imageSampler, pixel).x;
-  H.x = read_imagef(input, imageSampler, pixel + (int2)(1,0)).x - center2 +
-        read_imagef(input, imageSampler, pixel + (int2)(-1,0)).x;
-  H.y = read_imagef(input, imageSampler, pixel + (int2)(0,1)).x - center2 +
-        read_imagef(input, imageSampler, pixel + (int2)(0,-1)).x;
-  H.z =(read_imagef(input, imageSampler, pixel + (int2)(1,1)).x -
-        read_imagef(input, imageSampler, pixel + (int2)(1,-1)).x -
-        read_imagef(input, imageSampler, pixel + (int2)(-1,1)).x +
-        read_imagef(input, imageSampler, pixel + (int2)(-1,-1)).x)/4.0f;
+  float8 neighbors = read_imagef_8neighbors(input, pixel);
+  H.x = neighbors.s1 - center2 + neighbors.s0;
+  H.y = neighbors.s3 - center2 + neighbors.s2;
+  H.z =(neighbors.s5 - neighbors.s6 - neighbors.s7 + neighbors.s4)/4.0f;
 
   float det = scale2 * (H.x * H.y - H.z * H.z);
 
@@ -79,14 +101,9 @@ __kernel void detect_extrema(__read_only  image2d_t  detimg,
     return;
   }
 
-  if (read_imagef(detimg, imageSampler, pixel + (int2)(0,1)).x > val   ||
-      read_imagef(detimg, imageSampler, pixel + (int2)(1,1)).x > val   ||
-      read_imagef(detimg, imageSampler, pixel + (int2)(1,0)).x > val   ||
-      read_imagef(detimg, imageSampler, pixel + (int2)(1,-1)).x > val  ||
-      read_imagef(detimg, imageSampler, pixel + (int2)(0,-1)).x > val  ||
-      read_imagef(detimg, imageSampler, pixel + (int2)(-1,-1)).x > val ||
-      read_imagef(detimg, imageSampler, pixel + (int2)(-1,0)).x > val  ||
-      read_imagef(detimg, imageSampler, pixel + (int2)(-1,1)).x > val)
+  float8 neighbors = read_imagef_8neighbors(detimg, pixel);
+
+  if (any(neighbors > val))
   {
     return;
   }
