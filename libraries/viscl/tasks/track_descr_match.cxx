@@ -51,7 +51,8 @@ track_descr_match::track_descr_match()
    search_box_radius_(50),
    hamming_dist_threshold_(15),
    detect_thresh_(0.003f),
-   smooth_sigma_(2.0f)
+   smooth_sigma_(2.0f),
+   subpixel_(false)
 {
   program = program_registry::inst()->register_program(std::string("track_descr_match"),
                                                        track_descr_match_source);
@@ -78,7 +79,7 @@ void track_descr_match::first_frame(const image &img)
   buffer numkpts_b, kvals;
 
   hes->detect(smoothed, kptmap1, kpts1, kvals, numkpts_b,
-              detect_thresh_, smooth_sigma_);
+              detect_thresh_, smooth_sigma_, subpixel_);
   numkpts1 = hes->num_kpts(numkpts_b);
   std::cout << numkpts1 << "\n";
   brf->compute_descriptors(smoothed, kpts1, numkpts1, descriptors1);
@@ -93,7 +94,7 @@ buffer track_descr_match::track(const image &img)
   buffer kpts2, kvals, numkpts2_b;
   image kptmap2;
   hes->detect(smoothed, kptmap2, kpts2, kvals, numkpts2_b,
-              detect_thresh_, smooth_sigma_);
+              detect_thresh_, smooth_sigma_, subpixel_);
   int numkpts2 = hes->num_kpts(numkpts2_b);
   std::cout << numkpts2 << "\n";
 

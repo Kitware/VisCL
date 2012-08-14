@@ -72,6 +72,9 @@ public:
   /// Set the Guassian smoothing sigma
   void set_smooth_sigma(float ss) { smooth_sigma_ = ss; }
 
+  /// Enable/disable sub-pixel interpolation of points
+  void set_subpixel(bool sp) { subpixel_ = sp; }
+
   /// Get the maximum number of keypoints to track
   int max_kpts() const { return max_kpts_; }
 
@@ -86,6 +89,9 @@ public:
 
   /// Get the Guassian smoothing sigma
   float smooth_sigma() const { return smooth_sigma_; }
+
+  /// Are the points interpolated to sub-pixel accuracy
+  bool subpixel() const { return subpixel_; }
 
 private:
 
@@ -105,6 +111,7 @@ private:
   unsigned hamming_dist_threshold_;
   float detect_thresh_;
   float smooth_sigma_;
+  bool subpixel_;
 };
 
 typedef boost::shared_ptr<track_descr_match> track_descr_match_t;

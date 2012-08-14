@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
     viscl::track_descr_match_t tracker = NEW_VISCL_TASK(viscl::track_descr_match);
     tracker->set_search_box_radius(200);
     tracker->set_max_kpts(20000);
+    tracker->set_subpixel(true);
 
     std::vector<cl_float2> kpts1, kpts2, kpts3;
     std::cout << "start" <<std::endl;
