@@ -110,8 +110,8 @@ private:
 typedef boost::shared_ptr<track_descr_match> track_descr_match_t;
 
 void write_tracks_to_file(const std::string& filename,
-                          const std::vector<cl_int2> &kpts1,
-                          const std::vector<cl_int2> &kpts2,
+                          const std::vector<cl_float2> &kpts1,
+                          const std::vector<cl_float2> &kpts2,
                           const std::vector<int> &indices);
 
 }

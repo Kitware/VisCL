@@ -55,7 +55,7 @@ namespace viscl
 
 template <class T>
 void cl_hessian_detect(const vil_image_view<T> &img, float thresh,
-                       float sigma, vcl_vector<cl_int2> &kpts,
+                       float sigma, vcl_vector<cl_float2> &kpts,
                        vcl_vector<float> &kvals)
 {
   image img_cl = upload_image(img);
@@ -70,7 +70,7 @@ void cl_hessian_detect(const vil_image_view<T> &img, float thresh,
   int numkpts = buf[0];
 
   kpts.resize(numkpts);
-  queue->enqueueReadBuffer(*kpts_b().get(), CL_TRUE, 0, sizeof(cl_int2)*numkpts, &kpts[0]);
+  queue->enqueueReadBuffer(*kpts_b().get(), CL_TRUE, 0, sizeof(cl_float2)*numkpts, &kpts[0]);
 
   kvals.resize(numkpts);
   queue->enqueueReadBuffer(*kvals_b().get(), CL_TRUE, 0, sizeof(float)*numkpts, &kvals[0]);
@@ -93,7 +93,7 @@ void cl_gaussian_smooth(const vil_image_view<T> &img, vil_image_view<T> &output,
 
 template<class pixtype>
 void track_descr_first_frame(const vil_image_view<pixtype> &img,
-                             vcl_vector<cl_int2> &kpts,
+                             vcl_vector<cl_float2> &kpts,
                              track_descr_match_t& tdm)
 {
   image img_cl = upload_image(img);
@@ -104,14 +104,14 @@ void track_descr_first_frame(const vil_image_view<pixtype> &img,
   kpts.clear();
   kpts.resize(numkpts);
   cl_queue_t queue = tdm->get_queue();
-  queue->enqueueReadBuffer(*kpts1().get(), CL_TRUE, 0, sizeof(cl_int2)*numkpts, &kpts[0]);
+  queue->enqueueReadBuffer(*kpts1().get(), CL_TRUE, 0, sizeof(cl_float2)*numkpts, &kpts[0]);
 }
 
 //*****************************************************************************
 
 template<class pixtype>
 vcl_vector<int> track_descr_track(const vil_image_view<pixtype> &img,
-                                  vcl_vector<cl_int2> &kpts,
+                                  vcl_vector<cl_float2> &kpts,
                                   track_descr_match_t& tdm)
 {
   image img_cl = upload_image(img);
@@ -126,7 +126,7 @@ vcl_vector<int> track_descr_track(const vil_image_view<pixtype> &img,
 
   kpts.clear();
   kpts.resize(numkpts);
-  queue->enqueueReadBuffer(*kpts1().get(), CL_TRUE, 0, sizeof(cl_int2)*numkpts, &kpts[0]);
+  queue->enqueueReadBuffer(*kpts1().get(), CL_TRUE, 0, sizeof(cl_float2)*numkpts, &kpts[0]);
 
   return tracks;
 }
@@ -135,7 +135,7 @@ vcl_vector<int> track_descr_track(const vil_image_view<pixtype> &img,
 
 template<class T, int R>
 void compute_brief_descriptors(const vil_image_view<T> &img,
-                               const vcl_vector<cl_int2> &kpts,
+                               const vcl_vector<cl_float2> &kpts,
                                vcl_vector<cl_int4> &descriptors,
                                float sigma)
 {
@@ -145,7 +145,7 @@ void compute_brief_descriptors(const vil_image_view<T> &img,
 
   image img_cl = upload_image(img);
   image smoothed_cl = gs->smooth(img_cl, sigma, 2);
-  buffer kpts_cl = manager::inst()->create_buffer<cl_int2>(CL_MEM_READ_ONLY, kpts.size());
+  buffer kpts_cl = manager::inst()->create_buffer<cl_float2>(CL_MEM_READ_ONLY, kpts.size());
   queue->enqueueWriteBuffer(*kpts_cl().get(), CL_TRUE, 0, kpts_cl.mem_size(), &kpts[0]);
 
   buffer descriptors_cl;
@@ -158,14 +158,14 @@ void compute_brief_descriptors(const vil_image_view<T> &img,
 
 template<class T, int R>
 void compute_brief_descriptors(const vil_image_view<T> &img,
-                               const vcl_vector<cl_int2> &kpts,
+                               const vcl_vector<cl_float2> &kpts,
                                vcl_vector<cl_int4> &descriptors)
 {
   typename brief<R>::type brf = NEW_VISCL_TASK(viscl::brief<R>);
   cl_queue_t queue = brf->get_queue();
 
   image img_cl = upload_image(img);
-  buffer kpts_cl = manager::inst()->create_buffer<cl_int2>(CL_MEM_READ_ONLY, kpts.size());
+  buffer kpts_cl = manager::inst()->create_buffer<cl_float2>(CL_MEM_READ_ONLY, kpts.size());
   queue->enqueueWriteBuffer(*kpts_cl().get(), CL_TRUE, 0, kpts_cl.mem_size(), &kpts[0]);
 
   buffer descriptors_cl;

@@ -53,8 +53,7 @@ public:
   /// \param img input image
   /// \param kptmap output keypoint map image (half size of input)
   ///               caching keypoint indices by location/2
-  /// \param kpts buffer of detect keypoint coordinates,
-  ///             if \p subpixel then type is float2, else type is int2.
+  /// \param kpts buffer of detect keypoint coordinates (float2)
   /// \param kvals buffer of magnitudes of each keypoint detection (float)
   /// \param numkpts a buffer containing the number of keypoints detected.
   /// \param thresh detection threshold on determinant of Hessian.

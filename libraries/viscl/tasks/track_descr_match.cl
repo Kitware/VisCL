@@ -52,7 +52,7 @@ int brief_dist(brief_descr b1, brief_descr b2)
   return c.x + c.y + c.z + c.w;
 }
 
-__kernel void track(__global    int2        *kpts2,
+__kernel void track(__global    float2      *kpts2,
                     __read_only image2d_t    kptmap1,
                     __global    brief_descr *descriptors1,
                     __global    brief_descr *descriptors2,
@@ -65,7 +65,7 @@ __kernel void track(__global    int2        *kpts2,
   brief_descr descr = descriptors2[index];
 
   //kptmap is 1/2 the size of the original image
-  int2 pixel = kpts2[index] / 2;
+  int2 pixel = convert_int2_rte(kpts2[index] / 2);
 
   int2 loc;
   int closest_index = -1;

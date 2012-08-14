@@ -34,11 +34,11 @@
 
 template void viscl::cl_hessian_detect(const vil_image_view<float> &img,
                                        float thresh, float sigma,
-                                       vcl_vector<cl_int2> &kpts,
+                                       vcl_vector<cl_float2> &kpts,
                                        vcl_vector<float> &kvals);
 template void viscl::cl_hessian_detect(const vil_image_view<vxl_byte> &img,
                                        float thresh, float sigma,
-                                       vcl_vector<cl_int2> &kpts,
+                                       vcl_vector<cl_float2> &kpts,
                                        vcl_vector<float> &kvals);
 
 //*****************************************************************************
@@ -54,23 +54,23 @@ template void viscl::cl_gaussian_smooth(const vil_image_view<float> &,
 
 template void viscl::
 track_descr_first_frame(const vil_image_view<vxl_byte> &img,
-                        vcl_vector<cl_int2> &kpts,
+                        vcl_vector<cl_float2> &kpts,
                         track_descr_match_t& tdm);
 template vcl_vector<int> viscl::
 track_descr_track(const vil_image_view<vxl_byte> &img,
-                  vcl_vector<cl_int2> &kpts,
+                  vcl_vector<cl_float2> &kpts,
                   track_descr_match_t& tdm);
 
 //*****************************************************************************
 
 template void viscl::
 compute_brief_descriptors<vxl_byte, 10>(const vil_image_view<vxl_byte> &img,
-                                        const vcl_vector<cl_int2> &kpts,
+                                        const vcl_vector<cl_float2> &kpts,
                                         vcl_vector<cl_int4> &descriptors,
                                         float sigma);
 template void viscl::
 compute_brief_descriptors<vxl_byte, 10>(const vil_image_view<vxl_byte> &img,
-                                        const vcl_vector<cl_int2> &kpts,
+                                        const vcl_vector<cl_float2> &kpts,
                                         vcl_vector<cl_int4> &descriptors);
 
 //*****************************************************************************

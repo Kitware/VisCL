@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     tracker->set_search_box_radius(200);
     tracker->set_max_kpts(20000);
 
-    std::vector<cl_int2> kpts1, kpts2, kpts3;
+    std::vector<cl_float2> kpts1, kpts2, kpts3;
     std::cout << "start" <<std::endl;
     viscl::track_descr_first_frame(img1, kpts1, tracker);
     std::cout << "tracked 1" <<std::endl;

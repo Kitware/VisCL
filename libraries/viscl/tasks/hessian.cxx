@@ -86,17 +86,8 @@ void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts,
   image detimg = manager::inst()->create_image(detimg_fmt, CL_MEM_READ_WRITE, ni, nj);
   cl::ImageFormat kptimg_fmt(CL_R, CL_SIGNED_INT32);
   kptmap = manager::inst()->create_image(kptimg_fmt, CL_MEM_READ_WRITE, ni >> 1, nj >> 1);
-  cl_kernel_t extrema;
-  if( subpixel )
-  {
-    kpts = manager::inst()->create_buffer<cl_float2>(CL_MEM_READ_WRITE, kpts_buffer_size_);
-    extrema = detect_extrema_subpix;
-  }
-  else
-  {
-    kpts = manager::inst()->create_buffer<cl_int2>(CL_MEM_READ_WRITE, kpts_buffer_size_);
-    extrema = detect_extrema;
-  }
+  cl_kernel_t extrema = subpixel ? detect_extrema_subpix : detect_extrema;
+  kpts = manager::inst()->create_buffer<cl_float2>(CL_MEM_READ_WRITE, kpts_buffer_size_);
   kvals = manager::inst()->create_buffer<cl_float>(CL_MEM_READ_WRITE, kpts_buffer_size_);
 
   int init[1];
@@ -136,14 +127,7 @@ void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts,
   if (num_detected >= kpts_buffer_size_)
   {
     queue->enqueueWriteBuffer(*numkpts().get(), CL_TRUE, 0, numkpts.mem_size(), init);
-    if( subpixel )
-    {
-      kpts = manager::inst()->create_buffer<cl_float2>(CL_MEM_READ_WRITE, num_detected);
-    }
-    else
-    {
-      kpts = manager::inst()->create_buffer<cl_int2>(CL_MEM_READ_WRITE, num_detected);
-    }
+    kpts = manager::inst()->create_buffer<cl_float2>(CL_MEM_READ_WRITE, num_detected);
     kvals = manager::inst()->create_buffer<cl_float>(CL_MEM_READ_WRITE, num_detected);
     extrema->setArg(2, *kpts().get());
     extrema->setArg(3, *kvals().get());

@@ -125,8 +125,8 @@ buffer track_descr_match::track(const image &img)
 //*****************************************************************************
 
 void write_tracks_to_file(const std::string& filename,
-                          const std::vector<cl_int2> &kpts1,
-                          const std::vector<cl_int2> &kpts2,
+                          const std::vector<cl_float2> &kpts1,
+                          const std::vector<cl_float2> &kpts2,
                           const std::vector<int> &indices)
 {
   std::ofstream outfile(filename.c_str());
@@ -134,8 +134,8 @@ void write_tracks_to_file(const std::string& filename,
   {
     if (indices[i] > -1)
     {
-      const cl_int2& kpt1 = kpts1[indices[i]];
-      const cl_int2& kpt2 = kpts2[i];
+      const cl_float2& kpt1 = kpts1[indices[i]];
+      const cl_float2& kpt2 = kpts2[i];
       outfile << kpt1.s[0] << " " << kpt1.s[1] << " "
               << kpt2.s[0] << " " << kpt2.s[1] << " "
               << indices[i] << "\n";

@@ -132,7 +132,7 @@ __kernel void init_kpt_map(__write_only image2d_t kptmap)
 
 __kernel void detect_extrema(__read_only  image2d_t  detimg,
                              __write_only image2d_t  kptmap,
-                             __global     int2      *kpts,
+                             __global     float2    *kpts,
                              __global     float     *kvals,
                                           unsigned   kpts_size,
                              __global     int       *numkpts,
@@ -155,7 +155,7 @@ __kernel void detect_extrema(__read_only  image2d_t  detimg,
   int index = atomic_add(numkpts, 1);
   if (index < kpts_size)
   {
-    kpts[index] = pixel;
+    kpts[index] = convert_float2(pixel);
     kvals[index] = val;
     int2 mappixel = pixel >> 1;
     write_imagei(kptmap, mappixel, index);
