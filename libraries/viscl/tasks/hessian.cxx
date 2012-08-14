@@ -50,6 +50,7 @@ hessian::hessian()
   program = program_registry::inst()->register_program(std::string("hessian"), hessian_source);
   det_hessian = make_kernel("det_hessian");
   detect_extrema = make_kernel("detect_extrema");
+  detect_extrema_subpix = make_kernel("detect_extrema_subpix");
   init_kpt_map = make_kernel("init_kpt_map");
   kpts_buffer_size_ = 0;
   queue = manager::inst()->create_queue();
@@ -57,19 +58,21 @@ hessian::hessian()
 
 //*****************************************************************************
 
-void hessian::smooth_and_detect(const image &img, image &kptmap, buffer &kpts, buffer &numkpts,
-                                float thresh, float sigma) const
+void hessian::smooth_and_detect(const image &img, image &kptmap, buffer &kpts,
+                                buffer &kvals, buffer &numkpts,
+                                float thresh, float sigma, bool subpixel) const
 {
   float scale = 2.0f;
   gaussian_smooth_t gs = NEW_VISCL_TASK(viscl::gaussian_smooth);
   image smoothed = gs->smooth(img, scale, 2);
-  detect(smoothed, kptmap, kpts, numkpts, thresh, sigma);
+  detect(smoothed, kptmap, kpts, kvals, numkpts, thresh, sigma, subpixel);
 }
 
 //*****************************************************************************
 
-void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts, buffer &numkpts,
-                     float thresh, float sigma) const
+void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts,
+                     buffer &kvals, buffer &numkpts,
+                     float thresh, float sigma, bool subpixel) const
 {
   const size_t ni = smoothed.width(), nj = smoothed.height();
   // a hard upper bound on the number of keypoints that can be detected
@@ -83,7 +86,18 @@ void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts, buffer 
   image detimg = manager::inst()->create_image(detimg_fmt, CL_MEM_READ_WRITE, ni, nj);
   cl::ImageFormat kptimg_fmt(CL_R, CL_SIGNED_INT32);
   kptmap = manager::inst()->create_image(kptimg_fmt, CL_MEM_READ_WRITE, ni >> 1, nj >> 1);
-  kpts = manager::inst()->create_buffer<cl_int2>(CL_MEM_READ_WRITE, kpts_buffer_size_);
+  cl_kernel_t extrema;
+  if( subpixel )
+  {
+    kpts = manager::inst()->create_buffer<cl_float2>(CL_MEM_READ_WRITE, kpts_buffer_size_);
+    extrema = detect_extrema_subpix;
+  }
+  else
+  {
+    kpts = manager::inst()->create_buffer<cl_int2>(CL_MEM_READ_WRITE, kpts_buffer_size_);
+    extrema = detect_extrema;
+  }
+  kvals = manager::inst()->create_buffer<cl_float>(CL_MEM_READ_WRITE, kpts_buffer_size_);
 
   int init[1];
   init[0] = 0;
@@ -98,12 +112,13 @@ void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts, buffer 
   init_kpt_map->setArg(0, *kptmap().get());
 
   // Set arguments to kernel
-  detect_extrema->setArg(0, *detimg().get());
-  detect_extrema->setArg(1, *kptmap().get());
-  detect_extrema->setArg(2, *kpts().get());
-  detect_extrema->setArg(3, *numkpts().get());
-  detect_extrema->setArg(4, kpts_buffer_size_);
-  detect_extrema->setArg(5, thresh);
+  extrema->setArg(0, *detimg().get());
+  extrema->setArg(1, *kptmap().get());
+  extrema->setArg(2, *kpts().get());
+  extrema->setArg(3, *kvals().get());
+  extrema->setArg(4, kpts_buffer_size_);
+  extrema->setArg(5, *numkpts().get());
+  extrema->setArg(6, thresh);
 
   //Run the kernel on specific ND range
   cl::NDRange global(ni, nj);
@@ -114,19 +129,28 @@ void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts, buffer 
   queue->enqueueNDRangeKernel(*init_kpt_map.get(), cl::NullRange, initsize, cl::NullRange);
   queue->enqueueBarrier();
 
-  queue->enqueueNDRangeKernel(*detect_extrema.get(), cl::NullRange, global, cl::NullRange);
+  queue->enqueueNDRangeKernel(*extrema.get(), cl::NullRange, global, cl::NullRange);
   queue->enqueueBarrier();
   unsigned num_detected = this->num_kpts(numkpts);
   // if the keypoint buffer was too small, we need to allocate more memory and try again
   if (num_detected >= kpts_buffer_size_)
   {
     queue->enqueueWriteBuffer(*numkpts().get(), CL_TRUE, 0, numkpts.mem_size(), init);
-    kpts = manager::inst()->create_buffer<cl_int2>(CL_MEM_READ_WRITE, num_detected);
-    detect_extrema->setArg(2, *kpts().get());
-    detect_extrema->setArg(4, num_detected);
+    if( subpixel )
+    {
+      kpts = manager::inst()->create_buffer<cl_float2>(CL_MEM_READ_WRITE, num_detected);
+    }
+    else
+    {
+      kpts = manager::inst()->create_buffer<cl_int2>(CL_MEM_READ_WRITE, num_detected);
+    }
+    kvals = manager::inst()->create_buffer<cl_float>(CL_MEM_READ_WRITE, num_detected);
+    extrema->setArg(2, *kpts().get());
+    extrema->setArg(3, *kvals().get());
+    extrema->setArg(4, num_detected);
     queue->enqueueNDRangeKernel(*init_kpt_map.get(), cl::NullRange, initsize, cl::NullRange);
     queue->enqueueBarrier();
-    queue->enqueueNDRangeKernel(*detect_extrema.get(), cl::NullRange, global, cl::NullRange);
+    queue->enqueueNDRangeKernel(*extrema.get(), cl::NullRange, global, cl::NullRange);
     queue->finish();
   }
   // allocate 1.5x as much memory for the next frame to provided a buffer.

@@ -75,9 +75,9 @@ void track_descr_match::first_frame(const image &img)
   brf = NEW_VISCL_TASK(viscl::brief<10>);
   image smoothed = gs->smooth(img, smooth_sigma_, 2);
 
-  buffer numkpts_b;
+  buffer numkpts_b, kvals;
 
-  hes->detect(smoothed, kptmap1, kpts1, numkpts_b,
+  hes->detect(smoothed, kptmap1, kpts1, kvals, numkpts_b,
               detect_thresh_, smooth_sigma_);
   numkpts1 = hes->num_kpts(numkpts_b);
   std::cout << numkpts1 << "\n";
@@ -90,9 +90,9 @@ buffer track_descr_match::track(const image &img)
 {
   image smoothed = gs->smooth(img, smooth_sigma_, 2);
 
-  buffer kpts2, numkpts2_b;
+  buffer kpts2, kvals, numkpts2_b;
   image kptmap2;
-  hes->detect(smoothed, kptmap2, kpts2, numkpts2_b,
+  hes->detect(smoothed, kptmap2, kpts2, kvals, numkpts2_b,
               detect_thresh_, smooth_sigma_);
   int numkpts2 = hes->num_kpts(numkpts2_b);
   std::cout << numkpts2 << "\n";

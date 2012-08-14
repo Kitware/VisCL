@@ -58,6 +58,49 @@ float8 read_imagef_8neighbors(__read_only  image2d_t input,
 
 /*****************************************************************************/
 
+float2 interpolate_peak(float *val, float8 nb)
+{
+  float2 G = 0.0f;
+  G.x  = nb.s1 - nb.s0;
+  G.x += nb.s6 - nb.s4;
+  G.x += nb.s5 - nb.s7;
+
+  G.y  = nb.s3 - nb.s2;
+  G.y += nb.s7 - nb.s4;
+  G.y += nb.s5 - nb.s6;
+  G /= 6.0f;
+
+  float3 H = 0.0f;
+  float val2 = 2 * (*val);
+  H.x  = nb.s1 - val2 + nb.s0;
+  H.x += nb.s6 - 2*nb.s2 + nb.s4;
+  H.x += nb.s5 - 2*nb.s3 + nb.s7;
+  H.x /= 3.0f;
+
+  H.y  = nb.s3 - val2 + nb.s2;
+  H.y += nb.s7 - 2*nb.s0 + nb.s4;
+  H.y += nb.s5 - 2*nb.s1 + nb.s6;
+  H.y /= 3.0f;
+
+  H.z = (nb.s5 - nb.s6 - nb.s7 + nb.s4) / 4.0f;
+
+  float det =  H.x * H.y - H.z * H.z;
+
+  float2 offset = {G.y * H.z - G.x * H.y,
+                   G.x * H.z - G.y * H.x};
+  offset /= det;
+
+  // update the peak value to the iterpolated peak
+  *val += nb.s0 + nb.s1 + nb.s2 + nb.s3 + nb.s4 + nb.s5 + nb.s6 + nb.s7;
+  *val /= 9.0;
+  *val += (G.x + 0.5 * H.x * offset.x + H.z * offset.y) * offset.x;
+  *val += (G.y + 0.5 * H.y * offset.y) * offset.y;
+
+  return offset;
+}
+
+/*****************************************************************************/
+
 __kernel void det_hessian(__read_only  image2d_t input,
                           __write_only image2d_t output,
                                        float     scale2)
@@ -90,8 +133,9 @@ __kernel void init_kpt_map(__write_only image2d_t kptmap)
 __kernel void detect_extrema(__read_only  image2d_t  detimg,
                              __write_only image2d_t  kptmap,
                              __global     int2      *kpts,
-                             __global     int       *numkpts,
+                             __global     float     *kvals,
                                           unsigned   kpts_size,
+                             __global     int       *numkpts,
                                           float      thresh)
 {
   int2 pixel = (int2)(get_global_id(0), get_global_id(1));
@@ -112,6 +156,41 @@ __kernel void detect_extrema(__read_only  image2d_t  detimg,
   if (index < kpts_size)
   {
     kpts[index] = pixel;
+    kvals[index] = val;
+    int2 mappixel = pixel >> 1;
+    write_imagei(kptmap, mappixel, index);
+  }
+}
+
+/*****************************************************************************/
+
+__kernel void detect_extrema_subpix(__read_only  image2d_t  detimg,
+                                    __write_only image2d_t  kptmap,
+                                    __global     float2    *kpts,
+                                    __global     float     *kvals,
+                                                 unsigned   kpts_size,
+                                    __global     int       *numkpts,
+                                                 float      thresh)
+{
+  int2 pixel = (int2)(get_global_id(0), get_global_id(1));
+  float val = read_imagef(detimg, imageSampler, pixel).x;
+  if (val < thresh)
+  {
+    return;
+  }
+
+  float8 neighbors = read_imagef_8neighbors(detimg, pixel);
+
+  if (any(neighbors > val))
+  {
+    return;
+  }
+
+  int index = atomic_add(numkpts, 1);
+  if (index < kpts_size)
+  {
+    kpts[index] = convert_float2(pixel) + interpolate_peak(&val, neighbors);
+    kvals[index] = val;
     int2 mappixel = pixel >> 1;
     write_imagei(kptmap, mappixel, index);
   }

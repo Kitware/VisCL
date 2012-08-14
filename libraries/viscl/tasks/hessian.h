@@ -44,10 +44,25 @@ class hessian : public task
 public:
 
   hessian();
-  void smooth_and_detect(const image &img, image &kptmap, buffer &kpts, buffer &numkpts,
-                         float thresh, float sigma) const;
-  void detect(const image &img, image &kptmap, buffer &kpts, buffer &numkpts,
-              float thresh, float scale) const;
+
+  void smooth_and_detect(const image &img, image &kptmap, buffer &kpts,
+                         buffer &kvals, buffer &numkpts,
+                         float thresh, float sigma, bool subpixel = false) const;
+
+  /// Detect the Hessian determinant keypoints.
+  /// \param img input image
+  /// \param kptmap output keypoint map image (half size of input)
+  ///               caching keypoint indices by location/2
+  /// \param kpts buffer of detect keypoint coordinates,
+  ///             if \p subpixel then type is float2, else type is int2.
+  /// \param kvals buffer of magnitudes of each keypoint detection (float)
+  /// \param numkpts a buffer containing the number of keypoints detected.
+  /// \param thresh detection threshold on determinant of Hessian.
+  /// \param scale the scale (Gaussian sigma) of these points.
+  /// \param subpixel if true, compute sub-pixel interpolated keypoints
+  void detect(const image &img, image &kptmap, buffer &kpts, buffer &kvals,
+              buffer &numkpts, float thresh, float scale,
+              bool subpixel = false) const;
 
   unsigned num_kpts(const buffer &numkpts_b) const;
 
@@ -55,7 +70,10 @@ private:
 
 
 
-  cl_kernel_t det_hessian, detect_extrema, init_kpt_map;
+  cl_kernel_t det_hessian;
+  cl_kernel_t detect_extrema;
+  cl_kernel_t detect_extrema_subpix;
+  cl_kernel_t init_kpt_map;
   mutable unsigned kpts_buffer_size_;
 };
 

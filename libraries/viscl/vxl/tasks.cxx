@@ -34,10 +34,12 @@
 
 template void viscl::cl_hessian_detect(const vil_image_view<float> &img,
                                        float thresh, float sigma,
-                                       vcl_vector<cl_int2> &kpts);
+                                       vcl_vector<cl_int2> &kpts,
+                                       vcl_vector<float> &kvals);
 template void viscl::cl_hessian_detect(const vil_image_view<vxl_byte> &img,
                                        float thresh, float sigma,
-                                       vcl_vector<cl_int2> &kpts);
+                                       vcl_vector<cl_int2> &kpts,
+                                       vcl_vector<float> &kvals);
 
 //*****************************************************************************
 
