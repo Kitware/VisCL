@@ -4,14 +4,17 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-__constant sampler_t imageSampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_NEAREST;
+__constant sampler_t imageSampler = CLK_NORMALIZED_COORDS_FALSE |
+                                    CLK_ADDRESS_CLAMP_TO_EDGE |
+                                    CLK_FILTER_NEAREST;
 
 // A Brief descriptor is represented as 128 bits
 //using 4 32 bit integers in the int4 datat type
 typedef int4 brief_descr;
 
-//Hamming distance between brief descriptors.  This function counts the number of bits
-//(pop count) between 4 32 ints in parallel then sums the result
+// Hamming distance between brief descriptors.
+// This function counts the number of bits (pop count)
+// between 4 32 ints in parallel then sums the result
 int brief_dist(brief_descr b1, brief_descr b2)
 {
   int4 v = b1 ^ b2; //Find the bits that differ
@@ -25,9 +28,13 @@ int brief_dist(brief_descr b1, brief_descr b2)
   return c.x + c.y + c.z + c.w;
 }
 
-__kernel void track(__global int2 *kpts2, __read_only image2d_t kptmap1,
-                    __global brief_descr *descriptors1, __global brief_descr *descriptors2,
-                    __global int *tracks, int window)
+__kernel void track(__global    int2        *kpts2,
+                    __read_only image2d_t    kptmap1,
+                    __global    brief_descr *descriptors1,
+                    __global    brief_descr *descriptors2,
+                    __global    int         *tracks,
+                                unsigned     window,
+                                unsigned     closest_dist)
 {
   //index into kpts1 and descriptors1
   int index = get_global_id(0);
@@ -37,7 +44,6 @@ __kernel void track(__global int2 *kpts2, __read_only image2d_t kptmap1,
   int2 pixel = kpts2[index] / 2;
 
   int2 loc;
-  int closest_dist = 15;
   int closest_index = -1;
   for (loc.x = pixel.x - window; loc.x <= pixel.x + window; loc.x++)
   {

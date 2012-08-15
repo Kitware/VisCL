@@ -25,6 +25,7 @@ namespace viscl
 track_descr_match::track_descr_match()
  : max_kpts_(5000),
    search_box_radius_(50),
+   hamming_dist_threshold_(15),
    detect_thresh_(0.003f),
    smooth_sigma_(2.0f)
 {
@@ -70,6 +71,7 @@ track_descr_match::track_descr_match(const track_descr_match &t)
   this->track_k = t.track_k;
   this->max_kpts_ = t.max_kpts_;
   this->search_box_radius_ = t.search_box_radius_;
+  this->hamming_dist_threshold_ = t.hamming_dist_threshold_;
   this->detect_thresh_ = t.detect_thresh_;
   this->smooth_sigma_ = t.smooth_sigma_;
 }
@@ -116,6 +118,7 @@ buffer track_descr_match::track(const image &img)
   track_k->setArg(3, *descriptors2().get());
   track_k->setArg(4, *tracks_b().get());
   track_k->setArg(5, search_box_radius_);
+  track_k->setArg(6, hamming_dist_threshold_);
 
   cl::NDRange global(numkpts2);
   queue->enqueueNDRangeKernel(*track_k.get(), cl::NullRange, global, cl::NullRange);
