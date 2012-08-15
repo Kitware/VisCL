@@ -1,5 +1,8 @@
 include("${CMAKE_CURRENT_LIST_DIR}/viscl-config-targets.cmake")
 
+# include the vistk macros
+include(${CMAKE_CURRENT_LIST_DIR}/viscl-macros.cmake)
+
 # The build settings file.
 SET(viscl_BUILD_SETTINGS_FILE "@viscl_BUILD_SETTINGS_FILE@")
 
