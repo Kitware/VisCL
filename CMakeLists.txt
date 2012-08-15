@@ -66,8 +66,8 @@ endif (VISCL_ENABLE_TESTING)
 SET(viscl_INCLUDE_DIR_CONFIG ${viscl_SOURCE_DIR}/libraries)
 
 
-CONFIGURE_FILE(${viscl_SOURCE_DIR}/visclConfig.cmake.in
-               ${viscl_BINARY_DIR}/visclConfig.cmake @ONLY IMMEDIATE)
+CONFIGURE_FILE(${viscl_SOURCE_DIR}/viscl-config.cmake.in
+               ${viscl_BINARY_DIR}/viscl-config.cmake @ONLY IMMEDIATE)
 
 if (WIN32)
   set(cmakedir cmake)
