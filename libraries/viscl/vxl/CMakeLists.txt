@@ -18,11 +18,8 @@ export( TARGETS viscl_vxl
   APPEND FILE ${viscl_export_file}
 )
 
-foreach(fname in ${SRC_FILES})
-  string(REGEX MATCH ".*\\.h" hfile ${fname})
-  list(APPEND HEADER_FILES ${hfile})
-endforeach()
-
-install( FILES  ${HEADER_FILES}
-  DESTINATION "include/viscl/vxl"
-  COMPONENT   development)
+install( DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  DESTINATION include/viscl
+  COMPONENT development
+  FILES_MATCHING PATTERN "*.h"
+)
