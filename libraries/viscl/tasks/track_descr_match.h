@@ -43,6 +43,9 @@ public:
   /// The search box is square region with width and height of 2*radius+1.
   void set_search_box_radius(unsigned sbr) { search_box_radius_ = sbr; }
 
+  /// Set the threshold on the maximum hamming distance between descriptors
+  void set_hamming_dist_threshold(unsigned hdt) { hamming_dist_threshold_ = hdt; }
+
   /// Set the Hessian determinant detection threshold
   void set_detect_thresh(float dt) { detect_thresh_ = dt; }
 
@@ -55,6 +58,9 @@ public:
 
   /// Get the search box radius.
   unsigned search_box_radius() const { return search_box_radius_; }
+
+  /// Get the threshold on the maximum hamming distance between descriptors
+  unsigned hamming_dist_threshold() const { return hamming_dist_threshold_; }
 
   /// Get the Hessian determinant detection threshold
   float detect_thresh() const { return detect_thresh_; }
@@ -86,6 +92,7 @@ private:
 
   int max_kpts_;
   unsigned search_box_radius_;
+  unsigned hamming_dist_threshold_;
   float detect_thresh_;
   float smooth_sigma_;
 };

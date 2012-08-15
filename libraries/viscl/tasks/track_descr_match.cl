@@ -33,7 +33,8 @@ __kernel void track(__global    int2        *kpts2,
                     __global    brief_descr *descriptors1,
                     __global    brief_descr *descriptors2,
                     __global    int         *tracks,
-                                int          window)
+                                unsigned     window,
+                                unsigned     closest_dist)
 {
   //index into kpts1 and descriptors1
   int index = get_global_id(0);
@@ -43,7 +44,6 @@ __kernel void track(__global    int2        *kpts2,
   int2 pixel = kpts2[index] / 2;
 
   int2 loc;
-  int closest_dist = 15;
   int closest_index = -1;
   for (loc.x = pixel.x - window; loc.x <= pixel.x + window; loc.x++)
   {
