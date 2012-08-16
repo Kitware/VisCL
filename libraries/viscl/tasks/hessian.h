@@ -45,6 +45,12 @@ public:
 
   hessian();
 
+  /// Compute an image of Hessian determinants.
+  /// \param img input image
+  /// \param detimg output image of Hessian determinants
+  /// \param scale the scale (Gaussian sigma) of these points.
+  void det_hessian_image(const image &img, image &det_hes, float scale) const;
+
   void smooth_and_detect(const image &img, image &kptmap, buffer &kpts,
                          buffer &kvals, buffer &numkpts,
                          float thresh, float sigma, bool subpixel = false) const;

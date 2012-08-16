@@ -58,6 +58,33 @@ hessian::hessian()
 
 //*****************************************************************************
 
+void hessian::det_hessian_image(const image &img, image &detimg, float scale) const
+{
+  const size_t ni = img.width(), nj = img.height();
+
+  // allocate a new image if the current one is not the right size and type
+  cl::ImageFormat detimg_fmt(CL_INTENSITY, CL_FLOAT);
+  if ( detimg.width() != ni ||
+       detimg.height() != nj ||
+       detimg.format().image_channel_data_type != detimg_fmt.image_channel_data_type ||
+       detimg.format().image_channel_order != detimg_fmt.image_channel_order )
+  {
+    detimg = manager::inst()->create_image(detimg_fmt, CL_MEM_READ_WRITE, ni, nj);
+  }
+
+  // Set arguments to kernel
+  det_hessian->setArg(0, *img().get());
+  det_hessian->setArg(1, *detimg().get());
+  det_hessian->setArg(2, scale*scale);
+
+  //Run the kernel on specific ND range
+  cl::NDRange global(ni, nj);
+  queue->enqueueNDRangeKernel(*det_hessian.get(), cl::NullRange, global, cl::NullRange);
+  queue->finish();
+}
+
+//*****************************************************************************
+
 void hessian::smooth_and_detect(const image &img, image &kptmap, buffer &kpts,
                                 buffer &kvals, buffer &numkpts,
                                 float thresh, float sigma, bool subpixel) const
@@ -82,8 +109,11 @@ void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts,
     // an initial guess for the total number of keypoints
     kpts_buffer_size_ = max_kpts / 100;
   }
-  cl::ImageFormat detimg_fmt(CL_INTENSITY, CL_FLOAT);
-  image detimg = manager::inst()->create_image(detimg_fmt, CL_MEM_READ_WRITE, ni, nj);
+
+  // Compute the image of hessian determinants
+  image detimg;
+  det_hessian_image(smoothed, detimg, sigma);
+
   cl::ImageFormat kptimg_fmt(CL_R, CL_SIGNED_INT32);
   kptmap = manager::inst()->create_image(kptimg_fmt, CL_MEM_READ_WRITE, ni >> 1, nj >> 1);
   cl_kernel_t extrema = subpixel ? detect_extrema_subpix : detect_extrema;
@@ -94,11 +124,6 @@ void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts,
   init[0] = 0;
   numkpts = manager::inst()->create_buffer<int>(CL_MEM_READ_WRITE, 1);
   queue->enqueueWriteBuffer(*numkpts().get(), CL_TRUE, 0, numkpts.mem_size(), init);
-
-  // Set arguments to kernel
-  det_hessian->setArg(0, *smoothed().get());
-  det_hessian->setArg(1, *detimg().get());
-  det_hessian->setArg(2, sigma*sigma);
 
   init_kpt_map->setArg(0, *kptmap().get());
 
@@ -116,7 +141,6 @@ void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts,
   cl::NDRange initsize(ni >> 1, nj >> 1);
   //cl::NDRange local(32,32);
 
-  queue->enqueueNDRangeKernel(*det_hessian.get(), cl::NullRange, global, cl::NullRange);
   queue->enqueueNDRangeKernel(*init_kpt_map.get(), cl::NullRange, initsize, cl::NullRange);
   queue->enqueueBarrier();
 
