@@ -14,7 +14,7 @@ set(CXX_SRC_FILES
     track_descr_match.h        track_descr_match.cxx
 )
 
-encode_opencl_sources(cl_strings.cxx ${OCL_SRC_FILES})
+viscl_encode_opencl_sources(cl_strings.cxx ${OCL_SRC_FILES})
 
 
 add_library(viscl_tasks ${CXX_SRC_FILES} cl_strings.cxx)
@@ -25,4 +25,10 @@ install( TARGETS viscl_tasks EXPORT viscl_exports
 )
 export( TARGETS viscl_tasks
   APPEND FILE ${viscl_export_file}
+)
+
+install( DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  DESTINATION include/viscl
+  COMPONENT development
+  FILES_MATCHING PATTERN "*.h"
 )

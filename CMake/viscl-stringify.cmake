@@ -29,5 +29,3 @@ foreach(CL_FILE ${CL_FILES})
   string(REGEX REPLACE "\""  "\\\\\"" code "${code}")
   file(APPEND "${CXX_FILE}" "const char *${CL_NAME}_source = \"${code}\";\n\n\n")
 endforeach()
-
-
