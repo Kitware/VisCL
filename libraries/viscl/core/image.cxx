@@ -42,6 +42,10 @@ image::image(const boost::shared_ptr<cl::Image2D> &image) : img(image)
 
 size_t image::width() const
 {
+  if ( !img )
+  {
+    return 0;
+  }
   size_t width;
   img->getImageInfo<size_t>(CL_IMAGE_WIDTH, &width);
   return width;
@@ -51,6 +55,10 @@ size_t image::width() const
 
 size_t image::height() const
 {
+  if ( !img )
+  {
+    return 0;
+  }
   size_t height;
   img->getImageInfo<size_t>(CL_IMAGE_HEIGHT, &height);
   return height;
@@ -60,6 +68,10 @@ size_t image::height() const
 
 cl::ImageFormat image::format() const
 {
+  if ( !img )
+  {
+    return cl::ImageFormat();
+  }
   cl::ImageFormat imgf;
   img->getImageInfo<cl::ImageFormat>(CL_IMAGE_FORMAT, &imgf);
   return imgf;
