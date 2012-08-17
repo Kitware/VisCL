@@ -42,7 +42,7 @@
 #include <viscl/core/image.h>
 #include <viscl/core/manager.h>
 #include <viscl/tasks/hessian.h>
-#include <viscl/tasks/BRIEF.h>
+#include <viscl/tasks/brief.h>
 #include <viscl/tasks/gaussian_smooth.h>
 #include <viscl/tasks/track_descr_match.h>
 #include <viscl/tasks/warp_image.h>

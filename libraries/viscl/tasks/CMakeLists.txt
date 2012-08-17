@@ -3,12 +3,12 @@ set(OCL_SRC_FILES
     gaussian_smooth.cl
     hessian.cl
     track_descr_match.cl
-    BRIEF.cl
+    brief.cl
     warp_image.cl
 )
 
 set(CXX_SRC_FILES
-    BRIEF.h                    BRIEF.cxx
+    brief.h                    brief.cxx
     descriptor.h
     gaussian_smooth.h          gaussian_smooth.cxx
     hessian.h                  hessian.cxx

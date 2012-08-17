@@ -28,7 +28,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "BRIEF.h"
+#include "brief.h"
 
 #include <boost/make_shared.hpp>
 #include <sstream>
@@ -41,7 +41,7 @@
 #include <boost/random/uniform_int_distribution.hpp>
 
 
-extern const char* BRIEF_source;
+extern const char* brief_source;
 
 namespace viscl
 {

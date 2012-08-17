@@ -35,7 +35,7 @@
 #include <viscl/core/image.h>
 
 #include "hessian.h"
-#include "BRIEF.h"
+#include "brief.h"
 #include "gaussian_smooth.h"
 
 namespace viscl
