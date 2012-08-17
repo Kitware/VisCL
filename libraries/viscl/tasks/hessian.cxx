@@ -121,14 +121,15 @@ void hessian::find_peaks(const image &resp_img, image &kptmap,
   extrema->setArg(6, thresh);
 
   //Run the kernel on specific ND range
-  cl::NDRange global(ni, nj);
+  cl::NDRange global(ni-2, nj-2);
+  cl::NDRange offset(1, 1);
   cl::NDRange initsize(ni >> 1, nj >> 1);
   //cl::NDRange local(32,32);
 
   queue->enqueueNDRangeKernel(*init_kpt_map.get(), cl::NullRange, initsize, cl::NullRange);
   queue->enqueueBarrier();
 
-  queue->enqueueNDRangeKernel(*extrema.get(), cl::NullRange, global, cl::NullRange);
+  queue->enqueueNDRangeKernel(*extrema.get(), offset, global, cl::NullRange);
   queue->enqueueBarrier();
   unsigned num_detected = this->num_kpts(numkpts);
   // if the keypoint buffer was too small, we need to allocate more memory and try again
@@ -142,7 +143,7 @@ void hessian::find_peaks(const image &resp_img, image &kptmap,
     extrema->setArg(4, num_detected);
     queue->enqueueNDRangeKernel(*init_kpt_map.get(), cl::NullRange, initsize, cl::NullRange);
     queue->enqueueBarrier();
-    queue->enqueueNDRangeKernel(*extrema.get(), cl::NullRange, global, cl::NullRange);
+    queue->enqueueNDRangeKernel(*extrema.get(), offset, global, cl::NullRange);
     queue->finish();
   }
   // allocate 1.5x as much memory for the next frame to provided a buffer.
