@@ -15,4 +15,9 @@ if (BUILD_VXL_SUPPORT)
   # additional tests using VXL
   viscl_make_test(gaussian_smooth smooth_vxl)
   viscl_make_test(warp_image warp_vxl)
+
+  viscl_build_test(hessian libraries test_hessian.cxx)
+
+  viscl_make_test(hessian det_image)
+  viscl_make_test(hessian peaks)
 endif (BUILD_VXL_SUPPORT)
