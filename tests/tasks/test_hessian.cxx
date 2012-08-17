@@ -16,10 +16,10 @@
 #include <viscl/core/task_registry.h>
 
 #include <viscl/tasks/hessian.h>
-#include <viscl/vxl/transfer.h>
 
 #include <vil/vil_image_view.h>
 #include <vil/vil_save.h>
+#include <vil/vil_crop.h>
 #include <vil/vil_convert.h>
 #include <vil/algo/vil_find_peaks.h>
 
@@ -145,16 +145,9 @@ test_det_image()
   unsigned char img_data[buffer_size];
   make_wave_image(width, height, img_data, freq);
 
-  vil_image_view<vxl_byte> wave(img_data, width, height, 1, 1, width, width*height);
-  vil_save(wave, "wave.png");
-
+  // compute the analytical Hessian determinant solution
   float hes_data[buffer_size];
   make_hesdet_wave_image(width, height, hes_data, freq);
-  vil_image_view<float> hes_wave(hes_data, width, height, 1, 1, width, width*height);
-  vil_image_view<vxl_byte> hes_wave_byte;
-  vil_convert_stretch_range(hes_wave, hes_wave_byte);
-  vil_save(hes_wave_byte, "hes_wave.png");
-
 
   // create the image on the GPU and upload the test image to it.
   viscl::image img = viscl::manager::inst()->create_image(img_frmt, CL_MEM_READ_ONLY,
@@ -174,26 +167,55 @@ test_det_image()
   queue->enqueueWriteImage(*img().get(), CL_TRUE, origin, region,
                            0, 0, img_data);
 
+  // compute the Hessian determinant on the GPU
   viscl::image detimg;
   hes->det_hessian_image(img, detimg, 1.0);
 
+  // read the image back to the CPU
   float detimg_data[buffer_size];
   queue->enqueueReadImage(*detimg().get(), CL_TRUE, origin, region,
                            0, 0, detimg_data);
 
+  // use vil to wrap the images for comparisons
+  vil_image_view<vxl_byte> wave(img_data, width, height, 1, 1, width, width*height);
+  vil_image_view<float> hes_wave(hes_data, width, height, 1, 1, width, width*height);
   vil_image_view<float> hes_wave2(detimg_data, width, height, 1, 1, width, width*height);
   vil_image_view<float> diff;
-  vil_math_image_difference(hes_wave, hes_wave2, diff);
-  float min_v, max_v;
-  vil_math_value_range(diff, min_v, max_v);
-  std::cout << "diff ranges from "<<min_v<<" to "<<max_v<<std::endl;
+  vil_math_image_abs_difference(hes_wave, hes_wave2, diff);
+  // ignore the boundary pixels
+  diff = vil_crop(diff, 1, width-2, 1, height-2);
+
+  // find the range of values in both images
+  float min_v, max_v, min_t, max_t;
   vil_math_value_range(hes_wave, min_v, max_v);
   std::cout << "hes_wave ranges from "<<min_v<<" to "<<max_v<<std::endl;
+  min_t = min_v;
+  max_t = max_v;
   vil_math_value_range(hes_wave2, min_v, max_v);
   std::cout << "hes_wave2 ranges from "<<min_v<<" to "<<max_v<<std::endl;
-  vil_convert_stretch_range(diff, hes_wave_byte);
-  vil_save(hes_wave_byte, "diff.png");
+  min_t = std::min(min_t, min_v);
+  max_t = std::max(max_t, max_v);
 
+  // find 3 standard deviations above the mean error
+  double mean, var;
+  vil_math_mean_and_variance(mean, var, diff, 0);
+  double norm_error = (mean + 3*sqrt(var)) / (max_t - min_t);
+  // ideally this threshold should be lower ...
+  if (norm_error > 0.05)
+  {
+    TEST_ERROR("Determinant of Hessian is not accurate.  "
+               "Normalized error is " << norm_error);
+
+    // write debug images
+    vil_image_view<vxl_byte> byte_img;
+    vil_convert_stretch_range_limited(hes_wave, byte_img, min_t, max_t);
+    vil_save(byte_img, "hes_wave.png");
+    vil_convert_stretch_range_limited(hes_wave2, byte_img, min_t, max_t);
+    vil_save(byte_img, "hes_wave2.png");
+
+    vil_convert_stretch_range(wave, byte_img);
+    vil_save(byte_img, "wave.png");
+  }
 }
 
 
