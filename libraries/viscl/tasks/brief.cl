@@ -37,46 +37,45 @@ typedef int4 brief_descr;
 
 __constant sampler_t imageSampler = CLK_NORMALIZED_COORDS_FALSE |
                                     CLK_ADDRESS_CLAMP_TO_EDGE |
-                                    CLK_FILTER_NEAREST;
+                                    CLK_FILTER_LINEAR;
 
 __kernel void brief(__read_only image2d_t    input,
                     __global    float2      *kpts,
                     __global    brief_descr *descr)
 {
   int index = get_global_id(0);
-  int2 pixel = convert_int2_rte(kpts[index]);
+  float2 pixel = kpts[index];
 
   brief_descr d = 0;
   int loc = 0;
 
+#define read_loc(S) read_imagef(input, imageSampler, \
+                                pixel + convert_float2(map[loc].S)).x
+
   for (int i = 0; i < 32; i++)
   {
-    int less = read_imageui(input, imageSampler, pixel + map[loc].xy).x <
-               read_imageui(input, imageSampler, pixel + map[loc].zw).x;
+    int less = read_loc(xy) < read_loc(zw);
     d.x |= less << i;
     loc++;
   }
 
   for (int i = 0; i < 32; i++)
   {
-    int less = read_imageui(input, imageSampler, pixel + map[loc].xy).x <
-               read_imageui(input, imageSampler, pixel + map[loc].zw).x;
+    int less = read_loc(xy) < read_loc(zw);
     d.y |= less << i;
     loc++;
   }
 
   for (int i = 0; i < 32; i++)
   {
-    int less = read_imageui(input, imageSampler, pixel + map[loc].xy).x <
-               read_imageui(input, imageSampler, pixel + map[loc].zw).x;
+    int less = read_loc(xy) < read_loc(zw);
     d.z |= less << i;
     loc++;
   }
 
   for (int i = 0; i < 32; i++)
   {
-    int less = read_imageui(input, imageSampler, pixel + map[loc].xy).x <
-               read_imageui(input, imageSampler, pixel + map[loc].zw).x;
+    int less = read_loc(xy) < read_loc(zw);
     d.w |= less << i;
     loc++;
   }
