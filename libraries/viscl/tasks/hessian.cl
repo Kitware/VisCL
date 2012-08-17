@@ -186,10 +186,16 @@ __kernel void detect_extrema_subpix(__read_only  image2d_t  detimg,
     return;
   }
 
+  float2 offset = interpolate_peak(&val, neighbors);
+  if (any(fabs(offset) > 1.0f))
+  {
+    return;
+  }
+
   int index = atomic_add(numkpts, 1);
   if (index < kpts_size)
   {
-    kpts[index] = convert_float2(pixel) + interpolate_peak(&val, neighbors);
+    kpts[index] = convert_float2(pixel) + offset;
     kvals[index] = val;
     int2 mappixel = pixel >> 1;
     write_imagei(kptmap, mappixel, index);
