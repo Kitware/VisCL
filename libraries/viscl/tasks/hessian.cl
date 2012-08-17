@@ -147,7 +147,7 @@ __kernel void detect_extrema(__read_only  image2d_t  detimg,
 
   float8 neighbors = read_imagef_8neighbors(detimg, pixel);
 
-  if (any(neighbors > val))
+  if (any(neighbors >= val))
   {
     return;
   }
@@ -181,7 +181,7 @@ __kernel void detect_extrema_subpix(__read_only  image2d_t  detimg,
 
   float8 neighbors = read_imagef_8neighbors(detimg, pixel);
 
-  if (any(neighbors > val))
+  if (any(neighbors >= val))
   {
     return;
   }
