@@ -85,23 +85,11 @@ void hessian::det_hessian_image(const image &img, image &detimg, float scale) co
 
 //*****************************************************************************
 
-void hessian::smooth_and_detect(const image &img, image &kptmap, buffer &kpts,
-                                buffer &kvals, buffer &numkpts,
-                                float thresh, float sigma, bool subpixel) const
+void hessian::find_peaks(const image &resp_img, image &kptmap,
+                         buffer &kpts, buffer &kvals, buffer &numkpts,
+                         float thresh, bool subpixel) const
 {
-  float scale = 2.0f;
-  gaussian_smooth_t gs = NEW_VISCL_TASK(viscl::gaussian_smooth);
-  image smoothed = gs->smooth(img, scale, 2);
-  detect(smoothed, kptmap, kpts, kvals, numkpts, thresh, sigma, subpixel);
-}
-
-//*****************************************************************************
-
-void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts,
-                     buffer &kvals, buffer &numkpts,
-                     float thresh, float sigma, bool subpixel) const
-{
-  const size_t ni = smoothed.width(), nj = smoothed.height();
+  const size_t ni = resp_img.width(), nj = resp_img.height();
   // a hard upper bound on the number of keypoints that can be detected
   const unsigned max_kpts = ni * nj / 4;
   if (kpts_buffer_size_ < 1)
@@ -109,10 +97,6 @@ void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts,
     // an initial guess for the total number of keypoints
     kpts_buffer_size_ = max_kpts / 100;
   }
-
-  // Compute the image of hessian determinants
-  image detimg;
-  det_hessian_image(smoothed, detimg, sigma);
 
   cl::ImageFormat kptimg_fmt(CL_R, CL_SIGNED_INT32);
   kptmap = manager::inst()->create_image(kptimg_fmt, CL_MEM_READ_WRITE, ni >> 1, nj >> 1);
@@ -128,7 +112,7 @@ void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts,
   init_kpt_map->setArg(0, *kptmap().get());
 
   // Set arguments to kernel
-  extrema->setArg(0, *detimg().get());
+  extrema->setArg(0, *resp_img().get());
   extrema->setArg(1, *kptmap().get());
   extrema->setArg(2, *kpts().get());
   extrema->setArg(3, *kvals().get());
@@ -163,6 +147,32 @@ void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts,
   }
   // allocate 1.5x as much memory for the next frame to provided a buffer.
   kpts_buffer_size_ = std::min(3*num_detected/2, max_kpts);
+}
+
+//*****************************************************************************
+
+void hessian::smooth_and_detect(const image &img, image &kptmap, buffer &kpts,
+                                buffer &kvals, buffer &numkpts,
+                                float thresh, float sigma, bool subpixel) const
+{
+  float scale = 2.0f;
+  gaussian_smooth_t gs = NEW_VISCL_TASK(viscl::gaussian_smooth);
+  image smoothed = gs->smooth(img, scale, 2);
+  detect(smoothed, kptmap, kpts, kvals, numkpts, thresh, sigma, subpixel);
+}
+
+//*****************************************************************************
+
+void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts,
+                     buffer &kvals, buffer &numkpts,
+                     float thresh, float sigma, bool subpixel) const
+{
+  // Compute the image of hessian determinants
+  image detimg;
+  det_hessian_image(smoothed, detimg, sigma);
+
+  // Find the peaks
+  find_peaks(detimg, kptmap, kpts, kvals, numkpts, thresh, subpixel);
 }
 
 //*****************************************************************************

@@ -51,6 +51,19 @@ public:
   /// \param scale the scale (Gaussian sigma) of these points.
   void det_hessian_image(const image &img, image &det_hes, float scale) const;
 
+  /// Detect the keypoints at the maxima of a response image
+  /// \param resp_img response image, e.g. Hessian determinant
+  /// \param kptmap output keypoint map image (half size of input)
+  ///               caching keypoint indices by location/2
+  /// \param kpts buffer of detect keypoint coordinates (float2)
+  /// \param kvals buffer of magnitudes of each keypoint detection (float)
+  /// \param numkpts a buffer containing the number of keypoints detected.
+  /// \param thresh detection threshold on the response image
+  /// \param subpixel if true, compute sub-pixel interpolated keypoints
+  void find_peaks(const image &resp_img, image &kptmap,
+                  buffer &kpts, buffer &kvals, buffer &numkpts,
+                  float thresh, bool subpixel = false) const;
+
   void smooth_and_detect(const image &img, image &kptmap, buffer &kpts,
                          buffer &kvals, buffer &numkpts,
                          float thresh, float sigma, bool subpixel = false) const;
