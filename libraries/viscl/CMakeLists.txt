@@ -1,5 +1,5 @@
 add_subdirectory(core)
 add_subdirectory(tasks)
-if (VXL_FOUND)
+if (BUILD_VXL_SUPPORT)
   add_subdirectory(vxl)
 endif ()
