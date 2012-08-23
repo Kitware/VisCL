@@ -16,10 +16,12 @@
 #include <viscl/core/task_registry.h>
 
 #include <viscl/tasks/gaussian_smooth.h>
-#include <viscl/vxl/transfer.h>
 
+#ifdef HAS_VXL
+#include <viscl/vxl/transfer.h>
 #include <vil/vil_image_view.h>
 #include <vil/vil_save.h>
+#endif
 
 static void run_test(std::string const& test_name);
 
@@ -227,7 +229,7 @@ test_smooth()
   {
     TEST_ERROR("GPU and CPU smoothing results differ in "
                << (100.0f*diff_count)/buffer_size << "% of pixels");
-
+#ifdef HAS_VXL
     vil_image_view<vxl_byte> vil_src(img_data, width, height, 1,
                                      1, width, buffer_size);
     vil_save(vil_src, "test_smooth_source.png");
@@ -237,6 +239,7 @@ test_smooth()
     vil_image_view<vxl_byte> vil_truth(truth, width, height, 1,
                                        1, width, buffer_size);
     vil_save(vil_truth, "test_smooth_truth.png");
+#endif
   }
 }
 
@@ -244,6 +247,7 @@ test_smooth()
 void
 test_smooth_vxl()
 {
+#ifdef HAS_VXL
   // test parameters
   const unsigned width = 100;
   const unsigned height = 100;
@@ -303,6 +307,9 @@ test_smooth_vxl()
     vil_save(result_img, "test_smooth_result.png");
     vil_save(truth_img, "test_smooth_truth.png");
   }
+#else
+  TEST_ERROR("VXL support is not compiled in, this test is invalid");
+#endif
 }
 
 

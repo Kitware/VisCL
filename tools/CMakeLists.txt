@@ -8,7 +8,7 @@ target_link_libraries(viscl_report_opencl_specs viscl_core)
 install(TARGETS viscl_report_opencl_specs DESTINATION bin)
 
 
-if (VXL_FOUND)
+if (BUILD_VXL_SUPPORT)
 
   add_executable(viscl_time_smooth time_smooth.cxx)
   target_link_libraries(viscl_time_smooth
@@ -25,17 +25,17 @@ if (VXL_FOUND)
 
   install(TARGETS viscl_time_memory_transfer DESTINATION bin)
 
-endif (VXL_FOUND)
+endif (BUILD_VXL_SUPPORT)
 
 
 ###################################################################
 # Developer testing executables which are not meant for install
 ###################################################################
 
-if (VXL_FOUND)
+if (BUILD_VXL_SUPPORT)
 
   add_executable(track track.cxx )
   target_link_libraries(track
     viscl_tasks viscl_vxl vul )
 
-endif (VXL_FOUND)
+endif (BUILD_VXL_SUPPORT)

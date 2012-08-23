@@ -17,7 +17,6 @@ set(viscl_boost_version 1.47)
 set(BOOST_ROOT "" CACHE PATH "The root path to Boost")
 option(Boost_USE_STATIC_LIBS "Use a statically-linked Boost" OFF)
 find_package(Boost ${viscl_boost_version} REQUIRED COMPONENTS chrono system)
-find_package(vidtk QUIET)
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
@@ -37,20 +36,25 @@ if (BUILD_VXL_SUPPORT)
   include_directories(SYSTEM ${VXL_BRL_INCLUDE_DIR})
   include_directories(SYSTEM ${VXL_RPL_INCLUDE_DIR})
   include_directories(SYSTEM ${VXL_GEL_INCLUDE_DIR}/mrc)
+
+  # the vidtk and vistk dependencies are temporary and should be removed
+  # as soon as this code is finished migrating into the vidtk repository.
+  find_package(vidtk QUIET)
+  if (vidtk_FOUND)
+    include_directories(SYSTEM ${VIDTK_INCLUDE_DIRS})
+  endif (vidtk_FOUND)
+
+  find_package(vistk QUIET)
+  if (vistk_FOUND)
+    include(${vistk_DIR}/vistk-macros.cmake)
+    include_directories(SYSTEM ${VISTK_INCLUDE_DIR})
+    link_directories(${VISTK_LIBRARY_DIR})
+  endif (vistk_FOUND)
+
 endif ()
 
 
-find_package(vistk QUIET)
-if (vistk_FOUND)
-  include(${vistk_DIR}/vistk-macros.cmake)
-  include_directories(SYSTEM ${VISTK_INCLUDE_DIR})
-  link_directories(${VISTK_LIBRARY_DIR})
-endif (vistk_FOUND)
-
-include_directories(SYSTEM ${VIDTK_INCLUDE_DIRS})
-
 include_directories(SYSTEM ${OPENCL_INCLUDE_DIR})
-
 include_directories(libraries)
 
 add_subdirectory(libraries)

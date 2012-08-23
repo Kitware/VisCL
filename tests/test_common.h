@@ -7,6 +7,8 @@
 #ifndef VISCL_TEST_TEST_COMMON_H
 #define VISCL_TEST_TEST_COMMON_H
 
+#include <iostream>
+
 #define TEST_ERROR(msg)                         \
   do                                            \
   {                                             \

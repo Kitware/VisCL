@@ -5,8 +5,6 @@
  */
 
 
-#include <vcl_iostream.h>
-
 #include <test_common.h>
 
 #include <viscl/core/manager.h>
