@@ -11,7 +11,6 @@
 
 #include <cstdlib>
 #include <exception>
-#include <iostream>
 
 
 static void run_test(std::string const& test_name);
