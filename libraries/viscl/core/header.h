@@ -10,9 +10,18 @@
 #define __CL_ENABLE_EXCEPTIONS
 
 #if defined(__APPLE__) || defined(__MACOSX)
-#include <OpenCL/cl.hpp>
+  #include <OpenCL/cl.hpp>
 #else
-#include <CL/cl.hpp>
+  // Visual C++ doesn't support the "throws" syntax but can still work with
+  // the rest of the exception handling.
+  #ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable:4290)
+  #endif
+  #include <CL/cl.hpp>
+  #ifndef _MSC_VER
+    #pragma warning(pop)
+  #endif
 #endif
 
 #include <boost/shared_ptr.hpp>
