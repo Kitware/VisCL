@@ -16,8 +16,17 @@ set(CXX_SRC_FILES
 
 viscl_encode_opencl_sources(cl_strings.cxx ${OCL_SRC_FILES})
 
+source_group("Kernel Files"
+  REGULAR_EXPRESSION ".*\\.cl$")
 
-add_library(viscl_tasks ${CXX_SRC_FILES} cl_strings.cxx)
+function (viscl_kernel_group)
+  source_group("Kernels"
+    FILES ${ARGN})
+endfunction ()
+
+viscl_kernel_group(${OCL_SRC_FILES})
+
+add_library(viscl_tasks ${CXX_SRC_FILES} ${OCL_SRC_FILES} cl_strings.cxx)
 target_link_libraries(viscl_tasks viscl_core)
 
 install( TARGETS viscl_tasks EXPORT viscl_exports

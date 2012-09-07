@@ -20,11 +20,6 @@ public:
   gaussian_smooth();
   image smooth(const image &img, float sigma, int kernel_radius) const;
 
-protected:
-
-  void init();
-  void init(const cl_program_t &prog);
-
 private:
 
   cl_kernel_t conv_x, conv_y;
