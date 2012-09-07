@@ -10,6 +10,12 @@ set(viscl_export_file
 file(REMOVE ${viscl_export_file})
 
 find_package(OpenCL REQUIRED)
+if(NOT OPENCL_HAS_CXX)
+  message(WARNING "C++ bindings not found.  Using Kronos supplied reference OpenCL v1.1 C++ bindings.")
+  list(APPEND OPENCL_INCLUDE_DIRS ${viscl_SOURCE_DIR}/kronos)
+endif()
+include_directories(SYSTEM ${OPENCL_INCLUDE_DIRS})
+add_definitions(${OPENCL_CXX_DEFINITIONS})
 
 include(viscl-macros)
 
@@ -53,8 +59,6 @@ if (BUILD_VXL_SUPPORT)
 
 endif ()
 
-
-include_directories(SYSTEM ${OPENCL_INCLUDE_DIR})
 include_directories(libraries)
 
 add_subdirectory(libraries)
