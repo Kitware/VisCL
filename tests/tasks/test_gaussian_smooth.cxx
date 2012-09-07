@@ -13,7 +13,6 @@
 #include <test_common.h>
 
 #include <viscl/core/manager.h>
-#include <viscl/core/task_registry.h>
 
 #include <viscl/tasks/gaussian_smooth.h>
 

@@ -9,7 +9,7 @@
 #include <boost/make_shared.hpp>
 #include <sstream>
 
-#include <viscl/core/task_registry.h>
+#include <viscl/core/program_registry.h>
 #include "gaussian_smooth.h"
 #include <viscl/core/manager.h>
 
@@ -25,19 +25,21 @@ namespace viscl
 //*****************************************************************************
 
 template<int radius>
-void brief<radius>::init()
+brief<radius>::brief()
 {
-  task::build_source(generate_meta_source(BRIEF_source));
-  brief_k = make_kernel("brief");
-}
+  //Create meta program name
+  std::stringstream s;
+  s << "brief " << radius;
 
-//*****************************************************************************
+  //Check if the meta program exists so we can avoid re-generating the src
+  std::pair<cl_program_t, bool> p = program_registry::inst()->get_program(s.str());
+  if (p.first)
+    program = p.first;
+  else
+    program = program_registry::inst()->register_program(s.str(), generate_meta_source(BRIEF_source).c_str());
 
-template<int radius>
-void brief<radius>::init(const cl_program_t &prog)
-{
-  program = prog;
   brief_k = make_kernel("brief");
+  queue = manager::inst()->create_queue();
 }
 
 //*****************************************************************************
@@ -67,16 +69,6 @@ std::string brief<radius>::generate_meta_source(const std::string &source)
   metasource << "};\n\n" << source;
 
   return metasource.str();
-}
-
-//*****************************************************************************
-
-template<int radius>
-task_t brief<radius>::clone()
-{
-  type clone_ = boost::make_shared<brief<radius> >(*this);
-  clone_->queue = manager::inst()->create_queue();
-  return clone_;
 }
 
 //*****************************************************************************

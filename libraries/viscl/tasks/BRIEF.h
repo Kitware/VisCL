@@ -19,21 +19,12 @@ class brief : public task
 {
 public:
 
+  brief();
   typedef boost::shared_ptr<brief<radius> > type;
-
-  task_t clone();
 
   void compute_descriptors(const image &img_s, const buffer &kpts, size_t numkpts, buffer &descriptors);
 
-protected:
-
-  void init();
-  void init(const cl_program_t &prog);
-
 private:
-
-  friend class task_registry;
-  brief() {}
 
   std::string generate_meta_source(const std::string &source);
 

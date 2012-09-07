@@ -6,7 +6,7 @@ set(SRC_FILES
     image_3d.h              image_3d.cxx
     manager.h               manager.cxx
     task.h                  task.cxx
-    task_registry.h         task_registry.cxx
+    program_registry.h      program_registry.cxx
 )
 
 add_library(viscl_core ${SRC_FILES})

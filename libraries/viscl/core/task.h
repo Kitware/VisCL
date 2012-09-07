@@ -21,18 +21,11 @@ class task
 {
 public:
 
-  virtual task_t clone() = 0;
   cl_queue_t get_queue() const { return queue; }
 
 protected:
 
-  friend class task_registry;
-
-  virtual void init() = 0;
-  virtual void init(const cl_program_t &prog) = 0;
-
   cl_kernel_t make_kernel(const std::string &kernel_name);
-  void build_source(const std::string &source);
 
   cl_program_t program;
   cl_queue_t queue;

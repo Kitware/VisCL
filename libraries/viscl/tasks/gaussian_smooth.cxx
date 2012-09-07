@@ -7,7 +7,7 @@
 #include "gaussian_smooth.h"
 
 #include <boost/make_shared.hpp>
-
+#include <viscl/core/program_registry.h>
 #include <viscl/core/manager.h>
 
 #include <math.h>
@@ -20,31 +20,14 @@ namespace viscl
 
 //*****************************************************************************
 
-void gaussian_smooth::init()
+gaussian_smooth::gaussian_smooth()
 {
-  task::build_source(gaussian_smooth_source);
+  program = program_registry::inst()->register_program(std::string("gaussian_smooth"),
+                                                       gaussian_smooth_source);
   conv_x = make_kernel("convolveHoriz1D");
   conv_y = make_kernel("convolveVert1D");
+  queue = manager::inst()->create_queue();
 }
-
-//*****************************************************************************
-
-void gaussian_smooth::init(const cl_program_t &prog)
-{
-  program = prog;
-  conv_x = make_kernel("convolveHoriz1D");
-  conv_y = make_kernel("convolveVert1D");
-}
-
-//*****************************************************************************
-
-task_t gaussian_smooth::clone()
-{
-  gaussian_smooth_t clone_ = boost::make_shared<gaussian_smooth>(*this);
-  clone_->queue = manager::inst()->create_queue();
-  return clone_;
-}
-
 
 //*****************************************************************************
 
