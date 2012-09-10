@@ -31,7 +31,9 @@ bool program_registry::is_registered(const std::string &program_name)
 std::pair<cl_program_t, bool> program_registry::get_program(const std::string &program_name)
 {
   std::map<std::string, cl_program_t>::iterator p = prgms.find(program_name);
-  return std::make_pair(p->second, p != prgms.end());
+  if (p != prgms.end())
+    return std::make_pair(p->second, true);
+  return std::make_pair(boost::shared_ptr<cl::Program>(), false);
 }
 
 //*****************************************************************************

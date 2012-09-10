@@ -16,9 +16,6 @@ set(CXX_SRC_FILES
 
 viscl_encode_opencl_sources(cl_strings.cxx ${OCL_SRC_FILES})
 
-source_group("Kernel Files"
-  REGULAR_EXPRESSION ".*\\.cl$")
-
 function (viscl_kernel_group)
   source_group("Kernels"
     FILES ${ARGN})
@@ -26,6 +23,7 @@ endfunction ()
 
 viscl_kernel_group(${OCL_SRC_FILES})
 
+#OCL_SRC_FILES are needed in the add_library so that they show up in Visual Studio
 add_library(viscl_tasks ${CXX_SRC_FILES} ${OCL_SRC_FILES} cl_strings.cxx)
 target_link_libraries(viscl_tasks viscl_core)
 

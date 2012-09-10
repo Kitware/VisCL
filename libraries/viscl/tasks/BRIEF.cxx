@@ -33,7 +33,7 @@ brief<radius>::brief()
 
   //Check if the meta program exists so we can avoid re-generating the src
   std::pair<cl_program_t, bool> p = program_registry::inst()->get_program(s.str());
-  if (p.first)
+  if (p.second)
     program = p.first;
   else
     program = program_registry::inst()->register_program(s.str(), generate_meta_source(BRIEF_source).c_str());
