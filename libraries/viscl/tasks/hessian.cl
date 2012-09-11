@@ -84,8 +84,8 @@ float2 interpolate_peak(float *val, float8 nb)
 
   H.z = (nb.s5 - nb.s6 - nb.s7 + nb.s4) / 4.0f;
 
+  // compute offset = -inv(H) * G
   float det =  H.x * H.y - H.z * H.z;
-
   float2 offset = {G.y * H.z - G.x * H.y,
                    G.x * H.z - G.y * H.x};
   offset /= det;
@@ -140,6 +140,10 @@ __kernel void detect_extrema(__read_only  image2d_t  detimg,
 {
   int2 pixel = (int2)(get_global_id(0), get_global_id(1));
   float val = read_imagef(detimg, imageSampler, pixel).x;
+
+  // Note: some peak peak pixel values may fall below this threshold but
+  // their interpolated peak value may exceed it.  These are ignored for now
+  // to keep the algorithm efficient.
   if (val < thresh)
   {
     return;
