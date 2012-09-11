@@ -52,7 +52,6 @@ hessian::hessian()
   detect_extrema = make_kernel("detect_extrema");
   detect_extrema_subpix = make_kernel("detect_extrema_subpix");
   init_kpt_map = make_kernel("init_kpt_map");
-  kpts_buffer_size_ = 0;
   queue = manager::inst()->create_queue();
 }
 
@@ -92,17 +91,21 @@ void hessian::find_peaks(const image &resp_img, image &kptmap,
   const size_t ni = resp_img.width(), nj = resp_img.height();
   // a hard upper bound on the number of keypoints that can be detected
   const unsigned max_kpts = ni * nj / 4;
-  if (kpts_buffer_size_ < 1)
+
+  // Allocate buffers with an initial guess of size if unallocated
+  // If buffers have different size, use the smallest
+  unsigned max_detections = std::min(kpts.len(), kvals.len());
+  if( max_detections == 0 )
   {
-    // an initial guess for the total number of keypoints
-    kpts_buffer_size_ = max_kpts / 100;
+    // a default guess for the total number of keypoints
+    max_detections = max_kpts / 100;
+    kpts = manager::inst()->create_buffer<cl_float2>(CL_MEM_READ_WRITE, max_detections);
+    kvals = manager::inst()->create_buffer<cl_float>(CL_MEM_READ_WRITE, max_detections);
   }
 
   cl::ImageFormat kptimg_fmt(CL_R, CL_SIGNED_INT32);
   kptmap = manager::inst()->create_image(kptimg_fmt, CL_MEM_READ_WRITE, ni >> 1, nj >> 1);
   cl_kernel_t extrema = subpixel ? detect_extrema_subpix : detect_extrema;
-  kpts = manager::inst()->create_buffer<cl_float2>(CL_MEM_READ_WRITE, kpts_buffer_size_);
-  kvals = manager::inst()->create_buffer<cl_float>(CL_MEM_READ_WRITE, kpts_buffer_size_);
 
   int init[1];
   init[0] = 0;
@@ -116,7 +119,7 @@ void hessian::find_peaks(const image &resp_img, image &kptmap,
   extrema->setArg(1, *kptmap().get());
   extrema->setArg(2, *kpts().get());
   extrema->setArg(3, *kvals().get());
-  extrema->setArg(4, kpts_buffer_size_);
+  extrema->setArg(4, max_detections);
   extrema->setArg(5, *numkpts().get());
   extrema->setArg(6, thresh);
 
@@ -133,11 +136,17 @@ void hessian::find_peaks(const image &resp_img, image &kptmap,
   queue->enqueueBarrier();
   unsigned num_detected = this->num_kpts(numkpts);
   // if the keypoint buffer was too small, we need to allocate more memory and try again
-  if (num_detected >= kpts_buffer_size_)
+  if (num_detected >= max_detections)
   {
     queue->enqueueWriteBuffer(*numkpts().get(), CL_TRUE, 0, numkpts.mem_size(), init);
-    kpts = manager::inst()->create_buffer<cl_float2>(CL_MEM_READ_WRITE, num_detected);
-    kvals = manager::inst()->create_buffer<cl_float>(CL_MEM_READ_WRITE, num_detected);
+    if (num_detected > kpts.len())
+    {
+      kpts = manager::inst()->create_buffer<cl_float2>(CL_MEM_READ_WRITE, num_detected);
+    }
+    if (num_detected > kvals.len())
+    {
+      kvals = manager::inst()->create_buffer<cl_float>(CL_MEM_READ_WRITE, num_detected);
+    }
     extrema->setArg(2, *kpts().get());
     extrema->setArg(3, *kvals().get());
     extrema->setArg(4, num_detected);
@@ -146,8 +155,6 @@ void hessian::find_peaks(const image &resp_img, image &kptmap,
     queue->enqueueNDRangeKernel(*extrema.get(), offset, global, cl::NullRange);
     queue->finish();
   }
-  // allocate 1.5x as much memory for the next frame to provided a buffer.
-  kpts_buffer_size_ = std::min(3*num_detected/2, max_kpts);
 }
 
 //*****************************************************************************

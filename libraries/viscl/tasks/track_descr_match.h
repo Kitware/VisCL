@@ -104,7 +104,7 @@ private:
   buffer kpts1;
   buffer descriptors1;
   image kptmap1;
-  int numkpts1;
+  unsigned numkpts1;
 
   int max_kpts_;
   unsigned search_box_radius_;
@@ -112,6 +112,7 @@ private:
   float detect_thresh_;
   float smooth_sigma_;
   bool subpixel_;
+  unsigned kpts_buffer_size_;
 };
 
 typedef boost::shared_ptr<track_descr_match> track_descr_match_t;

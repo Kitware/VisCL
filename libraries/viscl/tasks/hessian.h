@@ -92,7 +92,6 @@ private:
   cl_kernel_t detect_extrema;
   cl_kernel_t detect_extrema_subpix;
   cl_kernel_t init_kpt_map;
-  mutable unsigned kpts_buffer_size_;
 };
 
 typedef boost::shared_ptr<hessian> hessian_t;

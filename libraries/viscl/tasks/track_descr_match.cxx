@@ -52,7 +52,8 @@ track_descr_match::track_descr_match()
    hamming_dist_threshold_(15),
    detect_thresh_(0.003f),
    smooth_sigma_(2.0f),
-   subpixel_(false)
+   subpixel_(false),
+   kpts_buffer_size_(0)
 {
   program = program_registry::inst()->register_program(std::string("track_descr_match"),
                                                        track_descr_match_source);
@@ -78,9 +79,15 @@ void track_descr_match::first_frame(const image &img)
 
   buffer numkpts_b, kvals;
 
+  const size_t ni = img.width(), nj = img.height();
+  // a hard upper bound on the number of keypoints that can be detected
+  const unsigned max_kpts = ni * nj / 4;
+
   hes->detect(smoothed, kptmap1, kpts1, kvals, numkpts_b,
               detect_thresh_, smooth_sigma_, subpixel_);
   numkpts1 = hes->num_kpts(numkpts_b);
+  // allocate 1.5x as much memory for the next frame to provided a buffer.
+  kpts_buffer_size_ = std::min(3*numkpts1/2, max_kpts);
   std::cout << numkpts1 << "\n";
   brf->compute_descriptors(smoothed, kpts1, numkpts1, descriptors1);
 }
@@ -91,12 +98,24 @@ buffer track_descr_match::track(const image &img)
 {
   image smoothed = gs->smooth(img, smooth_sigma_, 2);
 
+  const size_t ni = img.width(), nj = img.height();
+  // a hard upper bound on the number of keypoints that can be detected
+  const unsigned max_kpts = ni * nj / 4;
+
   buffer kpts2, kvals, numkpts2_b;
   image kptmap2;
+  kpts2 = manager::inst()->create_buffer<cl_float2>(CL_MEM_READ_WRITE, kpts_buffer_size_);
+  kvals = manager::inst()->create_buffer<cl_float>(CL_MEM_READ_WRITE, kpts_buffer_size_);
+
   hes->detect(smoothed, kptmap2, kpts2, kvals, numkpts2_b,
               detect_thresh_, smooth_sigma_, subpixel_);
-  int numkpts2 = hes->num_kpts(numkpts2_b);
+  unsigned numkpts2 = hes->num_kpts(numkpts2_b);
   std::cout << numkpts2 << "\n";
+  if (numkpts2 > kpts_buffer_size_)
+  {
+    // allocate 1.5x as much memory for the next frame to provided a buffer.
+    kpts_buffer_size_ = std::min(3*numkpts2/2, max_kpts);
+  }
 
   buffer descriptors2;
   brf->compute_descriptors(smoothed, kpts2, numkpts2, descriptors2);
