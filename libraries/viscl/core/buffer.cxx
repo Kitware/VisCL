@@ -20,6 +20,10 @@ buffer::buffer(const boost::shared_ptr<cl::Buffer> &buffer, size_t length) : buf
 
 size_t buffer::mem_size() const
 {
+  if ( !buf )
+  {
+    return 0;
+  }
   size_t mem;
   buf->getInfo<size_t>(CL_MEM_SIZE, &mem);
   return mem;
