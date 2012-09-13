@@ -10,6 +10,13 @@ set(SRC_FILES
     program_registry.h      program_registry.cxx
 )
 
+set(VISCL_DEFAULT_PLATFORM "0"
+  CACHE STRING "The default platform ID to use")
+
+set_source_files_properties(manager.cxx
+  PROPERTIES
+    COMPILE_DEFINITIONS "DEFAULT_PLATFORM=${VISCL_DEFAULT_PLATFORM}")
+
 add_library(viscl_core ${SRC_FILES})
 target_link_libraries(viscl_core ${OPENCL_LIBRARIES})
 

@@ -38,10 +38,22 @@ void manager::init_opencl()
     // Get available platforms
     cl::Platform::get(&platforms_);
 
+    /// \todo Add Windows support.
+    std::stringstream platform;
+    char* def_platform = getenv("VISCL_DEFAULT_PLATFORM");
+
+    if (def_platform)
+    {
+      platform << def_platform;
+    }
+
+    size_t platform_id = DEFAULT_PLATFORM;
+    platform >> platform_id;
+
     // Select the default platform and create a context using this platform and the GPU
     cl_context_properties cps[3] = {
         CL_CONTEXT_PLATFORM,
-        (cl_context_properties)(platforms_[0])(),
+        (cl_context_properties)(platforms_[platform_id])(),
         0
     };
 
