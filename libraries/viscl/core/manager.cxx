@@ -59,6 +59,16 @@ void manager::init_opencl()
       }
     }
 
+    if (platforms_.size() <= platform_id)
+    {
+      std::stringstream reason;
+
+      reason << "The platform ID requested (" << platform_id << ") is out of range: "
+                "There are " << platforms_.size() << " available platforms.";
+
+      throw std::runtime_error(reason.str());
+    }
+
     // Select the default platform and create a context using this platform and the GPU
     cl_context_properties cps[3] = {
         CL_CONTEXT_PLATFORM,
