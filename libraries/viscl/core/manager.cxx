@@ -6,8 +6,11 @@
 
 #include <viscl/core/manager.h>
 
+#include <boost/lexical_cast.hpp>
+
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 
 namespace viscl
 {
@@ -39,16 +42,22 @@ void manager::init_opencl()
     cl::Platform::get(&platforms_);
 
     /// \todo Add Windows support.
-    std::stringstream platform;
     char* def_platform = getenv("VISCL_DEFAULT_PLATFORM");
 
+    size_t platform_id = DEFAULT_PLATFORM;
     if (def_platform)
     {
-      platform << def_platform;
-    }
+      try
+      {
+        platform_id = boost::lexical_cast<size_t>(def_platform);
+      }
+      catch (boost::bad_lexical_cast const& e)
+      {
+        std::string const reason = std::string("Failed to parse the platform: ") + e.what();
 
-    size_t platform_id = DEFAULT_PLATFORM;
-    platform >> platform_id;
+        throw std::runtime_error(reason);
+      }
+    }
 
     // Select the default platform and create a context using this platform and the GPU
     cl_context_properties cps[3] = {
