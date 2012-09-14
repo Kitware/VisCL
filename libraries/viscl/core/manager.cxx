@@ -42,7 +42,7 @@ void manager::init_opencl()
     cl::Platform::get(&platforms_);
 
     /// \todo Add Windows support.
-    char* def_platform = getenv("VISCL_DEFAULT_PLATFORM");
+    char* def_platform = getenv("VISCL_OPENCL_PLATFORM");
 
     size_t platform_id = DEFAULT_PLATFORM;
     if (def_platform)
