@@ -7,14 +7,19 @@
 #include <viscl/core/manager.h>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/optional.hpp>
+#include <boost/scoped_array.hpp>
 
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <string>
 
 namespace viscl
 {
 
+typedef boost::optional<std::string> envvar_value_t;
+static envvar_value_t viscl_getenv(char const* name);
 
 manager *manager::inst_ = 0;
 
@@ -42,14 +47,14 @@ void manager::init_opencl()
     cl::Platform::get(&platforms_);
 
     /// \todo Add Windows support.
-    char* def_platform = getenv("VISCL_OPENCL_PLATFORM");
+    envvar_value_t def_platform = viscl_getenv("VISCL_OPENCL_PLATFORM");
 
     size_t platform_id = DEFAULT_PLATFORM;
     if (def_platform)
     {
       try
       {
-        platform_id = boost::lexical_cast<size_t>(def_platform);
+        platform_id = boost::lexical_cast<size_t>(*def_platform);
       }
       catch (boost::bad_lexical_cast const& e)
       {
@@ -330,6 +335,40 @@ const char *print_cl_errstring(cl_int err)
         case CL_INVALID_MIP_LEVEL:                return "Invalid mip-map level";
         default:                                  return "Unknown";
     }
+}
+
+envvar_value_t viscl_getenv(char const* name)
+{
+  envvar_value_t value;
+
+#if defined(_WIN32) || defined(_WIN64)
+  DWORD sz = GetEnvironmentVariable(name, NULL, 0);
+
+  if (sz)
+  {
+    typedef boost::scoped_array<char> raw_envvar_value_t;
+    raw_envvar_value_t const envvalue(new char[sz]);
+
+    sz = GetEnvironmentVariable(name, envvalue.get(), sz);
+
+    value = envvalue.get();
+  }
+
+  if (!sz)
+  {
+    // Failed to read the environment variable.
+    return envvar_value_t();
+  }
+#else
+  char const* const envvalue = getenv(name);
+
+  if (envvalue)
+  {
+    value = envvalue;
+  }
+#endif
+
+  return value;
 }
 
 }
