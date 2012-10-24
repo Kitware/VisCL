@@ -33,7 +33,8 @@ int main(int argc, char *argv[])
   try
   {
     viscl::track_descr_match_t tracker = NEW_VISCL_TASK(viscl::track_descr_match);
-    tracker->set_search_box_radius(50);
+    tracker->set_search_box_radius(200);
+    tracker->set_max_kpts(20000);
 
     std::vector<cl_int2> kpts1, kpts2, kpts3;
     std::cout << "start" <<std::endl;

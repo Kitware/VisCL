@@ -70,34 +70,7 @@ run_test(std::string const& test_name)
   }
 }
 
-
-/// Make a simple checkerboard pattern image for use in tests.
-/// Fills a pre-allocated buffer \a buffer of size \a width by \a height.
-/// Each block of the checkerboard is \a blocksize by \a blocksize.
-void make_checkerboard_image(const unsigned width,
-                             const unsigned height,
-                             unsigned char* const buffer,
-                             const unsigned blocksize = 8)
-{
-  for (unsigned j=0; j<height; ++j)
-  {
-    for (unsigned i=0; i<width; ++i)
-    {
-      // index into the image buffer
-      const unsigned index = j * width + i;
-      // block cell coordinates
-      const unsigned bi = i / blocksize;
-      const unsigned bj = j / blocksize;
-      // checkerboard boolean value (true for white, false for black)
-      const bool val = (bi % 2 + bj % 2) % 2;
-      // scale bool to byte image range
-      buffer[index] = static_cast<unsigned char>(val * 255);
-    }
-  }
-}
-
-
-/// Clampe a value \a input between \a min_val and \a max_val.
+/// Clamp a value \a input between \a min_val and \a max_val.
 template <typename T>
 T clamp(const T& input, const T& min_val, const T& max_val)
 {
@@ -272,19 +245,8 @@ test_smooth_vxl()
   viscl::image simg = smoother->smooth(img, sigma, kr);
 
   // create a result image and download the result to it
-  vil_image_view<vxl_byte> result_img(width, height);
-  viscl::cl_queue_t queue = viscl::manager::inst()->create_queue();
-  cl::size_t<3> origin;
-  origin.push_back(0);
-  origin.push_back(0);
-  origin.push_back(0);
-
-  cl::size_t<3> region;
-  region.push_back(width);
-  region.push_back(height);
-  region.push_back(1);
-  queue->enqueueReadImage(*simg().get(), CL_TRUE, origin, region,
-                          0, 0, result_img.top_left_ptr());
+  vil_image_view<vxl_byte> result_img;
+  viscl::download_image(simg, result_img, smoother->get_queue());
 
   unsigned long diff_count = 0;
   for( unsigned j=0; j<height; ++j )
@@ -310,6 +272,3 @@ test_smooth_vxl()
   TEST_ERROR("VXL support is not compiled in, this test is invalid");
 #endif
 }
-
-
-

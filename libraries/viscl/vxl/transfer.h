@@ -19,6 +19,9 @@ namespace viscl
 template<class T>
 image upload_image(const vil_image_view<T> &img);
 
+template<class T>
+void download_image(const image &img_cl, vil_image_view<T> &img, const cl_queue_t &queue = cl_queue_t());
+
 
 } // end namespace viscl
 

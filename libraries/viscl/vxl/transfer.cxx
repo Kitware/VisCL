@@ -14,7 +14,6 @@
 
 //*****************************************************************************
 
-
 //Does NOT support multiplane images or non-continuous memory
 template<class T>
 viscl::image viscl::upload_image(const vil_image_view<T> &img)
@@ -49,8 +48,42 @@ viscl::image viscl::upload_image(const vil_image_view<T> &img)
             (T *)img.top_left_ptr())));
 }
 
+//*****************************************************************************
+
+template<class T>
+void viscl::download_image(const viscl::image &img_cl, vil_image_view<T> &img, const viscl::cl_queue_t &queue)
+{
+  size_t width = img_cl.width();
+  size_t height = img_cl.height();
+  img.set_size(width, height, 1);
+
+  cl::size_t<3> origin;
+  origin.push_back(0);
+  origin.push_back(0);
+  origin.push_back(0);
+
+  cl::size_t<3> region;
+  region.push_back(width);
+  region.push_back(height);
+  region.push_back(1);
+
+  if (queue)
+    queue->enqueueReadImage(*img_cl().get(), CL_TRUE, origin, region,
+                          0, 0, img.top_left_ptr());
+  else
+  {
+    viscl::cl_queue_t q = viscl::manager::inst()->create_queue();
+    q->enqueueReadImage(*img_cl().get(), CL_TRUE, origin, region,
+                            0, 0, img.top_left_ptr());
+  }
+}
 
 //*****************************************************************************
 
 template viscl::image viscl::upload_image<float>(const vil_image_view<float> &);
 template viscl::image viscl::upload_image<vxl_byte>(const vil_image_view<vxl_byte> &);
+
+template void viscl::download_image(const viscl::image &img_cl, vil_image_view<float> &img, const viscl::cl_queue_t &queue);
+template void viscl::download_image(const viscl::image &img_cl, vil_image_view<vxl_byte> &img, const viscl::cl_queue_t &queue);
+
+//*****************************************************************************

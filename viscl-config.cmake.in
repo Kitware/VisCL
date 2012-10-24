@@ -7,7 +7,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/viscl-macros.cmake)
 SET(viscl_BUILD_SETTINGS_FILE "@viscl_BUILD_SETTINGS_FILE@")
 
 # The viscl include directories.
-SET(viscl_INCLUDE_DIR "@viscl_INCLUDE_DIR_CONFIG@")
+SET(viscl_INCLUDE_DIR "@viscl_INCLUDE_DIR_CONFIG@" "@OPENCL_INCLUDE_DIR@")
 
 # The viscl library directory.
 SET(viscl_LIBRARY_DIR "@viscl_BINARY_DIR@")

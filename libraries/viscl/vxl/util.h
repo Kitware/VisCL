@@ -18,6 +18,7 @@ void save_cl_image(const cl_queue_t &queue, const image &img, const char *filena
 template<>
 void save_cl_image<unsigned char>(const cl_queue_t &queue, const image &img, const char *filename);
 
+
 } // end namespace viscl
 
 #endif // VISCL_VXL_UTIL_H_

@@ -2,6 +2,7 @@
 set(SRC_FILES
     buffer.h                buffer.cxx
     header.h
+    homography.h
     image.h                 image.cxx
     image_3d.h              image_3d.cxx
     manager.h               manager.cxx
