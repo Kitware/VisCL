@@ -100,7 +100,7 @@ std::string brief<radius>::generate_meta_source(const std::string &source)
 template<int radius>
 void brief<radius>::compute_descriptors(const image &img_s, const buffer &kpts, size_t numkpts, buffer &descriptors)
 {
-  descriptors = manager::inst()->create_buffer<cl_int4>(CL_MEM_READ_WRITE, numkpts);
+  descriptors = manager::inst()->create_buffer<cl_uint4>(CL_MEM_READ_WRITE, numkpts);
   brief_k->setArg(0, *img_s().get());
   brief_k->setArg(1, *kpts().get());
   brief_k->setArg(2, *descriptors().get());
