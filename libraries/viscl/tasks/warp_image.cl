@@ -35,6 +35,8 @@ __kernel void warp_image(__read_only image2d_t src, __write_only image2d_t dest,
   src_pixel.x = dot(dest_to_src->row0, dest_pixel_h);
   src_pixel.y = dot(dest_to_src->row1, dest_pixel_h);
   src_pixel /= dot(dest_to_src->row2, dest_pixel_h);
-
+  //printf("%v2f\n", src_pixel);
   write_imagef(dest, dest_pixel, read_imagef(src, imageSampler, src_pixel));
 }
+
+/*****************************************************************************/

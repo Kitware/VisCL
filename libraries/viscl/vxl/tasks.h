@@ -234,6 +234,8 @@ bool warp_image_vxl(const vil_image_view<pixType> &src, image &dest_cl, const si
   image src_cl = upload_image(src);
   dest_cl = manager::inst()->create_image(src_cl.format(), CL_MEM_READ_WRITE, dni, dnj);
   viscl::homography H_cl = vgl_h_matrix_2d_to_viscl_homography(H);
+
+  vcl_cout << start_i << " " << start_j << " " << end_i << " " << end_j << "\n";
   warper->warp(src_cl, dest_cl, H_cl, start_i, start_j, end_i, end_j);
 
   return true;

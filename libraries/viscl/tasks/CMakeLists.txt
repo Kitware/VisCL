@@ -5,6 +5,7 @@ set(OCL_SRC_FILES
     track_descr_match.cl
     BRIEF.cl
     warp_image.cl
+    quad_tree.cl
 )
 
 set(CXX_SRC_FILES
@@ -14,6 +15,7 @@ set(CXX_SRC_FILES
     hessian.h                  hessian.cxx
     track_descr_match.h        track_descr_match.cxx
     warp_image.h               warp_image.cxx
+    quad_tree.h                quad_tree.cxx
 )
 
 viscl_encode_opencl_sources(cl_strings.cxx ${OCL_SRC_FILES})
