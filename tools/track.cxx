@@ -12,7 +12,6 @@
 #include <vil/vil_convert.h>
 
 #include <viscl/core/manager.h>
-#include <viscl/core/task_registry.h>
 #include <viscl/tasks/hessian.h>
 #include <viscl/tasks/BRIEF.h>
 #include <viscl/tasks/track_descr_match.h>

@@ -7,7 +7,7 @@
 #include "track_descr_match.h"
 #include <viscl/core/manager.h>
 
-#include <viscl/core/task_registry.h>
+#include <viscl/core/program_registry.h>
 
 #include <fstream>
 #include <boost/make_shared.hpp>
@@ -29,51 +29,17 @@ track_descr_match::track_descr_match()
    detect_thresh_(0.003f),
    smooth_sigma_(2.0f)
 {
-}
-
-//*****************************************************************************
-
-void track_descr_match::init()
-{
-  task::build_source(track_descr_match_source);
+  program = program_registry::inst()->register_program(std::string("track_descr_match"),
+                                                       track_descr_match_source);
   track_k = make_kernel("track");
-}
-
-//*****************************************************************************
-
-void track_descr_match::init(const cl_program_t &prog)
-{
-  program = prog;
-  track_k = make_kernel("track");
+  queue = manager::inst()->create_queue();
 }
 
 //*****************************************************************************
 
 track_descr_match::~track_descr_match()
 {
-}
 
-//*****************************************************************************
-
-task_t track_descr_match::clone()
-{
-  track_descr_match_t clone_ = boost::make_shared<track_descr_match>(*this);
-  clone_->queue = manager::inst()->create_queue();
-  return clone_;
-}
-
-//*****************************************************************************
-
-//Copy constructor for cloning, does not clone tracks
-track_descr_match::track_descr_match(const track_descr_match &t)
-{
-  this->program = t.program;
-  this->track_k = t.track_k;
-  this->max_kpts_ = t.max_kpts_;
-  this->search_box_radius_ = t.search_box_radius_;
-  this->hamming_dist_threshold_ = t.hamming_dist_threshold_;
-  this->detect_thresh_ = t.detect_thresh_;
-  this->smooth_sigma_ = t.smooth_sigma_;
 }
 
 //*****************************************************************************
@@ -153,5 +119,7 @@ void write_tracks_to_file(const std::string& filename,
   }
   outfile.close();
 }
+
+//*****************************************************************************
 
 }

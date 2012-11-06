@@ -18,9 +18,4 @@ boost::shared_ptr<cl::Kernel> task::make_kernel(const std::string &kernel_name)
   return boost::make_shared<cl::Kernel>(cl::Kernel(*program.get(), kernel_name.c_str()));
 }
 
-void task::build_source(const std::string &source)
-{
-  program = manager::inst()->build_source(source.c_str());
-}
-
 }

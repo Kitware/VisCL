@@ -8,11 +8,10 @@
 
 #include <boost/make_shared.hpp>
 
-#include <viscl/core/task_registry.h>
+#include <viscl/core/program_registry.h>
 #include <viscl/core/manager.h>
 
 #include "gaussian_smooth.h"
-
 
 extern const char* hessian_source;
 
@@ -21,31 +20,13 @@ namespace viscl
 
 //*****************************************************************************
 
-void hessian::init()
+hessian::hessian()
 {
-  task::build_source(hessian_source);
+  program = program_registry::inst()->register_program(std::string("hessian"), hessian_source);
   det_hessian = make_kernel("det_hessian");
   detect_extrema = make_kernel("detect_extrema");
   init_kpt_map = make_kernel("init_kpt_map");
-}
-
-//*****************************************************************************
-
-void hessian::init(const cl_program_t &prog)
-{
-  program = prog;
-  det_hessian = make_kernel("det_hessian");
-  detect_extrema = make_kernel("detect_extrema");
-  init_kpt_map = make_kernel("init_kpt_map");
-}
-
-//*****************************************************************************
-
-task_t hessian::clone()
-{
-  hessian_t clone_ = boost::make_shared<hessian>(*this);
-  clone_->queue = manager::inst()->create_queue();
-  return clone_;
+  queue = manager::inst()->create_queue();
 }
 
 //*****************************************************************************

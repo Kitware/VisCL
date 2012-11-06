@@ -15,7 +15,6 @@
 
 #include <viscl/core/image.h>
 #include <viscl/core/manager.h>
-#include <viscl/core/task_registry.h>
 #include <viscl/tasks/hessian.h>
 #include <viscl/tasks/BRIEF.h>
 #include <viscl/tasks/gaussian_smooth.h>

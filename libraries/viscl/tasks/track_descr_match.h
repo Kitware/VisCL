@@ -22,11 +22,8 @@ class track_descr_match : public task
 {
 public:
 
+  track_descr_match();
   ~track_descr_match();
-
-  //Copy constructor for cloning
-  track_descr_match(const track_descr_match &t);
-  task_t clone();
 
   void first_frame(const image &img);
 
@@ -52,7 +49,6 @@ public:
   /// Set the Guassian smoothing sigma
   void set_smooth_sigma(float ss) { smooth_sigma_ = ss; }
 
-
   /// Get the maximum number of keypoints to track
   int max_kpts() const { return max_kpts_; }
 
@@ -68,16 +64,7 @@ public:
   /// Get the Guassian smoothing sigma
   float smooth_sigma() const { return smooth_sigma_; }
 
-protected:
-
-  void init();
-  void init(const cl_program_t &prog);
-
 private:
-
-  //This makes it so only the task registry can compile the .cl code
-  friend class task_registry;
-  track_descr_match();
 
   hessian_t hes;
   brief<10>::type brf;

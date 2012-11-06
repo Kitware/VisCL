@@ -13,7 +13,6 @@
 #include <vil/algo/vil_gauss_filter.h>
 
 #include <viscl/core/manager.h>
-#include <viscl/core/task_registry.h>
 #include <viscl/tasks/gaussian_smooth.h>
 #include <viscl/vxl/transfer.h>
 

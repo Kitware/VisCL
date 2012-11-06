@@ -19,8 +19,7 @@ class hessian : public task
 {
 public:
 
-  task_t clone();
-
+  hessian();
   void smooth_and_detect(const image &img, image &kptmap, buffer &kpts, buffer &numkpts,
                          int max_kpts, float thresh, float sigma) const;
   void detect(const image &img, image &kptmap, buffer &kpts, buffer &numkpts,
@@ -28,16 +27,9 @@ public:
 
   int num_kpts(const buffer &numkpts_b);
 
-protected:
-
-  void init();
-  void init(const cl_program_t &prog);
-
 private:
 
-  //This makes it so only the task registry can compile the .cl code
-  friend class task_registry;
-  hessian() {};
+
 
   cl_kernel_t det_hessian, detect_extrema, init_kpt_map;
 };

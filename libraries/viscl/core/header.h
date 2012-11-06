@@ -25,6 +25,7 @@
 #endif
 
 #include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 namespace viscl
 {
@@ -37,5 +38,7 @@ typedef boost::shared_ptr<cl::Image2D> cl_image_t;
 typedef boost::shared_ptr<cl::Image3D> cl_image_3d_t;
 
 }
+
+#define NEW_VISCL_TASK(T) boost::make_shared<T>();
 
 #endif
