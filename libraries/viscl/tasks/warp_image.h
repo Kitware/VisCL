@@ -9,7 +9,7 @@
 
 #include <viscl/core/task.h>
 #include <viscl/core/image.h>
-#include <viscl/core/homography.h>
+#include <viscl/core/matrix.h>
 
 namespace viscl
 {
@@ -20,8 +20,14 @@ public:
 
   warp_image();
 
-  void warp(const image &src, const image &dest, const homography &H) const;
-  void warp(const image &src, const image &dest, const homography &H, unsigned int left,
+  ///Warps an image \src using the inverse of the homography \H and stores result in \dest
+  ///This function requires dest image to be preallocated.
+  void warp(const image &src, const image &dest, const matrix3x3 &H) const;
+
+  ///Warps an image \src using the inverse of the homography \H and stores result in \dest
+  ///\left, \top, \right, and \bot are bounds on the warping in \dest image coordinates
+  ///This function requires dest image to be preallocated.
+  void warp(const image &src, const image &dest, const matrix3x3 &H, unsigned int left,
             unsigned int top, unsigned int right, unsigned int bot) const;
 
 private:

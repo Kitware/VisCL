@@ -25,11 +25,14 @@
 #include <vil/vil_save.h>
 #include <vil/vil_bilin_interp.h>
 #include <vil/vil_nearest_interp.h>
+#endif
 
 float frac(float x)
 {
   return x - floor(x);
 }
+
+#ifdef HAS_VXL
 
 //OpenCL spec linear interpolator
 vxl_byte linear_interp(const vil_image_view<vxl_byte> &src, float u, float v)

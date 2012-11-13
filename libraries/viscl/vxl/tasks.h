@@ -22,9 +22,9 @@
 #include <viscl/tasks/gaussian_smooth.h>
 #include <viscl/tasks/track_descr_match.h>
 #include <viscl/tasks/warp_image.h>
-#include <viscl/core/homography.h>
+#include <viscl/core/matrix.h>
 
-#include "conversion.h"
+#include <viscl/vxl/conversion.h>
 
 namespace viscl
 {
@@ -233,7 +233,7 @@ bool warp_image_vxl(const vil_image_view<pixType> &src, image &dest_cl, const si
 
   image src_cl = upload_image(src);
   dest_cl = manager::inst()->create_image(src_cl.format(), CL_MEM_READ_WRITE, dni, dnj);
-  viscl::homography H_cl = vgl_h_matrix_2d_to_viscl_homography(H);
+  viscl::matrix3x3 H_cl = vnl_matrix_fixed_3x3_to_viscl_homography(H.get_matrix());
 
   warper->warp(src_cl, dest_cl, H_cl, start_i, start_j, end_i, end_j);
 

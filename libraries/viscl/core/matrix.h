@@ -4,15 +4,15 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-#ifndef CL_HOMOGRAPHY_H_
-#define CL_HOMOGRAPHY_H_
+#ifndef CL_MATRIX_H_
+#define CL_MATRIX_H_
 
 #include <viscl/core/header.h>
 
 namespace viscl
 {
 
-class homography
+class matrix3x3
 {
 public:
   cl_float3 row0;

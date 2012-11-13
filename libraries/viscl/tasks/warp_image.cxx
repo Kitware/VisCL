@@ -27,7 +27,7 @@ warp_image::warp_image()
 
 //*****************************************************************************
 
-void warp_image::warp(const image &src, const image &dest, const homography &H) const
+void warp_image::warp(const image &src, const image &dest, const matrix3x3 &H) const
 {
   warp(src, dest, H, 0, 0, static_cast<unsigned int>(dest.width()), static_cast<unsigned int>(dest.height()));
 }
@@ -37,10 +37,10 @@ void warp_image::warp(const image &src, const image &dest, const homography &H) 
 /// Warp cl image src into cl image dest using the dest-to-src 3x3 homography H
 /// left, top, right, bot are guards on the dest image for where the src image will warp
 /// This function requires dest image to be preallocated.
-void warp_image::warp(const image &src, const image &dest, const homography &H, unsigned int left,
+void warp_image::warp(const image &src, const image &dest, const matrix3x3 &H, unsigned int left,
                       unsigned int top, unsigned int right, unsigned int bot) const
 {
-  buffer homog = manager::inst()->create_buffer<homography>(CL_MEM_READ_ONLY, 1);
+  buffer homog = manager::inst()->create_buffer<matrix3x3>(CL_MEM_READ_ONLY, 1);
   queue->enqueueWriteBuffer(*homog().get(), CL_TRUE, 0, homog.mem_size(), &H);
 
   init_dest_k->setArg(0, *dest().get());
