@@ -234,6 +234,8 @@ void manager::report_device_specs(const cl::Device& dev,
               << dev.getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>() << "\n";
     std::cout << prefix << "Global Memory       : "
               << dev.getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>()/1048576 << " Mb\n";
+    std::cout << prefix << "Local Memory        : "
+              << dev.getInfo<CL_DEVICE_LOCAL_MEM_SIZE>()/1048576 << " Mb\n";
     std::cout << prefix << "Max Memory Alloc    : "
               << dev.getInfo<CL_DEVICE_MAX_MEM_ALLOC_SIZE>()/1048576 << " Mb\n";
     std::cout << prefix << "Max Image 2D Dims   : "
