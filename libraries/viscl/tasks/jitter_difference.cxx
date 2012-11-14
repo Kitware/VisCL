@@ -19,7 +19,7 @@ namespace viscl
 
 //*****************************************************************************
 
-jitter_difference::jitter_difference(int jitter_delta_) : local_x(16), local_y(16), jitter_delta(jitter_delta_)
+jitter_difference::jitter_difference(int jitter_delta_) : local_x(10), local_y(10), jitter_delta(jitter_delta_)
 {
   //Create meta program name
   std::stringstream s;
@@ -51,7 +51,6 @@ std::string jitter_difference::generate_meta_source(const std::string &source)
 
 //*****************************************************************************
 
-//diff is assumed to be pre-allocated
 //All images should be of the same size
 void jitter_difference::diff(const image &A, const image &B, const image &C, const image &diff) const
 {
@@ -59,6 +58,7 @@ void jitter_difference::diff(const image &A, const image &B, const image &C, con
   jitter_diff_k->setArg(1, *B().get());
   jitter_diff_k->setArg(2, *C().get());
   jitter_diff_k->setArg(3, *diff().get());
+
   queue->enqueueNDRangeKernel(*jitter_diff_k.get(), cl::NullRange,
                               cl::NDRange(diff.width(), diff.height()), cl::NDRange(local_x, local_y));
   queue->finish();

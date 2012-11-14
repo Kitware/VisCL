@@ -4,15 +4,15 @@
  * Kitware, Inc., 28 Corporate Drive, Clifton Park, NY 12065.
  */
 
-/* Meta Definitions*/
-
+/* Meta Definitions
 #define JITTER_DELTA 1
 #define JITTER_DELTA_X2 2
 #define LOCAL_X 16
 #define LOCAL_Y 16
-
+*/
 __constant sampler_t image_sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_NEAREST;
 
+//fetches memory from two images to a local buffer
 void fill_local_mem(__read_only image2d_t img1,
                     __read_only image2d_t img2,
                     __local float2 buf[JITTER_DELTA_X2 + LOCAL_Y][JITTER_DELTA_X2 + LOCAL_X],
@@ -42,22 +42,27 @@ void fill_local_mem(__read_only image2d_t img1,
   }
 }
 
+//computes the min and max value over a window of size JITTER_DELTA * 2 + 1
 void compute_min_max(__local float2 buf[JITTER_DELTA_X2 + LOCAL_Y][JITTER_DELTA_X2 + LOCAL_X],
-                     __local float4 minmax[JITTER_DELTA_X2 + LOCAL_Y][JITTER_DELTA_X2 + LOCAL_X],
+                     __local float4 minmax[LOCAL_Y][LOCAL_X],
                      int2 index)
 {
   float2 maxv = -INFINITY, minv = INFINITY;
-  for (int i = index.y - JITTER_DELTA; i <= index.y + JITTER_DELTA; i++)
+
+  //offset into jitter buffer
+  int2 window_index = index + (int2)(JITTER_DELTA, JITTER_DELTA);
+  for (int i = window_index.y - JITTER_DELTA; i <= window_index.y + JITTER_DELTA; i++)
   {
-    for (int j = index.x - JITTER_DELTA; j <= index.x + JITTER_DELTA; j++)
+    for (int j = window_index.x - JITTER_DELTA; j <= window_index.x + JITTER_DELTA; j++)
     {
+      //compute mins and maxes of the 2 images in parallel
       float2 val = buf[i][j];
       maxv = max(val, maxv);
       minv = min(val, minv);
     }
   }
 
-  minmax[index.y][index.y].xy = minv;
+  minmax[index.y][index.x].xy = minv;
   minmax[index.y][index.x].zw = maxv;
 }
 
@@ -66,6 +71,7 @@ void compute_min_max(__local float2 buf[JITTER_DELTA_X2 + LOCAL_Y][JITTER_DELTA_
 __kernel void jitter_difference(__read_only image2d_t A, __read_only image2d_t B, __read_only image2d_t C,
                                 __write_only image2d_t output)
 {
+
   int2 index_g = (int2)(get_global_id(0), get_global_id(1));
   int2 index_l = (int2)(get_local_id(0), get_local_id(1));
   __local float2 buf[JITTER_DELTA_X2 + LOCAL_Y][JITTER_DELTA_X2 + LOCAL_X];
@@ -74,7 +80,7 @@ __kernel void jitter_difference(__read_only image2d_t A, __read_only image2d_t B
 
   barrier(CLK_LOCAL_MEM_FENCE);
 
-  __local float4 minmax[JITTER_DELTA_X2 + LOCAL_Y][JITTER_DELTA_X2 + LOCAL_X];
+  __local float4 minmax[LOCAL_Y][LOCAL_X];
   compute_min_max(buf, minmax, index_l);
 
   barrier(CLK_LOCAL_MEM_FENCE);

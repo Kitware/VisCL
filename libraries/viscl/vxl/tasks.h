@@ -273,14 +273,14 @@ void compute_jitter_difference(const vil_image_view<pixtype> &A_vxl,
                                int jitter_delta)
 {
   image A = upload_image(A_vxl);
-  image B = upload_image(A_vxl);
-  image C = upload_image(A_vxl);
-
-  cl::ImageFormat img_fmt(CL_INTENSITY, CL_FLOAT);
-  image diff = viscl::manager::inst()->create_image(img_fmt, CL_MEM_WRITE_ONLY, A_vxl.ni(), A_vxl.nj());
+  image B = upload_image(B_vxl);
+  image C = upload_image(C_vxl);
+  image diff = viscl::manager::inst()->create_image(A.format(), CL_MEM_WRITE_ONLY, A_vxl.ni(), A_vxl.nj());
 
   jitter_difference jd(jitter_delta);
   jd.diff(A, B, C, diff);
+
+  download_image(diff, diff_vxl, jd.get_queue());
 }
 
 } // end namespace viscl

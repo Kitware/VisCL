@@ -55,7 +55,7 @@ viscl::image viscl::upload_image(const vil_image_view<T> &img)
       img_fmt = cl::ImageFormat(CL_INTENSITY, CL_FLOAT);
       break;
     case VIL_PIXEL_FORMAT_BYTE:
-      img_fmt = cl::ImageFormat(CL_INTENSITY, CL_UNORM_INT8);
+      img_fmt = cl::ImageFormat(CL_R, CL_UNSIGNED_INT8);
       break;
     default:
       std::cerr << "unsupported vil image format" << std::endl;;
