@@ -17,6 +17,8 @@
 
 #include <viscl/tasks/jitter_difference.h>
 
+#include <boost/chrono.hpp>
+
 #ifdef HAS_VXL
 #include <viscl/vxl/transfer.h>
 #include <viscl/vxl/tasks.h>
@@ -25,6 +27,9 @@
 #include <vil/vil_math.h>
 #endif
 
+#ifdef TIMING_TEST
+#include <boost/chrono.hpp>
+#endif
 
 #ifdef HAS_VXL
 
@@ -68,6 +73,45 @@ void jitter_diff_pair(const vil_image_view<vxl_byte> &img1,
       }
 
       diff(i,j) = mindiff;
+    }
+  }
+}
+
+void jitter_diff_pair_min_max(const vil_image_view<vxl_byte> &img1,
+                              const vil_image_view<vxl_byte> &img2,
+                              vil_image_view<vxl_byte> &diff,
+                              int jitter_delta)
+{
+  vil_image_view<vxl_byte> minv(img2.ni(), img2.nj());
+  vil_image_view<vxl_byte> maxv(img2.ni(), img2.nj());
+  minv.fill(255);
+  maxv.fill(0);
+
+  for (int i = 0; i < img2.ni(); i++)
+  {
+    for (int j = 0; j < img2.nj(); j++)
+    {
+      for (int offi = i - jitter_delta; offi <= i + jitter_delta; offi++)
+      {
+        for (int offj = j - jitter_delta; offj <= j + jitter_delta; offj++)
+        {
+          if (img2.in_range(offi, offj, 0))
+          {
+            vxl_byte val = img2(offi, offj);
+            if (maxv(i,j) < val)
+              maxv(i,j) = val;
+            if (minv(i,j) > val)
+              minv(i,j) = val;
+          }
+        }
+
+        if (img1(i,j) < minv(i,j))
+          diff(i,j) = minv(i,j) - img1(i,j);
+        else if (img1(i,j) < maxv(i,j))
+          diff(i,j) = 0;
+        else
+          diff(i,j) = img1(i,j) - maxv(i,j);
+      }
     }
   }
 }
@@ -173,38 +217,48 @@ test_jitter_diff_vxl()
   add_square(B, 100, 700, 100);
   add_square(C, 100, 700, 150);
 
-  vil_save(A, "A.png");
-  vil_save(B, "B.png");
-  vil_save(C, "C.png");
-
   vil_image_view<vxl_byte> diff_viscl;
   viscl::compute_jitter_difference(A, B, C, diff_viscl, jitter_delta);
-  vil_save(diff_viscl, "jdiff_viscl.png");
-
   vil_image_view<vxl_byte> diff_vxl;
   jitter_diff_vxl(A, B, C, diff_vxl, jitter_delta);
-  vil_save(diff_vxl, "jdiff_vxl.png");
+
+#ifdef TIMING_TEST
+  boost::chrono::system_clock::time_point start;
+  boost::chrono::duration<double> sec;
+  start = boost::chrono::system_clock::now();
+  const int iter = 100;
+  for (int i = 0; i < iter; i++)
+    viscl::compute_jitter_difference(A, B, C, diff_viscl, jitter_delta);
+
+  sec = boost::chrono::system_clock::now() - start;
+  std::cout << "viscl took on average " << sec.count() / iter << "\n";
+  start = boost::chrono::system_clock::now();
+
+  for (int i = 0; i < iter; i++)
+    jitter_diff_vxl(A, B, C, diff_vxl, jitter_delta);
+
+  sec = boost::chrono::system_clock::now() - start;
+  std::cout << "VXL took on avg"   << sec.count() / iter << "\n";
+#endif
 
   vil_image_view<vxl_byte> diff;
   vil_math_image_abs_difference(diff_viscl, diff_vxl, diff);
-
-
-   unsigned long diff_count = 0;
+  unsigned long diff_count = 0;
   for (unsigned i = 0; i < diff.ni(); i++)
   {
     for (unsigned int j = 0; j < diff.nj(); j++)
     {
       if (diff(i,j) != 0)
-        diff(i,j) = 255;;
+        diff_count++;
     }
   }
   if (diff_count > 0)
   {
     TEST_ERROR("GPU and CPU smoothing results differ in "
                << (100.0f*diff_count)/(diff.ni()*diff.nj()) << "% of pixels");
+    vil_save(diff_viscl, "jdiff_viscl.png");
+    vil_save(diff_vxl, "jdiff_vxl.png");
   }
-
-  vil_save(diff, "diff.png");
 
 #else
   TEST_ERROR("VXL support is not compiled in, this test is invalid");

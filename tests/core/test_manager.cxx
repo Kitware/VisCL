@@ -97,6 +97,3 @@ test_create_image()
   cl::ImageFormat img_frmt = cl::ImageFormat(CL_INTENSITY, CL_FLOAT);
   viscl::manager::inst()->create_image(img_frmt, CL_MEM_READ_ONLY, 100, 100);
 }
-
-
-

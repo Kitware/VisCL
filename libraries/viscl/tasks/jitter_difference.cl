@@ -86,7 +86,7 @@ __kernel void jitter_difference(__read_only image2d_t A, __read_only image2d_t B
   barrier(CLK_LOCAL_MEM_FENCE);
 
   float a = read_imagef(A, image_sampler, index_g).x;
-  float c = buf[index_l.y][index_l.x].y;
+  float c = buf[index_l.y+JITTER_DELTA][index_l.x+JITTER_DELTA].y;
   float2 bmm = minmax[index_l.y][index_l.x].xz;
   float2 cmm = minmax[index_l.y][index_l.x].yw;
 
@@ -99,5 +99,5 @@ __kernel void jitter_difference(__read_only image2d_t A, __read_only image2d_t B
   diff += comp_cb.x ? bmm.x - c : (comp_cb.y ? 0 : c - bmm.y);
   diff -= comp_ab.x ? bmm.x - a : (comp_ab.y ? 0 : a - bmm.y);
 
-  write_imagef(output, index_g, diff);
+  write_imagef(output, index_g, fabs(diff));
 }

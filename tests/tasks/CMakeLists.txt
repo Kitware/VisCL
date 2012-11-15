@@ -1,6 +1,6 @@
 
 set(libraries
-  viscl_tasks)
+  viscl_tasks  ${Boost_CHRONO_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 
 if (BUILD_VXL_SUPPORT)
   list(APPEND libraries viscl_vxl)
