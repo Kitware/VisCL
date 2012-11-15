@@ -36,6 +36,7 @@ void fill_local_mem(__read_only image2d_t img1,
                                                    read_imagef(img2, image_sampler, index_g+(int2)(-JITTER_DELTA, LOCAL_Y-JITTER_DELTA)).x);
   }
 
+  //load lower right
   if (all(comp)) {
     buf[index_l.y + LOCAL_Y][index_l.x + LOCAL_X] = (float2)(read_imagef(img1, image_sampler, index_g+(int2)(LOCAL_X-JITTER_DELTA, LOCAL_Y-JITTER_DELTA)).x,
                                                              read_imagef(img2, image_sampler, index_g+(int2)(LOCAL_X-JITTER_DELTA, LOCAL_Y-JITTER_DELTA)).x);

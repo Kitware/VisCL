@@ -33,7 +33,7 @@
 
 #ifdef HAS_VXL
 
-///Creates an image with a square at \x,\y with side 2*\s
+///adds a square to an image at \x,\y with side 2*\s
 void add_square(vil_image_view<vxl_byte> &img, int x, int y, int s)
 {
   for (int i = x - s; i <= x + s; i++)
@@ -47,6 +47,7 @@ void add_square(vil_image_view<vxl_byte> &img, int x, int y, int s)
   }
 }
 
+//Jitter diff find min difference
 void jitter_diff_pair(const vil_image_view<vxl_byte> &img1,
                       const vil_image_view<vxl_byte> &img2,
                       vil_image_view<vxl_byte> &diff,
@@ -77,6 +78,7 @@ void jitter_diff_pair(const vil_image_view<vxl_byte> &img1,
   }
 }
 
+//jitter diff using intermediate val theorem
 void jitter_diff_pair_min_max(const vil_image_view<vxl_byte> &img1,
                               const vil_image_view<vxl_byte> &img2,
                               vil_image_view<vxl_byte> &diff,
@@ -226,7 +228,7 @@ test_jitter_diff_vxl()
   boost::chrono::system_clock::time_point start;
   boost::chrono::duration<double> sec;
   start = boost::chrono::system_clock::now();
-  const int iter = 100;
+  const int iter = 50;
   for (int i = 0; i < iter; i++)
     viscl::compute_jitter_difference(A, B, C, diff_viscl, jitter_delta);
 

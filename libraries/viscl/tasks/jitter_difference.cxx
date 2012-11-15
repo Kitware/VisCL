@@ -19,7 +19,8 @@ namespace viscl
 
 //*****************************************************************************
 
-jitter_difference::jitter_difference(int jitter_delta_) : local_x(10), local_y(10), jitter_delta(jitter_delta_)
+jitter_difference::jitter_difference(int jitter_delta_, int local_x_, int local_y_)
+  : local_x(local_x_), local_y(local_y_), jitter_delta(jitter_delta_)
 {
   //Create meta program name
   std::stringstream s;
@@ -51,6 +52,7 @@ std::string jitter_difference::generate_meta_source(const std::string &source)
 
 //*****************************************************************************
 
+//A and B are two previous frames, C is the current frame
 //All images should be of the same size
 void jitter_difference::diff(const image &A, const image &B, const image &C, const image &diff) const
 {
