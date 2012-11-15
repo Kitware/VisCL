@@ -14,7 +14,7 @@ namespace viscl
 {
 
 template <class T>
-matrix3x3 vnl_matrix_fixed_3x3_to_viscl_homography(const vnl_matrix_fixed<T, 3, 3> &H)
+matrix3x3 vnl_to_viscl(const vnl_matrix_fixed<T, 3, 3> &H)
 {
   matrix3x3 H_cl;
   H_cl.row0.s[0] = static_cast<float>(H(0,0));
@@ -31,7 +31,7 @@ matrix3x3 vnl_matrix_fixed_3x3_to_viscl_homography(const vnl_matrix_fixed<T, 3, 
 }
 
 template <class T>
-vnl_matrix_fixed<T, 3, 3> viscl_homography_to_vnl_matrix_fixed_3x3(const matrix3x3 &H_cl)
+vnl_matrix_fixed<T, 3, 3> viscl_to_vnl(const matrix3x3 &H_cl)
 {
   vnl_matrix_fixed<T, 3, 3> H;
   H.set(0, 0, static_cast<T>(H_cl.row0.s[0]));

@@ -233,7 +233,7 @@ bool warp_image_vxl(const vil_image_view<pixType> &src, image &dest_cl, const si
 
   image src_cl = upload_image(src);
   dest_cl = manager::inst()->create_image(src_cl.format(), CL_MEM_READ_WRITE, dni, dnj);
-  viscl::matrix3x3 H_cl = vnl_matrix_fixed_3x3_to_viscl_homography(H.get_matrix());
+  viscl::matrix3x3 H_cl = vnl_to_viscl(H.get_matrix());
 
   warper->warp(src_cl, dest_cl, H_cl, start_i, start_j, end_i, end_j);
 
