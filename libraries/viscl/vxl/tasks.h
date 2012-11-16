@@ -9,9 +9,11 @@
 
 #include <viscl/vxl/transfer.h>
 #include <vil/vil_image_view.h>
-
+#include <vgl/algo/vgl_h_matrix_2d.h>
+#include <vnl/vnl_inverse.h>
+#include <vgl/vgl_box_2d.h>
+#include <vgl/vgl_intersection.h>
 #include <vcl_vector.h>
-
 
 #include <viscl/core/image.h>
 #include <viscl/core/manager.h>
@@ -19,7 +21,10 @@
 #include <viscl/tasks/BRIEF.h>
 #include <viscl/tasks/gaussian_smooth.h>
 #include <viscl/tasks/track_descr_match.h>
+#include <viscl/tasks/warp_image.h>
+#include <viscl/core/matrix.h>
 
+#include <viscl/vxl/conversion.h>
 
 namespace viscl
 {
@@ -53,20 +58,7 @@ void cl_gaussian_smooth(const vil_image_view<T> &img, vil_image_view<T> &output,
   image img_cl = upload_image(img);
   gaussian_smooth_t gs = NEW_VISCL_TASK(viscl::gaussian_smooth);
   image result = gs->smooth( img_cl, sigma, kernel_radius);
-
-  cl::size_t<3> origin;
-  origin.push_back(0);
-  origin.push_back(0);
-  origin.push_back(0);
-
-  cl::size_t<3> region;
-  region.push_back(img.ni());
-  region.push_back(img.nj());
-  region.push_back(1);
-
-  output.set_size(img.ni(), img.nj());
-  cl_queue_t queue = gs->get_queue();
-  queue->enqueueReadImage(*result().get(),  CL_TRUE, origin, region, 0, 0, (float *)output.top_left_ptr());
+  download_image(img_cl, output, gs->get_queue());
 }
 
 //*****************************************************************************
@@ -154,6 +146,99 @@ void compute_brief_descriptors(const vil_image_view<T> &img,
   queue->enqueueReadBuffer(*descriptors_cl().get(), CL_TRUE, 0, descriptors_cl.mem_size(), &descriptors[0]);
 }
 
+//*****************************************************************************
+
+template <class pixType, class T>
+bool warp_image_vxl(const vil_image_view<pixType> &src, vil_image_view<pixType> &dest, const vgl_h_matrix_2d<T> &H)
+{
+  warp_image_t warper = NEW_VISCL_TASK(viscl::warp_image);
+  image dest_cl;
+  size_t dni = dest.ni(), dnj = dest.nj();
+  if (dni == 0 || dnj == 0)
+  {
+    dni = src.ni();
+    dnj = src.nj();
+  }
+
+  if (!warp_image_vxl(src, dest_cl, dni, dnj, H, warper))
+    return false;
+
+  download_image(dest_cl, dest, warper->get_queue());
+
+  return true;
+}
+
+//*****************************************************************************
+
+template <class pixType, class T>
+bool warp_image_vxl(const vil_image_view<pixType> &src, image &dest_cl, const size_t dni, const size_t dnj,
+                    const vgl_h_matrix_2d<T> &H, const warp_image_t &warper)
+{
+  // Retrieve destination and source image properties
+  unsigned int const sni = src.ni();
+  unsigned int const snj = src.nj();
+
+  typedef vgl_homg_point_2d<T> homog_type;
+  typedef vgl_point_2d<T> point_type;
+  typedef vgl_box_2d<T> box_type;
+
+  // First, figure out the bounding box of src projected into dest.
+  // There may be considerable computation saving for the cases when
+  // the output image is much larger that the projected source image,
+  // which will often occur during mosaicing.
+  vgl_h_matrix_2d<T> const& src_to_dest_homography(vnl_inverse( H.get_matrix() ) );
+
+  box_type src_on_dest_bounding_box;
+
+  homog_type cnrs[4] = { homog_type( 0, 0 ),
+                         homog_type( sni - 1, 0 ),
+                         homog_type( sni - 1, snj - 1 ),
+                         homog_type( 0, snj - 1 ) };
+
+  for( unsigned i = 0; i < 4; ++i )
+  {
+    // Shift the point to destination image pixel index coordinates
+    point_type p = src_to_dest_homography * cnrs[i];
+    src_on_dest_bounding_box.add( p );
+  }
+
+  // Calculate intersection with destination pixels we are looking to fill
+  box_type dest_boundaries( 0, dni - 1, 0, dnj - 1 );
+  box_type intersection = vgl_intersection( src_on_dest_bounding_box, dest_boundaries );
+
+  // Determine if this is a special case (source and destination images
+  // overlap at only a single exact point). We can handle this case better
+  // later.
+  bool point_intercept = false;
+  if( intersection.min_x() == intersection.max_x() &&
+      intersection.min_y() == intersection.max_y() )
+  {
+    point_intercept = true;
+  }
+
+  // Exit on invalid case, or else semi-optimized warp will fail. This
+  // condition should only occur if we exceed the image bounds given the
+  // above computation (ie one image maps to a region completely outside
+  // the other, or there is less than a 1 pixel overlap)
+  if( intersection.width() == 0 && intersection.height() == 0 && !point_intercept)
+  {
+    return false;
+  }
+
+  // Extract start and end, row/col scanning ranges [start..end-1]
+  const int start_j = static_cast<int>(std::floor(intersection.min_y()));
+  const int start_i = static_cast<int>(std::floor(intersection.min_x()));
+  const int end_j = static_cast<int>(std::floor(intersection.max_y()+1));
+  const int end_i = static_cast<int>(std::floor(intersection.max_x()+1));
+
+  image src_cl = upload_image(src);
+  dest_cl = manager::inst()->create_image(src_cl.format(), CL_MEM_READ_WRITE, dni, dnj);
+  viscl::matrix3x3 H_cl = vnl_to_viscl(H.get_matrix());
+
+  warper->warp(src_cl, dest_cl, H_cl, start_i, start_j, end_i, end_j);
+
+  return true;
+}
 
 
 } // end namespace viscl

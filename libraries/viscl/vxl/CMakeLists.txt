@@ -4,11 +4,12 @@ set(SRC_FILES
     transfer.h                 transfer.cxx
     tasks.h                    tasks.cxx
     util.h                     util.cxx
+    conversion.h               conversion.cxx
 )
 
 
 add_library(viscl_vxl ${SRC_FILES})
-target_link_libraries(viscl_vxl viscl_tasks vil vil_algo vnl)
+target_link_libraries(viscl_vxl viscl_tasks vil vil_algo vnl vgl_algo vgl)
 
 
 install( TARGETS viscl_vxl EXPORT viscl_exports

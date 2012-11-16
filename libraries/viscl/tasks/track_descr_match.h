@@ -14,7 +14,6 @@
 #include "BRIEF.h"
 #include "gaussian_smooth.h"
 
-
 namespace viscl
 {
 

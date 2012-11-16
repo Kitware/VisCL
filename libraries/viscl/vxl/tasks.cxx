@@ -46,3 +46,24 @@ template void viscl::
 compute_brief_descriptors<vxl_byte, 10>(const vil_image_view<vxl_byte> &img,
                                         const vcl_vector<cl_int2> &kpts,
                                         vcl_vector<cl_int4> &descriptors);
+
+//*****************************************************************************
+
+template bool viscl::
+warp_image_vxl(const vil_image_view<float> &src, vil_image_view<float> &dest, const vgl_h_matrix_2d<float> &H);
+template bool viscl::
+warp_image_vxl(const vil_image_view<vxl_byte> &src, vil_image_view<vxl_byte> &dest, const vgl_h_matrix_2d<float> &H);
+template bool viscl::
+warp_image_vxl(const vil_image_view<vxl_byte> &src, vil_image_view<vxl_byte> &dest, const vgl_h_matrix_2d<double> &H);
+
+template bool viscl::
+warp_image_vxl(const vil_image_view<float> &src, viscl::image &dest, const size_t dni, const size_t dnj,
+               const vgl_h_matrix_2d<float> &H, const viscl::warp_image_t &warper);
+template bool viscl::
+warp_image_vxl(const vil_image_view<vxl_byte> &src, viscl::image &dest, const size_t dni, const size_t dnj,
+               const vgl_h_matrix_2d<float> &H, const viscl::warp_image_t &warper);
+template bool viscl::
+warp_image_vxl(const vil_image_view<vxl_byte> &src, viscl::image &dest, const size_t dni, const size_t dnj,
+               const vgl_h_matrix_2d<double> &H, const viscl::warp_image_t &warper);
+
+//*****************************************************************************

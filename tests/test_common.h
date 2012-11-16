@@ -52,4 +52,29 @@
     }                                       \
   } while (false)
 
+/// Make a simple checkerboard pattern image for use in tests.
+/// Fills a pre-allocated buffer \a buffer of size \a width by \a height.
+/// Each block of the checkerboard is \a blocksize by \a blocksize.
+void make_checkerboard_image(const unsigned width,
+                             const unsigned height,
+                             unsigned char* const buffer,
+                             const unsigned blocksize = 8)
+{
+  for (unsigned j=0; j<height; ++j)
+  {
+    for (unsigned i=0; i<width; ++i)
+    {
+      // index into the image buffer
+      const unsigned index = j * width + i;
+      // block cell coordinates
+      const unsigned bi = i / blocksize;
+      const unsigned bj = j / blocksize;
+      // checkerboard boolean value (true for white, false for black)
+      const bool val = (bi % 2 + bj % 2) % 2;
+      // scale bool to byte image range
+      buffer[index] = static_cast<unsigned char>(val * 255);
+    }
+  }
+}
+
 #endif // VISCL_TEST_TEST_COMMON_H
