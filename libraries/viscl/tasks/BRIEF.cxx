@@ -48,8 +48,7 @@ namespace viscl
 
 //*****************************************************************************
 
-template<int radius>
-brief<radius>::brief()
+brief::brief(int radius_) : radius(radius_)
 {
   //Create meta program name
   std::stringstream s;
@@ -68,8 +67,7 @@ brief<radius>::brief()
 
 //*****************************************************************************
 
-template<int radius>
-std::string brief<radius>::generate_meta_source(const std::string &source)
+std::string brief::generate_meta_source(const std::string &source)
 {
   //Boost rand guarantees that the random values generating the comparison map for brief
   //will be constistent otherwise the descriptor algorithm would not be thread safe
@@ -97,8 +95,7 @@ std::string brief<radius>::generate_meta_source(const std::string &source)
 
 //*****************************************************************************
 
-template<int radius>
-void brief<radius>::compute_descriptors(const image &img_s, const buffer &kpts, size_t numkpts, buffer &descriptors)
+void brief::compute_descriptors(const image &img_s, const buffer &kpts, size_t numkpts, buffer &descriptors)
 {
   descriptors = manager::inst()->create_buffer<cl_uint4>(CL_MEM_READ_WRITE, numkpts);
   brief_k->setArg(0, *img_s().get());
@@ -111,8 +108,5 @@ void brief<radius>::compute_descriptors(const image &img_s, const buffer &kpts, 
 }
 
 //*****************************************************************************
-
-//Should probably move this all to .h for implicit instantiation
-template class brief<10>;
 
 }

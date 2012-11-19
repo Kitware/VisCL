@@ -62,14 +62,15 @@ track_descr_track(const vil_image_view<vxl_byte> &img,
 //*****************************************************************************
 
 template void viscl::
-compute_brief_descriptors<vxl_byte, 10>(const vil_image_view<vxl_byte> &img,
+compute_brief_descriptors<vxl_byte>(const vil_image_view<vxl_byte> &img,
                                         const vcl_vector<cl_int2> &kpts,
                                         vcl_vector<cl_int4> &descriptors,
-                                        float sigma);
+                                        float sigma, int radius);
 template void viscl::
-compute_brief_descriptors<vxl_byte, 10>(const vil_image_view<vxl_byte> &img,
+compute_brief_descriptors<vxl_byte>(const vil_image_view<vxl_byte> &img,
                                         const vcl_vector<cl_int2> &kpts,
-                                        vcl_vector<cl_int4> &descriptors);
+                                        vcl_vector<cl_int4> &descriptors,
+                                        int radius);
 
 //*****************************************************************************
 

@@ -38,13 +38,11 @@
 namespace viscl
 {
 
-template<int radius>
 class brief : public task
 {
 public:
 
-  brief();
-  typedef boost::shared_ptr<brief<radius> > type;
+  brief(int radius_);
 
   void compute_descriptors(const image &img_s, const buffer &kpts, size_t numkpts, buffer &descriptors);
 
@@ -52,8 +50,12 @@ private:
 
   std::string generate_meta_source(const std::string &source);
 
+  int radius;
+
   cl_kernel_t brief_k, brief_dist_k;
 };
+
+typedef boost::shared_ptr<brief> brief_t;
 
 }
 

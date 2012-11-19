@@ -129,15 +129,15 @@ vcl_vector<int> track_descr_track(const vil_image_view<pixtype> &img,
 
 //*****************************************************************************
 
-template<class T, int R>
+template<class T>
 void compute_brief_descriptors(const vil_image_view<T> &img,
                                const vcl_vector<cl_int2> &kpts,
                                vcl_vector<cl_int4> &descriptors,
-                               float sigma)
+                               float sigma, int radius)
 {
-  typename brief<R>::type brf = NEW_VISCL_TASK(viscl::brief<R>);
+  brief brf(radius);
   gaussian_smooth_t gs = NEW_VISCL_TASK(viscl::gaussian_smooth);
-  cl_queue_t queue = brf->get_queue();
+  cl_queue_t queue = brf.get_queue();
 
   image img_cl = upload_image(img);
   image smoothed_cl = gs->smooth(img_cl, sigma, 2);
@@ -145,27 +145,28 @@ void compute_brief_descriptors(const vil_image_view<T> &img,
   queue->enqueueWriteBuffer(*kpts_cl().get(), CL_TRUE, 0, kpts_cl.mem_size(), &kpts[0]);
 
   buffer descriptors_cl;
-  brf->compute_descriptors(smoothed_cl, kpts_cl, kpts.size(), descriptors_cl);
+  brf.compute_descriptors(smoothed_cl, kpts_cl, kpts.size(), descriptors_cl);
   descriptors.resize(kpts.size());
   queue->enqueueReadBuffer(*descriptors_cl().get(), CL_TRUE, 0, descriptors_cl.mem_size(), &descriptors[0]);
 }
 
 //*****************************************************************************
 
-template<class T, int R>
+template<class T>
 void compute_brief_descriptors(const vil_image_view<T> &img,
                                const vcl_vector<cl_int2> &kpts,
-                               vcl_vector<cl_int4> &descriptors)
+                               vcl_vector<cl_int4> &descriptors,
+                               int radius)
 {
-  typename brief<R>::type brf = NEW_VISCL_TASK(viscl::brief<R>);
-  cl_queue_t queue = brf->get_queue();
+  brief brf = viscl::brief(radius);
+  cl_queue_t queue = brf.get_queue();
 
   image img_cl = upload_image(img);
   buffer kpts_cl = manager::inst()->create_buffer<cl_int2>(CL_MEM_READ_ONLY, kpts.size());
   queue->enqueueWriteBuffer(*kpts_cl().get(), CL_TRUE, 0, kpts_cl.mem_size(), &kpts[0]);
 
   buffer descriptors_cl;
-  brf->compute_descriptors(img_cl, kpts_cl, kpts.size(), descriptors_cl);
+  brf.compute_descriptors(img_cl, kpts_cl, kpts.size(), descriptors_cl);
   descriptors.resize(kpts.size());
   queue->enqueueReadBuffer(*descriptors_cl().get(), CL_TRUE, 0, descriptors_cl.mem_size(), &descriptors[0]);
 }

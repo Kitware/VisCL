@@ -51,7 +51,8 @@ track_descr_match::track_descr_match()
    search_box_radius_(50),
    hamming_dist_threshold_(15),
    detect_thresh_(0.003f),
-   smooth_sigma_(2.0f)
+   smooth_sigma_(2.0f),
+   brf(10)
 {
   program = program_registry::inst()->register_program(std::string("track_descr_match"),
                                                        track_descr_match_source);
@@ -72,7 +73,6 @@ void track_descr_match::first_frame(const image &img)
 {
   gs = NEW_VISCL_TASK(viscl::gaussian_smooth);
   hes = NEW_VISCL_TASK(viscl::hessian);
-  brf = NEW_VISCL_TASK(viscl::brief<10>);
   image smoothed = gs->smooth(img, smooth_sigma_, 2);
 
   buffer numkpts_b;
@@ -81,7 +81,7 @@ void track_descr_match::first_frame(const image &img)
               max_kpts_, detect_thresh_, smooth_sigma_);
   numkpts1 = hes->num_kpts(numkpts_b);
   std::cout << numkpts1 << "\n";
-  brf->compute_descriptors(smoothed, kpts1, numkpts1, descriptors1);
+  brf.compute_descriptors(smoothed, kpts1, numkpts1, descriptors1);
 }
 
 //*****************************************************************************
@@ -98,7 +98,7 @@ buffer track_descr_match::track(const image &img)
   std::cout << numkpts2 << "\n";
 
   buffer descriptors2;
-  brf->compute_descriptors(smoothed, kpts2, numkpts2, descriptors2);
+  brf.compute_descriptors(smoothed, kpts2, numkpts2, descriptors2);
 
   buffer tracks_b = manager::inst()->create_buffer<int>(CL_MEM_WRITE_ONLY, numkpts2);
 

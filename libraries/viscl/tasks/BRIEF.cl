@@ -47,7 +47,7 @@ __kernel void brief(__read_only image2d_t input, __global int2 *kpts, __global b
 
   for (int i = 0; i < 32; i++)
   {
-    uint4 less = (uint4)(read_imageui(input, imageSampler, pixel + map[loc].xy).x <
+    brief_descr less = (uint4)(read_imageui(input, imageSampler, pixel + map[loc].xy).x <
                          read_imageui(input, imageSampler, pixel + map[loc++].zw).x,
                          read_imageui(input, imageSampler, pixel + map[loc].xy).x <
                          read_imageui(input, imageSampler, pixel + map[loc++].zw).x,

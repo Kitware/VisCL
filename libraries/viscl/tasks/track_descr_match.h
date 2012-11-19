@@ -90,7 +90,7 @@ public:
 private:
 
   hessian_t hes;
-  brief<10>::type brf;
+  brief brf;
   gaussian_smooth_t gs;
 
   cl_kernel_t track_k;
