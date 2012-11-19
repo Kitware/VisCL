@@ -24,7 +24,7 @@ jitter_difference::jitter_difference(int jitter_delta_, int local_x_, int local_
 {
   //Create meta program name
   std::stringstream s;
-  s << "jitter_difference " << jitter_delta;
+  s << "jitter_difference " << jitter_delta << " " << local_x << " " << local_y;
 
   //Check if the meta program exists so we can avoid re-generating the src
   std::pair<cl_program_t, bool> p = program_registry::inst()->get_program(s.str());
