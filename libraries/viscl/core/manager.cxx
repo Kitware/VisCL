@@ -6,6 +6,8 @@
 
 #include <viscl/core/manager.h>
 
+#include "utils.h"
+
 #include <boost/lexical_cast.hpp>
 #include <boost/optional.hpp>
 #include <boost/scoped_array.hpp>
@@ -17,9 +19,6 @@
 
 namespace viscl
 {
-
-typedef boost::optional<std::string> envvar_value_t;
-static envvar_value_t viscl_getenv(char const* name);
 
 manager *manager::inst_ = 0;
 
@@ -335,40 +334,6 @@ const char *print_cl_errstring(cl_int err)
         case CL_INVALID_MIP_LEVEL:                return "Invalid mip-map level";
         default:                                  return "Unknown";
     }
-}
-
-envvar_value_t viscl_getenv(char const* name)
-{
-  envvar_value_t value;
-
-#if defined(_WIN32) || defined(_WIN64)
-  DWORD sz = GetEnvironmentVariable(name, NULL, 0);
-
-  if (sz)
-  {
-    typedef boost::scoped_array<char> raw_envvar_value_t;
-    raw_envvar_value_t const envvalue(new char[sz]);
-
-    sz = GetEnvironmentVariable(name, envvalue.get(), sz);
-
-    value = envvalue.get();
-  }
-
-  if (!sz)
-  {
-    // Failed to read the environment variable.
-    return envvar_value_t();
-  }
-#else
-  char const* const envvalue = getenv(name);
-
-  if (envvalue)
-  {
-    value = envvalue;
-  }
-#endif
-
-  return value;
 }
 
 }

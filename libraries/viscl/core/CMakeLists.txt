@@ -8,6 +8,7 @@ set(SRC_FILES
     manager.h               manager.cxx
     task.h                  task.cxx
     program_registry.h      program_registry.cxx
+    utils.h                 utils.cxx
 )
 
 set(VISCL_DEFAULT_PLATFORM "0"
