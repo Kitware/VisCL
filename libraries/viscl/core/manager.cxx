@@ -48,12 +48,12 @@ void manager::init_opencl()
     /// \todo Add Windows support.
     envvar_value_t def_platform = viscl_getenv("VISCL_OPENCL_PLATFORM");
 
-    size_t platform_id = DEFAULT_PLATFORM;
+    int platform_id = DEFAULT_PLATFORM;
     if (def_platform)
     {
       try
       {
-        platform_id = boost::lexical_cast<size_t>(*def_platform);
+        platform_id = boost::lexical_cast<int>(*def_platform);
       }
       catch (boost::bad_lexical_cast const& e)
       {
