@@ -63,6 +63,21 @@ void manager::init_opencl()
       }
     }
 
+    if (platform_id < 0)
+    {
+      for (size_t i = 0; i < platforms_.size(); ++i)
+      {
+        std::vector<cl::Device> devices;
+        platforms_[i].getDevices(CL_DEVICE_TYPE_GPU, &devices);
+
+        if (devices.size())
+        {
+          platform_id = i;
+          break;
+        }
+      }
+    }
+
     if (platforms_.size() <= platform_id)
     {
       std::stringstream reason;
