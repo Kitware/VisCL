@@ -11,8 +11,8 @@ set(SRC_FILES
     utils.h                 utils.cxx
 )
 
-set(VISCL_DEFAULT_PLATFORM "0"
-  CACHE STRING "The default platform ID to use")
+set(VISCL_DEFAULT_PLATFORM "-1"
+  CACHE STRING "The default platform ID to use (-1 is 'first GPU')")
 
 set_source_files_properties(manager.cxx
   PROPERTIES
