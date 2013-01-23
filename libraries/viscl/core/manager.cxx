@@ -6,12 +6,19 @@
 
 #include <viscl/core/manager.h>
 
+#include "utils.h"
+
+#include <boost/lexical_cast.hpp>
+#include <boost/optional.hpp>
+#include <boost/scoped_array.hpp>
+
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
+#include <string>
 
 namespace viscl
 {
-
 
 manager *manager::inst_ = 0;
 
@@ -38,10 +45,53 @@ void manager::init_opencl()
     // Get available platforms
     cl::Platform::get(&platforms_);
 
+    /// \todo Add Windows support.
+    envvar_value_t def_platform = viscl_getenv("VISCL_OPENCL_PLATFORM");
+
+    int platform_id = DEFAULT_PLATFORM;
+    if (def_platform)
+    {
+      try
+      {
+        platform_id = boost::lexical_cast<int>(*def_platform);
+      }
+      catch (boost::bad_lexical_cast const& e)
+      {
+        std::string const reason = std::string("Failed to parse the platform: ") + e.what();
+
+        throw std::runtime_error(reason);
+      }
+    }
+
+    if (platform_id < 0)
+    {
+      for (size_t i = 0; i < platforms_.size(); ++i)
+      {
+        std::vector<cl::Device> devices;
+        platforms_[i].getDevices(CL_DEVICE_TYPE_GPU, &devices);
+
+        if (devices.size())
+        {
+          platform_id = i;
+          break;
+        }
+      }
+    }
+
+    if (platforms_.size() <= platform_id)
+    {
+      std::stringstream reason;
+
+      reason << "The platform ID requested (" << platform_id << ") is out of range: "
+                "There are " << platforms_.size() << " available platforms.";
+
+      throw std::runtime_error(reason.str());
+    }
+
     // Select the default platform and create a context using this platform and the GPU
     cl_context_properties cps[3] = {
         CL_CONTEXT_PLATFORM,
-        (cl_context_properties)(platforms_[0])(),
+        (cl_context_properties)(platforms_[platform_id])(),
         0
     };
 

@@ -8,7 +8,15 @@ set(SRC_FILES
     manager.h               manager.cxx
     task.h                  task.cxx
     program_registry.h      program_registry.cxx
+    utils.h                 utils.cxx
 )
+
+set(VISCL_DEFAULT_PLATFORM "-1"
+  CACHE STRING "The default platform ID to use (-1 is 'first GPU')")
+
+set_source_files_properties(manager.cxx
+  PROPERTIES
+    COMPILE_DEFINITIONS "DEFAULT_PLATFORM=${VISCL_DEFAULT_PLATFORM}")
 
 add_library(viscl_core ${SRC_FILES})
 target_link_libraries(viscl_core ${OPENCL_LIBRARIES})
