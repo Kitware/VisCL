@@ -68,7 +68,15 @@ void manager::init_opencl()
       for (size_t i = 0; i < platforms_.size(); ++i)
       {
         std::vector<cl::Device> devices;
-        platforms_[i].getDevices(CL_DEVICE_TYPE_GPU, &devices);
+
+        try
+        {
+          platforms_[i].getDevices(CL_DEVICE_TYPE_GPU, &devices);
+        }
+        catch (cl::Error const&)
+        {
+          continue;
+        }
 
         if (devices.size())
         {
