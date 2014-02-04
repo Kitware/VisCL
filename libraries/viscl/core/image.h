@@ -1,5 +1,5 @@
 /*ckwg +29
- * Copyright 2012 by Kitware, Inc.
+ * Copyright 2012-2014 by Kitware, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,11 @@ public:
   size_t width() const;
   size_t height() const;
 
+  size_t depth() const { return 1; }
+
   cl::ImageFormat format() const;
+
+  size_t mem_size() const;
 
   const boost::shared_ptr<cl::Image2D> &operator()() const {return img;}
 

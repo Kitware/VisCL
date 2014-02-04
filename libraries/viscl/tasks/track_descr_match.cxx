@@ -1,5 +1,5 @@
 /*ckwg +29
- * Copyright 2012 by Kitware, Inc.
+ * Copyright 2012-2014 by Kitware, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -77,11 +77,11 @@ void track_descr_match::first_frame(const image &img)
 
   buffer numkpts_b;
 
-  hes->detect(smoothed, kptmap1, kpts1, numkpts_b,
+  hes->detect(smoothed, kptmap1_, kpts1_, numkpts_b,
               max_kpts_, detect_thresh_, smooth_sigma_);
-  numkpts1 = hes->num_kpts(numkpts_b);
-  std::cout << numkpts1 << "\n";
-  brf->compute_descriptors(smoothed, kpts1, numkpts1, descriptors1);
+  numkpts1_ = hes->num_kpts(numkpts_b);
+  std::cout << numkpts1_ << "\n";
+  brf->compute_descriptors(smoothed, kpts1_, numkpts1_, descriptors1_);
 }
 
 //*****************************************************************************
@@ -103,6 +103,33 @@ buffer track_descr_match::track(const image &img)
   buffer tracks_b = manager::inst()->create_buffer<int>(CL_MEM_WRITE_ONLY, numkpts2);
 
   track_k->setArg(0, *kpts2().get());
+  track_k->setArg(1, *kptmap1_().get());
+  track_k->setArg(2, *descriptors1_().get());
+  track_k->setArg(3, *descriptors2().get());
+  track_k->setArg(4, *tracks_b().get());
+  track_k->setArg(5, search_box_radius_);
+  track_k->setArg(6, hamming_dist_threshold_);
+
+  cl::NDRange global(numkpts2);
+  queue->enqueueNDRangeKernel(*track_k.get(), cl::NullRange, global, cl::NullRange);
+  queue->finish();
+
+  kpts1_ = kpts2;
+  kptmap1_ = kptmap2;
+  numkpts1_ = numkpts2;
+  descriptors1_ = descriptors2;
+
+  return tracks_b;
+}
+
+//*****************************************************************************
+
+buffer track_descr_match::match(const buffer &kpts1, const image &kptmap1, const buffer descriptors1,
+                                const buffer &kpts2, int numkpts2, const image &kptmap2, const buffer descriptors2)
+{
+  buffer tracks_b = manager::inst()->create_buffer<int>(CL_MEM_WRITE_ONLY, numkpts2);
+
+  track_k->setArg(0, *kpts2().get());
   track_k->setArg(1, *kptmap1().get());
   track_k->setArg(2, *descriptors1().get());
   track_k->setArg(3, *descriptors2().get());
@@ -113,11 +140,6 @@ buffer track_descr_match::track(const image &img)
   cl::NDRange global(numkpts2);
   queue->enqueueNDRangeKernel(*track_k.get(), cl::NullRange, global, cl::NullRange);
   queue->finish();
-
-  kpts1 = kpts2;
-  kptmap1 = kptmap2;
-  numkpts1 = numkpts2;
-  descriptors1 = descriptors2;
 
   return tracks_b;
 }

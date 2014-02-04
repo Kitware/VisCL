@@ -1,5 +1,5 @@
 /*ckwg +29
- * Copyright 2012 by Kitware, Inc.
+ * Copyright 2012-2014 by Kitware, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -52,9 +52,13 @@ public:
 
   buffer track(const image &img);
 
-  const buffer& last_keypoints() const { return kpts1; }
+  //Match without using state for tracks
+  buffer match(const buffer &kpts1, const image &kptmap1, const buffer descriptors1,
+               const buffer &kpts2, int numkpts2, const image &kptmap2, const buffer descriptors2);
 
-  int last_num_keypoints() const { return numkpts1; }
+  const buffer& last_keypoints() const { return kpts1_; }
+
+  int last_num_keypoints() const { return numkpts1_; }
 
   /// Set the maximum number of keypoints to track
   void set_max_kpts(int mk) { max_kpts_ = mk; }
@@ -95,10 +99,10 @@ private:
 
   cl_kernel_t track_k;
 
-  buffer kpts1;
-  buffer descriptors1;
-  image kptmap1;
-  int numkpts1;
+  buffer kpts1_;
+  buffer descriptors1_;
+  image kptmap1_;
+  int numkpts1_;
 
   int max_kpts_;
   unsigned search_box_radius_;
