@@ -100,19 +100,8 @@ buffer track_descr_match::track(const image &img)
   buffer descriptors2;
   brf->compute_descriptors(smoothed, kpts2, numkpts2, descriptors2);
 
-  buffer tracks_b = manager::inst()->create_buffer<int>(CL_MEM_WRITE_ONLY, numkpts2);
-
-  track_k->setArg(0, *kpts2().get());
-  track_k->setArg(1, *kptmap1_().get());
-  track_k->setArg(2, *descriptors1_().get());
-  track_k->setArg(3, *descriptors2().get());
-  track_k->setArg(4, *tracks_b().get());
-  track_k->setArg(5, search_box_radius_);
-  track_k->setArg(6, hamming_dist_threshold_);
-
-  cl::NDRange global(numkpts2);
-  queue->enqueueNDRangeKernel(*track_k.get(), cl::NullRange, global, cl::NullRange);
-  queue->finish();
+  buffer tracks_b = match(kpts1_, kptmap1_, descriptors1_,
+                          kpts2, numkpts2, kptmap2, descriptors2);
 
   kpts1_ = kpts2;
   kptmap1_ = kptmap2;
