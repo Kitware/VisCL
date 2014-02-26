@@ -1,5 +1,5 @@
 /*ckwg +29
- * Copyright 2012 by Kitware, Inc.
+ * Copyright 2012-2014 by Kitware, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,7 @@
 #include <string>
 
 #include <viscl/core/header.h>
+#include "config.h"
 
 namespace viscl
 {
@@ -41,7 +42,7 @@ namespace viscl
 class task;
 typedef boost::shared_ptr<task> task_t;
 
-class task
+class VISCL_EXPORT task
 {
 public:
 

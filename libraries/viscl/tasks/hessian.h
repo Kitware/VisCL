@@ -1,5 +1,5 @@
 /*ckwg +29
- * Copyright 2012 by Kitware, Inc.
+ * Copyright 2012-2014 by Kitware, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ public:
   void detect(const image &img, image &kptmap, buffer &kpts, buffer &numkpts,
               int max_kpts, float thresh, float scale) const;
 
-  int num_kpts(const buffer &numkpts_b);
+  int num_kpts(const buffer &numkpts_b) const;
 
 private:
 

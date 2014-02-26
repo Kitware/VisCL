@@ -18,7 +18,9 @@ set_source_files_properties(manager.cxx
   PROPERTIES
     COMPILE_DEFINITIONS "DEFAULT_PLATFORM=${VISCL_DEFAULT_PLATFORM}")
 
-add_library(viscl_core ${SRC_FILES})
+#This is shared because the singleton manager and program registry, remove if
+#they are made non singleton
+add_library(viscl_core SHARED ${SRC_FILES})
 target_link_libraries(viscl_core ${OPENCL_LIBRARIES})
 
 install( TARGETS viscl_core EXPORT viscl_exports

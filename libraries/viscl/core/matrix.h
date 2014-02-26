@@ -1,5 +1,5 @@
 /*ckwg +29
- * Copyright 2012 by Kitware, Inc.
+ * Copyright 2012-2014 by Kitware, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,11 +32,12 @@
 #define CL_MATRIX_H_
 
 #include <viscl/core/header.h>
+#include "config.h"
 
 namespace viscl
 {
 
-class matrix3x3
+class VISCL_EXPORT matrix3x3
 {
 public:
   cl_float3 row0;

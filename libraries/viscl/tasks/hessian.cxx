@@ -1,5 +1,5 @@
 /*ckwg +29
- * Copyright 2012 by Kitware, Inc.
+ * Copyright 2012-2014 by Kitware, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -58,9 +58,8 @@ hessian::hessian()
 void hessian::smooth_and_detect(const image &img, image &kptmap, buffer &kpts, buffer &numkpts,
                          int max_kpts, float thresh, float sigma) const
 {
-  float scale = 2.0f;
   gaussian_smooth_t gs = NEW_VISCL_TASK(viscl::gaussian_smooth);
-  image smoothed = gs->smooth(img, scale, 2);
+  image smoothed = gs->smooth(img, sigma, sigma);
   detect(smoothed, kptmap, kpts, numkpts, max_kpts, thresh, sigma);
 }
 
@@ -111,7 +110,7 @@ void hessian::detect(const image &smoothed, image &kptmap, buffer &kpts, buffer 
 
 //*****************************************************************************
 
-int hessian::num_kpts(const buffer &numkpts_b)
+int hessian::num_kpts(const buffer &numkpts_b) const
 {
   int buf[1];
   queue->enqueueReadBuffer(*numkpts_b().get(), CL_TRUE, 0, numkpts_b.mem_size(), buf);

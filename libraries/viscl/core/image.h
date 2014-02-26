@@ -34,10 +34,12 @@
 #include <viscl/core/header.h>
 #include <boost/shared_ptr.hpp>
 
+#include "config.h"
+
 namespace viscl
 {
 
-class image
+class VISCL_EXPORT image
 {
 public:
 
