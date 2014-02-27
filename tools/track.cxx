@@ -30,6 +30,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 #include <vil/vil_image_view.h>
 #include <vil/vil_load.h>
