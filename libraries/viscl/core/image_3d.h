@@ -1,5 +1,5 @@
 /*ckwg +29
- * Copyright 2012 by Kitware, Inc.
+ * Copyright 2012-2014 by Kitware, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,10 +34,12 @@
 #include <viscl/core/header.h>
 #include <boost/shared_ptr.hpp>
 
+#include "config.h"
+
 namespace viscl
 {
 
-class image_3d
+class VISCL_EXPORT image_3d
 {
 public:
 

@@ -1,5 +1,5 @@
 /*ckwg +29
- * Copyright 2013 by Kitware, Inc.
+ * Copyright 2013-2014 by Kitware, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,7 @@
 #define CL_UTILS_H_
 
 #include <boost/optional.hpp>
+#include "config.h"
 
 #include <string>
 
@@ -39,7 +40,7 @@ namespace viscl
 {
 
 typedef boost::optional<std::string> envvar_value_t;
-envvar_value_t viscl_getenv(char const* name);
+VISCL_EXPORT envvar_value_t viscl_getenv(char const* name);
 
 }
 

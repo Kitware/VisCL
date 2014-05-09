@@ -1,5 +1,5 @@
 /*ckwg +29
- * Copyright 2012 by Kitware, Inc.
+ * Copyright 2012-2014 by Kitware, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,8 @@
  */
 
 #include <iostream>
+#include <sstream>
+#include <fstream>
 
 #include <vil/vil_image_view.h>
 #include <vil/vil_load.h>
@@ -45,14 +47,7 @@ int main(int argc, char *argv[])
 {
   viscl::manager::inst()->report_opencl_specs();
 
-  vil_image_view<vxl_byte> img1_color = vil_load(argv[1]);
-  vil_image_view<vxl_byte> img2_color = vil_load(argv[2]);
-  vil_image_view<vxl_byte> img3_color = vil_load(argv[3]);
-
-  vil_image_view<vxl_byte> img1, img2, img3, output;
-  vil_convert_planes_to_grey(img1_color, img1);
-  vil_convert_planes_to_grey(img2_color, img2);
-  vil_convert_planes_to_grey(img3_color, img3);
+  std::ifstream imglist(argv[1]);
 
   try
   {
@@ -60,17 +55,41 @@ int main(int argc, char *argv[])
     tracker->set_search_box_radius(200);
     tracker->set_max_kpts(20000);
 
-    std::vector<cl_int2> kpts1, kpts2, kpts3;
-    std::cout << "start" <<std::endl;
-    viscl::track_descr_first_frame(img1, kpts1, tracker);
-    std::cout << "tracked 1" <<std::endl;
-    std::vector<int> indices21, indices32;
-    indices21 = viscl::track_descr_track(img2, kpts2, tracker);
-    std::cout << "tracked 2" <<std::endl;
-    indices32 = viscl::track_descr_track(img3, kpts3, tracker);
-    std::cout << "tracked 3" <<std::endl;
+    bool first = true;
+    int count = 0;
+    std::string filename;
 
-    viscl::write_tracks_to_file("tracks.txt", kpts2, kpts3, indices32);
+    std::vector<cl_int2> *kpts1 = new std::vector<cl_int2>();
+    std::vector<cl_int2> *kpts2 = new std::vector<cl_int2>();
+
+    while (imglist >> filename)
+    {
+      vil_image_view<vxl_byte> img_color = vil_load(filename.c_str());
+      vil_image_view<vxl_byte> img;
+      vil_convert_planes_to_grey(img_color, img);
+      std::vector<cl_int2> kpts;
+
+      if (first)
+      {
+        std::cout << "start" <<std::endl;
+        viscl::track_descr_first_frame(img, *kpts1, tracker);
+        first = false;
+      }
+      else
+      {
+        std::cout << "tracking " << ++count << "..." << std::endl;
+        std::vector<int> indices;
+        kpts2->clear();
+        indices = viscl::track_descr_track(img, *kpts2, tracker);
+        std::ostringstream str;
+        str << "tracks_" << count-1 << "-" << count << ".txt";
+        viscl::write_tracks_to_file(str.str(), *kpts1, *kpts2, indices);
+        std::swap(kpts1, kpts2);
+      }
+    }
+
+    delete kpts1;
+    delete kpts2;
   }
   catch(const cl::Error &e)
   {

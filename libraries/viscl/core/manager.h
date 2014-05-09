@@ -1,5 +1,5 @@
 /*ckwg +29
- * Copyright 2012 by Kitware, Inc.
+ * Copyright 2012-2014 by Kitware, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,10 +41,12 @@
 #include <viscl/core/image.h>
 #include <viscl/core/buffer.h>
 
+#include "config.h"
+
 namespace viscl
 {
 
-class manager
+class VISCL_EXPORT manager
 {
 public:
 
@@ -88,7 +90,7 @@ private:
   std::vector<cl::Device> devices_;
 };
 
-const char *print_cl_errstring(cl_int err);
+VISCL_EXPORT  const char *print_cl_errstring(cl_int err);
 
 //Implicit Instantiations
 template<class T>

@@ -1,5 +1,5 @@
 /*ckwg +29
- * Copyright 2012 by Kitware, Inc.
+ * Copyright 2012-2014 by Kitware, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -67,5 +67,13 @@ cl::ImageFormat image::format() const
 
 //*****************************************************************************
 
+size_t image::mem_size() const
+{
+  size_t element_size;
+  img->getImageInfo<size_t>(CL_IMAGE_ELEMENT_SIZE, &element_size);
+  return element_size * this->height() * this->width();
+}
+
+//*****************************************************************************
 
 }

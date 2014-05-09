@@ -1,5 +1,5 @@
 /*ckwg +29
- * Copyright 2012-2014 by Kitware, Inc.
+ * Copyright 2014 by Kitware, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,23 +28,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CL_MATRIX_H_
-#define CL_MATRIX_H_
+#ifndef VISCL_CONFIG_H_
+#define VISCL_CONFIG_H_
 
-#include <viscl/core/header.h>
-#include "config.h"
 
-namespace viscl
-{
-
-class VISCL_EXPORT matrix3x3
-{
-public:
-  cl_float3 row0;
-  cl_float3 row1;
-  cl_float3 row2;
-};
-
-}
-
+// Visibility macros
+#if defined(_WIN32) || defined(_WIN64)
+# define VISCL_EXPORT __declspec(dllexport)
+# define VISCL_IMPORT __declspec(dllimport)
+# define VISCL_NO_EXPORT
+#elif defined(VISCL_HAVE_GCC_VISIBILITY)
+# define VISCL_EXPORT __attribute__((__visibility__("default")))
+# define VISCL_IMPORT __attribute__((__visibility__("default")))
+# define VISCL_NO_EXPORT __attribute__((__visibility__("hidden")))
+#else
+# define VISCL_EXPORT
+# define VISCL_IMPORT
+# define VISCL_NO_EXPORT
 #endif
+
+
+#endif // VISCL_CONFIG_H_
